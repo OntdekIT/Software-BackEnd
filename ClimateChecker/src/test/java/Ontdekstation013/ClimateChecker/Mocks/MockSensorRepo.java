@@ -21,7 +21,7 @@ public class MockSensorRepo implements SensorRepository {
         this.sensors = new ArrayList<>();
     }
 
-    public void FillDatabase(List<Sensor> sensors){
+    public void fillDatabase(List<Sensor> sensors){
         this.sensors = sensors;
     }
 

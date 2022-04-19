@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @SpringBootTest
@@ -98,15 +99,14 @@ class SensorServiceTests {
 	// No functionality in SensorService
 	@Test
 	void createSensorTest() {
+
 		sensorDto dto = new sensorDto();
 		dto.setId(1);
 		dto.setStationId(6);
 		dto.setTypeId(3);
 		dto.setData(2);
 		sensorService.createSensor(dto);
-
-
-
+		
 		sensorDto newDto = sensorService.findSensorById(1);
 
 		Assertions.assertEquals(dto.getId(), newDto.getId());

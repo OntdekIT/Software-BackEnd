@@ -403,3 +403,165 @@ alter table station add constraint FKguexbm09vbcok067wdao85dw0 foreign key (loca
 2022-04-19 09:45:39 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "STATION" not found; SQL statement:
 alter table station add constraint FKjpfw49q2hwosivlesvqxjy6qo foreign key (userid) references user (userid) [42102-200]
+2022-04-19 11:18:53 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CREATE TABLE LOCATION (LOCATIONID BIGINT NOT NULL AUTO_INCREMENT, LATITUDE FLOAT NOT NULL, LOCATION_NAME VARCHAR(255), LONGITUDE FLOAT NOT NULL, PRIMARY KEY (LOCATIONID)) ENGINE=[*]INNODB"; expected "identifier"; SQL statement:
+create table location (locationid bigint not null auto_increment, latitude float not null, location_name varchar(255), longitude float not null, primary key (locationid)) engine=InnoDB [42001-200]
+2022-04-19 11:18:53 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CREATE TABLE SENSOR (SENSORID BIGINT NOT NULL AUTO_INCREMENT, SENSOR_DATA INTEGER NOT NULL, SENSOR_TYPEID BIGINT, STATIONID BIGINT, PRIMARY KEY (SENSORID)) ENGINE=[*]INNODB"; expected "identifier"; SQL statement:
+create table sensor (sensorid bigint not null auto_increment, sensor_data integer not null, sensor_typeid bigint, stationid bigint, primary key (sensorid)) engine=InnoDB [42001-200]
+2022-04-19 11:18:53 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CREATE TABLE SENSOR_TYPE (TYPEID BIGINT NOT NULL AUTO_INCREMENT, TYPE_NAME VARCHAR(255), PRIMARY KEY (TYPEID)) ENGINE=[*]INNODB"; expected "identifier"; SQL statement:
+create table sensor_type (typeid bigint not null auto_increment, type_name varchar(255), primary key (typeid)) engine=InnoDB [42001-200]
+2022-04-19 11:18:53 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CREATE TABLE STATION (STATIONID BIGINT NOT NULL AUTO_INCREMENT, NAME VARCHAR(255), HEIGHT FLOAT NOT NULL, LOCATION_LOCATIONID BIGINT, USERID BIGINT, PRIMARY KEY (STATIONID)) ENGINE=[*]INNODB"; expected "identifier"; SQL statement:
+create table station (stationid bigint not null auto_increment, name varchar(255), height float not null, location_locationid bigint, userid bigint, primary key (stationid)) engine=InnoDB [42001-200]
+2022-04-19 11:18:53 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CREATE TABLE USER (USERID BIGINT NOT NULL AUTO_INCREMENT, ADMIN TINYINT NOT NULL, MAIL_ADDRESS VARCHAR(255), PASSWORD_HASH TINYINT, PASSWORD_SALT TINYINT, USER_NAME VARCHAR(255), PRIMARY KEY (USERID)) ENGINE=[*]INNODB"; expected "identifier"; SQL statement:
+create table user (userid bigint not null auto_increment, admin tinyint not null, mail_address varchar(255), password_hash tinyint, password_salt tinyint, user_name varchar(255), primary key (userid)) engine=InnoDB [42001-200]
+2022-04-19 11:18:53 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SENSOR" not found; SQL statement:
+alter table sensor add constraint FKokblxlilng14k37vbnax547yi foreign key (sensor_typeid) references sensor_type (typeid) [42102-200]
+2022-04-19 11:18:53 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SENSOR" not found; SQL statement:
+alter table sensor add constraint FK73l0iai9750tbfx3p3i1jtty6 foreign key (stationid) references station (stationid) [42102-200]
+2022-04-19 11:18:53 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "STATION" not found; SQL statement:
+alter table station add constraint FKguexbm09vbcok067wdao85dw0 foreign key (location_locationid) references location (locationid) [42102-200]
+2022-04-19 11:18:53 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "STATION" not found; SQL statement:
+alter table station add constraint FKjpfw49q2hwosivlesvqxjy6qo foreign key (userid) references user (userid) [42102-200]
+2022-04-19 11:24:06 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CREATE TABLE LOCATION (LOCATIONID BIGINT NOT NULL AUTO_INCREMENT, LATITUDE FLOAT NOT NULL, LOCATION_NAME VARCHAR(255), LONGITUDE FLOAT NOT NULL, PRIMARY KEY (LOCATIONID)) ENGINE=[*]INNODB"; expected "identifier"; SQL statement:
+create table location (locationid bigint not null auto_increment, latitude float not null, location_name varchar(255), longitude float not null, primary key (locationid)) engine=InnoDB [42001-200]
+2022-04-19 11:24:06 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CREATE TABLE SENSOR (SENSORID BIGINT NOT NULL AUTO_INCREMENT, SENSOR_DATA INTEGER NOT NULL, SENSOR_TYPEID BIGINT, STATIONID BIGINT, PRIMARY KEY (SENSORID)) ENGINE=[*]INNODB"; expected "identifier"; SQL statement:
+create table sensor (sensorid bigint not null auto_increment, sensor_data integer not null, sensor_typeid bigint, stationid bigint, primary key (sensorid)) engine=InnoDB [42001-200]
+2022-04-19 11:24:06 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CREATE TABLE SENSOR_TYPE (TYPEID BIGINT NOT NULL AUTO_INCREMENT, TYPE_NAME VARCHAR(255), PRIMARY KEY (TYPEID)) ENGINE=[*]INNODB"; expected "identifier"; SQL statement:
+create table sensor_type (typeid bigint not null auto_increment, type_name varchar(255), primary key (typeid)) engine=InnoDB [42001-200]
+2022-04-19 11:24:06 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CREATE TABLE STATION (STATIONID BIGINT NOT NULL AUTO_INCREMENT, NAME VARCHAR(255), HEIGHT FLOAT NOT NULL, LOCATION_LOCATIONID BIGINT, USERID BIGINT, PRIMARY KEY (STATIONID)) ENGINE=[*]INNODB"; expected "identifier"; SQL statement:
+create table station (stationid bigint not null auto_increment, name varchar(255), height float not null, location_locationid bigint, userid bigint, primary key (stationid)) engine=InnoDB [42001-200]
+2022-04-19 11:24:06 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CREATE TABLE USER (USERID BIGINT NOT NULL AUTO_INCREMENT, ADMIN TINYINT NOT NULL, MAIL_ADDRESS VARCHAR(255), PASSWORD_HASH TINYINT, PASSWORD_SALT TINYINT, USER_NAME VARCHAR(255), PRIMARY KEY (USERID)) ENGINE=[*]INNODB"; expected "identifier"; SQL statement:
+create table user (userid bigint not null auto_increment, admin tinyint not null, mail_address varchar(255), password_hash tinyint, password_salt tinyint, user_name varchar(255), primary key (userid)) engine=InnoDB [42001-200]
+2022-04-19 11:24:06 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SENSOR" not found; SQL statement:
+alter table sensor add constraint FKokblxlilng14k37vbnax547yi foreign key (sensor_typeid) references sensor_type (typeid) [42102-200]
+2022-04-19 11:24:06 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SENSOR" not found; SQL statement:
+alter table sensor add constraint FK73l0iai9750tbfx3p3i1jtty6 foreign key (stationid) references station (stationid) [42102-200]
+2022-04-19 11:24:06 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "STATION" not found; SQL statement:
+alter table station add constraint FKguexbm09vbcok067wdao85dw0 foreign key (location_locationid) references location (locationid) [42102-200]
+2022-04-19 11:24:06 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "STATION" not found; SQL statement:
+alter table station add constraint FKjpfw49q2hwosivlesvqxjy6qo foreign key (userid) references user (userid) [42102-200]
+2022-04-19 11:28:28 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CREATE TABLE LOCATION (LOCATIONID BIGINT NOT NULL AUTO_INCREMENT, LATITUDE FLOAT NOT NULL, LOCATION_NAME VARCHAR(255), LONGITUDE FLOAT NOT NULL, PRIMARY KEY (LOCATIONID)) ENGINE=[*]INNODB"; expected "identifier"; SQL statement:
+create table location (locationid bigint not null auto_increment, latitude float not null, location_name varchar(255), longitude float not null, primary key (locationid)) engine=InnoDB [42001-200]
+2022-04-19 11:28:28 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CREATE TABLE SENSOR (SENSORID BIGINT NOT NULL AUTO_INCREMENT, SENSOR_DATA INTEGER NOT NULL, SENSOR_TYPEID BIGINT, STATIONID BIGINT, PRIMARY KEY (SENSORID)) ENGINE=[*]INNODB"; expected "identifier"; SQL statement:
+create table sensor (sensorid bigint not null auto_increment, sensor_data integer not null, sensor_typeid bigint, stationid bigint, primary key (sensorid)) engine=InnoDB [42001-200]
+2022-04-19 11:28:28 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CREATE TABLE SENSOR_TYPE (TYPEID BIGINT NOT NULL AUTO_INCREMENT, TYPE_NAME VARCHAR(255), PRIMARY KEY (TYPEID)) ENGINE=[*]INNODB"; expected "identifier"; SQL statement:
+create table sensor_type (typeid bigint not null auto_increment, type_name varchar(255), primary key (typeid)) engine=InnoDB [42001-200]
+2022-04-19 11:28:28 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CREATE TABLE STATION (STATIONID BIGINT NOT NULL AUTO_INCREMENT, NAME VARCHAR(255), HEIGHT FLOAT NOT NULL, LOCATION_LOCATIONID BIGINT, USERID BIGINT, PRIMARY KEY (STATIONID)) ENGINE=[*]INNODB"; expected "identifier"; SQL statement:
+create table station (stationid bigint not null auto_increment, name varchar(255), height float not null, location_locationid bigint, userid bigint, primary key (stationid)) engine=InnoDB [42001-200]
+2022-04-19 11:28:28 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CREATE TABLE USER (USERID BIGINT NOT NULL AUTO_INCREMENT, ADMIN TINYINT NOT NULL, MAIL_ADDRESS VARCHAR(255), PASSWORD_HASH TINYINT, PASSWORD_SALT TINYINT, USER_NAME VARCHAR(255), PRIMARY KEY (USERID)) ENGINE=[*]INNODB"; expected "identifier"; SQL statement:
+create table user (userid bigint not null auto_increment, admin tinyint not null, mail_address varchar(255), password_hash tinyint, password_salt tinyint, user_name varchar(255), primary key (userid)) engine=InnoDB [42001-200]
+2022-04-19 11:28:28 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SENSOR" not found; SQL statement:
+alter table sensor add constraint FKokblxlilng14k37vbnax547yi foreign key (sensor_typeid) references sensor_type (typeid) [42102-200]
+2022-04-19 11:28:28 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SENSOR" not found; SQL statement:
+alter table sensor add constraint FK73l0iai9750tbfx3p3i1jtty6 foreign key (stationid) references station (stationid) [42102-200]
+2022-04-19 11:28:28 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "STATION" not found; SQL statement:
+alter table station add constraint FKguexbm09vbcok067wdao85dw0 foreign key (location_locationid) references location (locationid) [42102-200]
+2022-04-19 11:28:28 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "STATION" not found; SQL statement:
+alter table station add constraint FKjpfw49q2hwosivlesvqxjy6qo foreign key (userid) references user (userid) [42102-200]
+2022-04-19 11:38:16 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CREATE TABLE LOCATION (LOCATIONID BIGINT NOT NULL AUTO_INCREMENT, LATITUDE FLOAT NOT NULL, LOCATION_NAME VARCHAR(255), LONGITUDE FLOAT NOT NULL, PRIMARY KEY (LOCATIONID)) ENGINE=[*]INNODB"; expected "identifier"; SQL statement:
+create table location (locationid bigint not null auto_increment, latitude float not null, location_name varchar(255), longitude float not null, primary key (locationid)) engine=InnoDB [42001-200]
+2022-04-19 11:38:16 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CREATE TABLE SENSOR (SENSORID BIGINT NOT NULL AUTO_INCREMENT, SENSOR_DATA INTEGER NOT NULL, SENSOR_TYPEID BIGINT, STATIONID BIGINT, PRIMARY KEY (SENSORID)) ENGINE=[*]INNODB"; expected "identifier"; SQL statement:
+create table sensor (sensorid bigint not null auto_increment, sensor_data integer not null, sensor_typeid bigint, stationid bigint, primary key (sensorid)) engine=InnoDB [42001-200]
+2022-04-19 11:38:16 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CREATE TABLE SENSOR_TYPE (TYPEID BIGINT NOT NULL AUTO_INCREMENT, TYPE_NAME VARCHAR(255), PRIMARY KEY (TYPEID)) ENGINE=[*]INNODB"; expected "identifier"; SQL statement:
+create table sensor_type (typeid bigint not null auto_increment, type_name varchar(255), primary key (typeid)) engine=InnoDB [42001-200]
+2022-04-19 11:38:16 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CREATE TABLE STATION (STATIONID BIGINT NOT NULL AUTO_INCREMENT, NAME VARCHAR(255), HEIGHT FLOAT NOT NULL, LOCATION_LOCATIONID BIGINT, USERID BIGINT, PRIMARY KEY (STATIONID)) ENGINE=[*]INNODB"; expected "identifier"; SQL statement:
+create table station (stationid bigint not null auto_increment, name varchar(255), height float not null, location_locationid bigint, userid bigint, primary key (stationid)) engine=InnoDB [42001-200]
+2022-04-19 11:38:16 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CREATE TABLE USER (USERID BIGINT NOT NULL AUTO_INCREMENT, ADMIN TINYINT NOT NULL, MAIL_ADDRESS VARCHAR(255), PASSWORD_HASH TINYINT, PASSWORD_SALT TINYINT, USER_NAME VARCHAR(255), PRIMARY KEY (USERID)) ENGINE=[*]INNODB"; expected "identifier"; SQL statement:
+create table user (userid bigint not null auto_increment, admin tinyint not null, mail_address varchar(255), password_hash tinyint, password_salt tinyint, user_name varchar(255), primary key (userid)) engine=InnoDB [42001-200]
+2022-04-19 11:38:16 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SENSOR" not found; SQL statement:
+alter table sensor add constraint FKokblxlilng14k37vbnax547yi foreign key (sensor_typeid) references sensor_type (typeid) [42102-200]
+2022-04-19 11:38:16 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SENSOR" not found; SQL statement:
+alter table sensor add constraint FK73l0iai9750tbfx3p3i1jtty6 foreign key (stationid) references station (stationid) [42102-200]
+2022-04-19 11:38:16 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "STATION" not found; SQL statement:
+alter table station add constraint FKguexbm09vbcok067wdao85dw0 foreign key (location_locationid) references location (locationid) [42102-200]
+2022-04-19 11:38:16 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "STATION" not found; SQL statement:
+alter table station add constraint FKjpfw49q2hwosivlesvqxjy6qo foreign key (userid) references user (userid) [42102-200]
+2022-04-19 11:40:05 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CREATE TABLE LOCATION (LOCATIONID BIGINT NOT NULL AUTO_INCREMENT, LATITUDE FLOAT NOT NULL, LOCATION_NAME VARCHAR(255), LONGITUDE FLOAT NOT NULL, PRIMARY KEY (LOCATIONID)) ENGINE=[*]INNODB"; expected "identifier"; SQL statement:
+create table location (locationid bigint not null auto_increment, latitude float not null, location_name varchar(255), longitude float not null, primary key (locationid)) engine=InnoDB [42001-200]
+2022-04-19 11:40:06 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CREATE TABLE SENSOR (SENSORID BIGINT NOT NULL AUTO_INCREMENT, SENSOR_DATA INTEGER NOT NULL, SENSOR_TYPEID BIGINT, STATIONID BIGINT, PRIMARY KEY (SENSORID)) ENGINE=[*]INNODB"; expected "identifier"; SQL statement:
+create table sensor (sensorid bigint not null auto_increment, sensor_data integer not null, sensor_typeid bigint, stationid bigint, primary key (sensorid)) engine=InnoDB [42001-200]
+2022-04-19 11:40:06 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CREATE TABLE SENSOR_TYPE (TYPEID BIGINT NOT NULL AUTO_INCREMENT, TYPE_NAME VARCHAR(255), PRIMARY KEY (TYPEID)) ENGINE=[*]INNODB"; expected "identifier"; SQL statement:
+create table sensor_type (typeid bigint not null auto_increment, type_name varchar(255), primary key (typeid)) engine=InnoDB [42001-200]
+2022-04-19 11:40:06 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CREATE TABLE STATION (STATIONID BIGINT NOT NULL AUTO_INCREMENT, NAME VARCHAR(255), HEIGHT FLOAT NOT NULL, LOCATION_LOCATIONID BIGINT, USERID BIGINT, PRIMARY KEY (STATIONID)) ENGINE=[*]INNODB"; expected "identifier"; SQL statement:
+create table station (stationid bigint not null auto_increment, name varchar(255), height float not null, location_locationid bigint, userid bigint, primary key (stationid)) engine=InnoDB [42001-200]
+2022-04-19 11:40:06 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CREATE TABLE USER (USERID BIGINT NOT NULL AUTO_INCREMENT, ADMIN TINYINT NOT NULL, MAIL_ADDRESS VARCHAR(255), PASSWORD_HASH TINYINT, PASSWORD_SALT TINYINT, USER_NAME VARCHAR(255), PRIMARY KEY (USERID)) ENGINE=[*]INNODB"; expected "identifier"; SQL statement:
+create table user (userid bigint not null auto_increment, admin tinyint not null, mail_address varchar(255), password_hash tinyint, password_salt tinyint, user_name varchar(255), primary key (userid)) engine=InnoDB [42001-200]
+2022-04-19 11:40:06 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SENSOR" not found; SQL statement:
+alter table sensor add constraint FKokblxlilng14k37vbnax547yi foreign key (sensor_typeid) references sensor_type (typeid) [42102-200]
+2022-04-19 11:40:06 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SENSOR" not found; SQL statement:
+alter table sensor add constraint FK73l0iai9750tbfx3p3i1jtty6 foreign key (stationid) references station (stationid) [42102-200]
+2022-04-19 11:40:06 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "STATION" not found; SQL statement:
+alter table station add constraint FKguexbm09vbcok067wdao85dw0 foreign key (location_locationid) references location (locationid) [42102-200]
+2022-04-19 11:40:06 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "STATION" not found; SQL statement:
+alter table station add constraint FKjpfw49q2hwosivlesvqxjy6qo foreign key (userid) references user (userid) [42102-200]
+2022-04-19 11:43:31 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CREATE TABLE LOCATION (LOCATIONID BIGINT NOT NULL AUTO_INCREMENT, LATITUDE FLOAT NOT NULL, LOCATION_NAME VARCHAR(255), LONGITUDE FLOAT NOT NULL, PRIMARY KEY (LOCATIONID)) ENGINE=[*]INNODB"; expected "identifier"; SQL statement:
+create table location (locationid bigint not null auto_increment, latitude float not null, location_name varchar(255), longitude float not null, primary key (locationid)) engine=InnoDB [42001-200]
+2022-04-19 11:43:31 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CREATE TABLE SENSOR (SENSORID BIGINT NOT NULL AUTO_INCREMENT, SENSOR_DATA INTEGER NOT NULL, SENSOR_TYPEID BIGINT, STATIONID BIGINT, PRIMARY KEY (SENSORID)) ENGINE=[*]INNODB"; expected "identifier"; SQL statement:
+create table sensor (sensorid bigint not null auto_increment, sensor_data integer not null, sensor_typeid bigint, stationid bigint, primary key (sensorid)) engine=InnoDB [42001-200]
+2022-04-19 11:43:31 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CREATE TABLE SENSOR_TYPE (TYPEID BIGINT NOT NULL AUTO_INCREMENT, TYPE_NAME VARCHAR(255), PRIMARY KEY (TYPEID)) ENGINE=[*]INNODB"; expected "identifier"; SQL statement:
+create table sensor_type (typeid bigint not null auto_increment, type_name varchar(255), primary key (typeid)) engine=InnoDB [42001-200]
+2022-04-19 11:43:31 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CREATE TABLE STATION (STATIONID BIGINT NOT NULL AUTO_INCREMENT, NAME VARCHAR(255), HEIGHT FLOAT NOT NULL, LOCATION_LOCATIONID BIGINT, USERID BIGINT, PRIMARY KEY (STATIONID)) ENGINE=[*]INNODB"; expected "identifier"; SQL statement:
+create table station (stationid bigint not null auto_increment, name varchar(255), height float not null, location_locationid bigint, userid bigint, primary key (stationid)) engine=InnoDB [42001-200]
+2022-04-19 11:43:31 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "CREATE TABLE USER (USERID BIGINT NOT NULL AUTO_INCREMENT, ADMIN TINYINT NOT NULL, MAIL_ADDRESS VARCHAR(255), PASSWORD_HASH TINYINT, PASSWORD_SALT TINYINT, USER_NAME VARCHAR(255), PRIMARY KEY (USERID)) ENGINE=[*]INNODB"; expected "identifier"; SQL statement:
+create table user (userid bigint not null auto_increment, admin tinyint not null, mail_address varchar(255), password_hash tinyint, password_salt tinyint, user_name varchar(255), primary key (userid)) engine=InnoDB [42001-200]
+2022-04-19 11:43:31 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SENSOR" not found; SQL statement:
+alter table sensor add constraint FKokblxlilng14k37vbnax547yi foreign key (sensor_typeid) references sensor_type (typeid) [42102-200]
+2022-04-19 11:43:31 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SENSOR" not found; SQL statement:
+alter table sensor add constraint FK73l0iai9750tbfx3p3i1jtty6 foreign key (stationid) references station (stationid) [42102-200]
+2022-04-19 11:43:31 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "STATION" not found; SQL statement:
+alter table station add constraint FKguexbm09vbcok067wdao85dw0 foreign key (location_locationid) references location (locationid) [42102-200]
+2022-04-19 11:43:31 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "STATION" not found; SQL statement:
+alter table station add constraint FKjpfw49q2hwosivlesvqxjy6qo foreign key (userid) references user (userid) [42102-200]
