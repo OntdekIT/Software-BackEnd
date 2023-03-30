@@ -11,12 +11,16 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.FluentQuery;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
+
 public class MockUserRepo implements UserRepository {
-    public List<User> userList;
+
+public List<User> userList;
+
 
     @Override
     public List<User> findAll() {
@@ -50,6 +54,9 @@ public class MockUserRepo implements UserRepository {
 
     @Override
     public void delete(User entity) {
+        if(userList.contains(entity)){
+            userList.remove(entity);
+        }
 
     }
 
@@ -134,7 +141,13 @@ public class MockUserRepo implements UserRepository {
 
     @Override
     public User getById(Long aLong) {
-        return null;
+        User resultUser = null;
+        for (int i = 0; i < userList.size(); i++) {
+            if(userList.get(i).getUserID() == aLong){
+                resultUser = userList.get(i);
+            }
+        }
+        return resultUser;
     }
 
     @Override
@@ -180,8 +193,14 @@ public class MockUserRepo implements UserRepository {
         this.userList = userList;
     }
 
+
     @Override
-    public boolean existsUserByUserNameOrMailAddress(String Username, String MailAddress) {
+    public boolean existsUserByUserName(String userName) {
+        return false;
+    }
+
+    @Override
+    public boolean existsUserByMailAddress(String mailAddress) {
         return false;
     }
 

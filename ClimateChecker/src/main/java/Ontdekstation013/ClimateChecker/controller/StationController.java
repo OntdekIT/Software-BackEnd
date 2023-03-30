@@ -30,6 +30,7 @@ public class StationController {
     @GetMapping("{stationId}")
     public ResponseEntity<stationDto> getStationById(@PathVariable long stationId) {
         stationDto dto = stationService.findStationById(stationId);
+        // Hoort station bij de userID in JWToken?
         return ResponseEntity.ok(dto);
     }
 

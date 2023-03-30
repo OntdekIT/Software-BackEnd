@@ -1,8 +1,11 @@
 package Ontdekstation013.ClimateChecker;
 
+import Ontdekstation013.ClimateChecker.Mocks.MockSensorRepo;
 import Ontdekstation013.ClimateChecker.Mocks.MockStationRepo;
+import Ontdekstation013.ClimateChecker.Mocks.MockTypeRepo;
 import Ontdekstation013.ClimateChecker.models.*;
 import Ontdekstation013.ClimateChecker.models.dto.*;
+import Ontdekstation013.ClimateChecker.services.SensorService;
 import Ontdekstation013.ClimateChecker.services.StationService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,14 +18,20 @@ import java.util.List;
 @SpringBootTest
 class StationServiceTests {
 	private StationService stationService;
+	private SensorService SensorService;
 	private MockStationRepo mockRepo;
+	private MockSensorRepo mockSensorRepo;
+	private MockTypeRepo mockTypeRepo;
 
 
 
 	@BeforeEach
 	void setup() throws Exception{
 		this.mockRepo = new MockStationRepo();
-		this.stationService = new StationService(mockRepo);
+		this.mockSensorRepo = new MockSensorRepo();
+		this.mockTypeRepo = new MockTypeRepo();
+		this.SensorService = new SensorService(mockSensorRepo, mockTypeRepo);
+		this.stationService = new StationService(mockRepo, SensorService);
 
 
 		List<Station> stations = new ArrayList<>();
