@@ -32,7 +32,7 @@ class UserServiceTests {
 
 		User user = new User();
 
-		// user 1
+		// User 1
 		user.setUserID(1);
 		user.setUserName("name1");
 		user.setMailAddress("mail1");
