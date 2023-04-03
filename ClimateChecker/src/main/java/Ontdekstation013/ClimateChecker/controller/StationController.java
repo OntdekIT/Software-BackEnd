@@ -20,6 +20,7 @@ public class StationController {
     private final StationService stationService;
     private final SensorService sensorService;
 
+
     @Autowired
     public StationController(StationService stationService, SensorService sensorService){
         this.stationService = stationService;
@@ -39,7 +40,7 @@ public class StationController {
     public ResponseEntity<List<stationTitleDto>> getStationsByUserId(@PathVariable long userId) {
 
         List<stationTitleDto> newDtoList = stationService.getAllByUserId(userId);
-        return ResponseEntity.ok(newDtoList);
+            return ResponseEntity.ok(newDtoList);
     }
 
     // get all by page number
@@ -72,7 +73,7 @@ public class StationController {
     }
 
     // create new station
-    @PostMapping
+    @PostMapping("createStation")
     public ResponseEntity<stationDto> createStation(@RequestBody registerStationDto stationDto){
 
         boolean created = stationService.createStation(stationDto);
@@ -98,5 +99,16 @@ public class StationController {
 
         stationService.editStation(stationDto);
         return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
+
+    @GetMapping("/available/{registrationCode}")
+    public boolean checkRegistrationCode(@PathVariable long registrationCode){
+        List<Station> resultStations = stationService.findAllByRegistrationCode(registrationCode);
+        boolean availibility = true;
+
+        if(resultStations.size() > 0){
+            availibility = false;
+        }
+        return availibility;
     }
 }

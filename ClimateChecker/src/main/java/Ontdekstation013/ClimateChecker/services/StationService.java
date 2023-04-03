@@ -48,12 +48,14 @@ public class StationService {
         stationDto newdto = new stationDto();
         newdto.setId(station.getStationID());
         newdto.setName(station.getName());
-        newdto.setHeight(station.getHeight());
+        newdto.setHeight(station.getLocation().getHeight());
+        newdto.setDirection(station.getLocation().getDirection());
         newdto.setLocationId(station.getLocation().getLocationID());
         newdto.setLocationName(station.getLocation().getLocationName());
         newdto.setLatitude(station.getLocation().getLatitude());
         newdto.setLongitude(station.getLocation().getLongitude());
         newdto.setIspublic(station.isPublic());
+        newdto.setIsoutside(station.getLocation().isOutside());
         newdto.setSensors(sensorService.getSensorsByStation(station.getStationID()));
 
         return newdto;
@@ -120,9 +122,10 @@ public class StationService {
         User owner = new User();
         owner.setUserID(stationDto.getUserId());
 
-        Location location = new Location(stationDto.getAddress(), stationDto.getLatitude(), stationDto.getLongitude());
+        Location location = new Location(stationDto.getAddress(), stationDto.getLatitude(), stationDto.getLongitude(), stationDto.getHeight());
+        location.setLocationID(3);
 
-        Station station = new Station(owner, stationDto.getStationname(), stationDto.getHeight(), location, stationDto.isIspublic());
+        Station station = new Station(owner, stationDto.getStationname(), location, stationDto.isIspublic());
 
         stationRepository.save(station);
 
@@ -138,12 +141,16 @@ public class StationService {
         Station currentStation = stationRepository.findById(stationDto.getId()).get();
 
         currentStation.setName(stationDto.getName());
-        currentStation.setHeight(stationDto.getHeight());
         currentStation.setPublic(stationDto.isIspublic());
+        currentStation.setRegistrationCode(stationDto.getRegistrationCode());
 
-        Location location = new Location(stationDto.getAddress(), stationDto.getLatitude(), stationDto.getLongitude());
+        Location location = new Location(stationDto.getAddress(), stationDto.getLatitude(), stationDto.getLongitude(), stationDto.getHeight());
         currentStation.setLocation(location);
 
         stationRepository.save(currentStation);
+    }
+
+    public List<Station> findAllByRegistrationCode(long registrationCode){
+        return stationRepository.findAllByRegistrationCode(registrationCode);
     }
 }

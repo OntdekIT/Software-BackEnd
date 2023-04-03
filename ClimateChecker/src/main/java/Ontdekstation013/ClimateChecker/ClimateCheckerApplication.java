@@ -121,13 +121,13 @@ public class ClimateCheckerApplication {
 			//Seed Location
 			List<Location> locations = new ArrayList<>();
 
-			locations.add(new Location(1L, "Reeshof",  (float)51.581124, (float)4.994231));
-			locations.add(new Location(2L, "Reeshof",  (float)51.575043, (float)5.002305));
-			locations.add(new Location(3L, "Stappegoor",  (float)51.539151, (float)5.079001));
-			locations.add(new Location(4L, "Besterd",  (float)51.56664652915646, (float)5.0888906124543665));
-			locations.add(new Location(5L, "Wagnerplein",  (float)51.58398517610992, (float)5.086270119955303));
-			locations.add(new Location(6L, "013 Poppodium",  (float)51.55800402393493, (float)5.092794917662567));
-			locations.add(new Location(7L, "Heikantlaan",  (float)51.58102914210408, (float)5.092454772670171));
+			locations.add(new Location(1L, "Reeshof",  (float)51.581124, (float)4.994231, (float) 1.0, "N"));
+			locations.add(new Location(2L, "Reeshof",  (float)51.575043, (float)5.002305, (float) 6.0, "E"));
+			locations.add(new Location(3L, "Stappegoor",  (float)51.539151, (float)5.079001, (float) 38.2, "N"));
+			locations.add(new Location(4L, "Besterd",  (float)51.56664652915646, (float)5.0888906124543665, (float) 2.0, "E"));
+			locations.add(new Location(5L, "Wagnerplein",  (float)51.58398517610992, (float)5.086270119955303, (float) 4.0,"S"));
+			locations.add(new Location(6L, "013 Poppodium",  (float)51.55800402393493, (float)5.092794917662567, (float) 10.0,"W"));
+			locations.add(new Location(7L, "Heikantlaan",  (float)51.58102914210408, (float)5.092454772670171, (float) 10.0,"E"));
 
 			for (Location location : locations) {
 				locationRepository.save(location);
@@ -136,13 +136,13 @@ public class ClimateCheckerApplication {
 			//Seed Station
 			List<Station> stations = new ArrayList<>();
 
-			stations.add(new Station(1L, "Voortuin", (float) 1.0, locations.get(0), users.get(0), true));
-			stations.add(new Station(2L, "Industrieterrein", (float) 6.0, locations.get(1), users.get(0), false));
-			stations.add(new Station(3L, "Fontys dak", (float) 38.2, locations.get(2), users.get(1), true));
-			stations.add(new Station(4L, "Besterdplein", (float) 2.0, locations.get(3), users.get(1), true));
-			stations.add(new Station(5L, "Wagnerplein", (float) 4.0, locations.get(4), users.get(2), true));
-			stations.add(new Station(6L, "013 Poppodium", (float) 10.0, locations.get(5), users.get(3), true));
-			stations.add(new Station(7L, "Heikantlaan", (float) 10.0, locations.get(6), users.get(4), true));
+			stations.add(new Station(1L, 4,"Voortuin", locations.get(0), users.get(0), true));
+			stations.add(new Station(2L, 60,"Industrieterrein", locations.get(1), users.get(0), false));
+			stations.add(new Station(3L, 33,"Fontys dak", locations.get(2), users.get(1), true));
+			stations.add(new Station(4L, 2,"Besterdplein", locations.get(3), users.get(1), true));
+			stations.add(new Station(5L, 11,"Wagnerplein", locations.get(4), users.get(2), true));
+			stations.add(new Station(6L, 98,"013 Poppodium", locations.get(5), users.get(3), true));
+			stations.add(new Station(7L, 51,"Heikantlaan", locations.get(6), users.get(4), true));
 
 			for (Station station : stations) {
 				stationRepository.save(station);

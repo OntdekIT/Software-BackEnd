@@ -9,6 +9,7 @@ public class editStationDto extends Dto{
 
     long Id;
     String name;
+    long registrationCode;
     float height;
     String address;
     float latitude;

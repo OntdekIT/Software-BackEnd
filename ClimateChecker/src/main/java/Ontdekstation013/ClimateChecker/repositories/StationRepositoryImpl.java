@@ -12,4 +12,10 @@ public class StationRepositoryImpl implements StationRepositoryCustom{
 
         return stations;
     }
+
+    public List<Station> findAllByRegistrationCode(long registrationCode){
+        List<Station> stations = new ArrayList<>();
+
+        return stations;
+    }
 }

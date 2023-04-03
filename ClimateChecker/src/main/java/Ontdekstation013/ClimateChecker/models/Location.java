@@ -25,6 +25,11 @@ public class Location {
 
     @NotBlank
     private float longitude;
+    private float height;
+
+    private String direction;
+
+    private boolean isOutside;
 
     @OneToOne(mappedBy = "location")
     private Station station;
@@ -40,16 +45,19 @@ public class Location {
     }
 
 
-    public Location(long id, String locationName, float latitude, float longitude){
+    public Location(long id, String locationName, float latitude, float longitude, float height, String direction){
         this.LocationID = id;
         this.locationName = locationName;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.height = height;
+        this.direction = direction;
     }
 
-    public Location(String locationName, float latitude, float longitude){
+    public Location(String locationName, float latitude, float longitude, float height){
         this.locationName = locationName;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.height = height;
     }
 }

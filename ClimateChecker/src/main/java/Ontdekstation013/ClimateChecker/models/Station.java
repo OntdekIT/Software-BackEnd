@@ -29,39 +29,48 @@ public class Station {
     @JoinColumn(name = "userID")
     private User owner;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    private Location location;
+    private long registrationCode;
 
-    private float height;
+    @OneToOne(cascade = CascadeType.MERGE)
+    private Location location;
 
     private String Name;
 
     private boolean isPublic;
 
-    public Station(long id, List<Sensor> sensors, User owner, Location location, float height, String name, boolean isPublic) {
+
+    public Station(long id, List<Sensor> sensors, User owner, Location location, String name, boolean isPublic) {
         this.StationID = id;
         this.sensors = sensors;
         this.owner = owner;
         this.location = location;
-        this.height = height;
         this.Name = name;
         this.isPublic = isPublic;
     }
 
-    public Station(User owner, String name, float height, Location location, boolean isPublic) {
+    public Station(User owner, String name, Location location, boolean isPublic) {
         this.owner = owner;
         this.location = location;
-        this.height = height;
         this.Name = name;
         this.isPublic = isPublic;
     }
 
-    public Station(long id, String name, float height, Location location, User owner, boolean isPublic){
+    public Station(long id, String name, Location location, User owner, boolean isPublic){
         this.StationID = id;
         this.Name = name;
-        this.height = height;
         this.location = location;
         this.owner = owner;
         this.isPublic = isPublic;
     }
+
+    public Station(long id, long registrationCode, String name, Location location, User owner, boolean isPublic){
+        this.StationID = id;
+        this.registrationCode = registrationCode;
+        this.Name = name;
+        this.location = location;
+        this.owner = owner;
+        this.isPublic = isPublic;
+    }
+
+
 }

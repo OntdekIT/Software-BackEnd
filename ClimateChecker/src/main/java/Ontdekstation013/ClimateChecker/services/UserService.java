@@ -251,4 +251,6 @@ public class UserService {
         String domain = "http://localhost:8082/";
         return (domain + "api/User/verify" + "?linkHash=" + token.getLinkHash() + "&oldEmail=" + token.getUser().getMailAddress() + "&newEmail=" + newEmail);
     }
+
+
 }
