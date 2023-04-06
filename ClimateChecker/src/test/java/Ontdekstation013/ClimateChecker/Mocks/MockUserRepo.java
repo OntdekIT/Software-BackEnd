@@ -180,8 +180,17 @@ public class MockUserRepo implements UserRepository {
         this.userList = userList;
     }
 
-    @Override
     public boolean existsUserByUserNameOrMailAddress(String Username, String MailAddress) {
+        return false;
+    }
+
+    @Override
+    public boolean existsUserByUserName(String userName) {
+        return false;
+    }
+
+    @Override
+    public boolean existsUserByMailAddress(String mailAddress) {
         return false;
     }
 

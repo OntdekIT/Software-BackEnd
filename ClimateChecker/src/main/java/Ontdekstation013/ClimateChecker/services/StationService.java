@@ -14,49 +14,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import Ontdekstation013.ClimateChecker.services.converters.*;
 
 @Service
 public class StationService {
 
     private final StationRepository stationRepository;
 
-    private final SensorService sensorService;
+    public final SensorService sensorService;
+    private final StationConverter stationConverter;
 
     @Autowired
     public StationService(StationRepository stationRepository, SensorService sensorService) {
         this.stationRepository = stationRepository;
         this.sensorService = sensorService;
+        this.stationConverter = new StationConverter(sensorService);
     }
 
     public stationDto findStationById(long id) {
         Station station = stationRepository.findById(id).get();
-        stationDto newdto = stationToStationDTO(station);
-        return newdto;
-    }
 
-    public stationTitleDto stationToStationTitleDTo (Station station){
-        stationTitleDto newdto = new stationTitleDto();
-        newdto.setId(station.getStationID());
-        newdto.setName(station.getName());
-
-
-        return newdto;
-    }
-
-
-    public stationDto stationToStationDTO (Station station){
-        stationDto newdto = new stationDto();
-        newdto.setId(station.getStationID());
-        newdto.setName(station.getName());
-        newdto.setHeight(station.getHeight());
-        newdto.setLocationId(station.getLocation().getLocationID());
-        newdto.setLocationName(station.getLocation().getLocationName());
-        newdto.setLatitude(station.getLocation().getLatitude());
-        newdto.setLongitude(station.getLocation().getLongitude());
-        newdto.setIspublic(station.isPublic());
-        newdto.setSensors(sensorService.getSensorsByStation(station.getStationID()));
-
-        return newdto;
+        return stationConverter.stationToStationDTO(station);
     }
 
     public List<stationTitleDto> getAllByUserId(long userId) {
@@ -66,7 +44,7 @@ public class StationService {
         for (Station station: stationList
         ) {
 
-            newDtoList.add(stationToStationTitleDTo(station));
+            newDtoList.add(stationConverter.stationToStationTitleDTo(station));
 
         }
 
@@ -80,7 +58,7 @@ public class StationService {
         for (Station station: StationList
         ) {
 
-            newDtoList.add(stationToStationTitleDTo(station));
+            newDtoList.add(stationConverter.stationToStationTitleDTo(station));
 
         }
 
@@ -93,7 +71,7 @@ public class StationService {
         List<stationDto> newDtoList = new ArrayList<>();
         for (Station station: StationList)
         {
-            newDtoList.add(stationToStationDTO(station));
+            newDtoList.add(stationConverter.stationToStationDTO(station));
         }
         return newDtoList;
     }

@@ -3,7 +3,9 @@ package Ontdekstation013.ClimateChecker;
 import Ontdekstation013.ClimateChecker.Mocks.MockStationRepo;
 import Ontdekstation013.ClimateChecker.models.*;
 import Ontdekstation013.ClimateChecker.models.dto.*;
+import Ontdekstation013.ClimateChecker.services.SensorService;
 import Ontdekstation013.ClimateChecker.services.StationService;
+import Ontdekstation013.ClimateChecker.services.converters.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,13 +18,15 @@ import java.util.List;
 class StationServiceTests {
 	private StationService stationService;
 	private MockStationRepo mockRepo;
+	private StationConverter stationConverter;
 
 
 
 	@BeforeEach
 	void setup() throws Exception{
 		this.mockRepo = new MockStationRepo();
-		this.stationService = new StationService(mockRepo);
+		this.stationService = new StationService(mockRepo, stationService.sensorService);
+		this.stationConverter = new StationConverter(stationService.sensorService);
 
 
 		List<Station> stations = new ArrayList<>();
@@ -110,7 +114,7 @@ class StationServiceTests {
 		station.setSensors(new ArrayList<>());
 		station.setPublic(true);
 
-		stationDto newDto = stationService.stationToStationDTO(station);
+		stationDto newDto = stationConverter.stationToStationDTO(station);
 
 		Assertions.assertEquals(station.getStationID(),newDto.getId());
 		Assertions.assertEquals(station.getHeight(),newDto.getHeight());
