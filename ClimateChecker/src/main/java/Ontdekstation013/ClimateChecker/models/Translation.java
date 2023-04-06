@@ -12,7 +12,7 @@ import javax.persistence.Id;
 public class Translation {
 
     @Id
-    private int ID;
+//    private int ID;
     private String BoksID;
     private String Text;
 

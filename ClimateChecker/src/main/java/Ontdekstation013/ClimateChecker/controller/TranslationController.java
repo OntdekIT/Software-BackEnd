@@ -21,7 +21,7 @@ public class TranslationController {
     private TranslationService _translationService;
 
     @GetMapping(value = "/Page", params = {"_language", "_pageID"})
-    public TranslationPage getTranslationPage(@RequestParam String _language, @RequestParam String _pageID){
+    public List<Translation> getTranslationPage(@RequestParam String _language, @RequestParam String _pageID){
 
         return _translationService.getTranslationPage(_language, _pageID);
     }
