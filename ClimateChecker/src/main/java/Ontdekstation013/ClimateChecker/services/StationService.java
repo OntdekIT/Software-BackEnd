@@ -19,8 +19,8 @@ import org.springframework.stereotype.Service;
 public class StationService {
 
     private final StationRepository stationRepository;
-
     private final SensorService sensorService;
+
 
     @Autowired
     public StationService(StationRepository stationRepository, SensorService sensorService) {
@@ -31,6 +31,15 @@ public class StationService {
     public stationDto findStationById(long id) {
         Station station = stationRepository.findById(id).get();
         stationDto newdto = stationToStationDTO(station);
+        return newdto;
+    }
+
+    public stationDto findStationByRegistrationCode(long registrationCode) {
+        List<Station> stations = stationRepository.findAllByRegistrationCode(registrationCode);
+        stationDto newdto = null;
+        if(stations.size() > 0){
+            stationToStationDTO(stations.get(0));
+        }
         return newdto;
     }
 
@@ -112,20 +121,13 @@ public class StationService {
     // Returns false if not all information is filled in
     // Returns true if successful
     public boolean createStation(registerStationDto stationDto) {
-
-        if (stationDto.getUserId() < 1 || stationDto.getStationname().equals("")
-                || stationDto.getAddress().equals("")) {
-            return false;
-        }
-
-
         User owner = new User();
         owner.setUserID(stationDto.getUserId());
 
-        Location location = new Location(stationDto.getAddress(), stationDto.getLatitude(), stationDto.getLongitude(), stationDto.getHeight());
+        Location location = new Location(); //stationDto.getHeight()
         location.setLocationID(3);
 
-        Station station = new Station(owner, stationDto.getStationname(), location, stationDto.isIspublic());
+        Station station = new Station();
 
         stationRepository.save(station);
 

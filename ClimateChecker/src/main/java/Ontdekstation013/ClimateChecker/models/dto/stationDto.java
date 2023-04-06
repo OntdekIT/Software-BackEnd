@@ -10,6 +10,7 @@ import java.util.List;
 public class stationDto extends Dto{
 
     long id;
+    long registrationCode;
     String name;
     float height;
     String direction;

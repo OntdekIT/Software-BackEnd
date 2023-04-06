@@ -5,6 +5,7 @@ import Ontdekstation013.ClimateChecker.models.dto.*;
 import Ontdekstation013.ClimateChecker.repositories.StationRepository;
 import Ontdekstation013.ClimateChecker.services.SensorService;
 import Ontdekstation013.ClimateChecker.services.StationService;
+import Ontdekstation013.ClimateChecker.services.ValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,12 +20,14 @@ public class StationController {
 
     private final StationService stationService;
     private final SensorService sensorService;
+    private final ValidationService validationService;
 
 
     @Autowired
-    public StationController(StationService stationService, SensorService sensorService){
+    public StationController(StationService stationService, SensorService sensorService, ValidationService validationService){
         this.stationService = stationService;
         this.sensorService = sensorService;
+        this.validationService = validationService;
     }
 
     // get station based on id
@@ -74,9 +77,18 @@ public class StationController {
 
     // create new station
     @PostMapping("createStation")
-    public ResponseEntity<stationDto> createStation(@RequestBody registerStationDto stationDto){
+    public ResponseEntity<stationDto> createStation(@RequestBody registerStationDto registerStationDto){
+        boolean validated = validationService.validateLongValue(registerStationDto.getUserId(),1,0);
+        validated = validationService.validateStringLength(registerStationDto.getStationName(), 1, 30); // Max stationnaam lengte
 
-        boolean created = stationService.createStation(stationDto);
+        boolean created = false;
+        if (validated){
+/*
+            StationDto stationDto = stationService.findStationByRegistrationCode(registerStationDto.getRegisterCode());
+*/
+            created = stationService.createStation(registerStationDto);
+
+        }
 
         if (created) {
             return ResponseEntity.status(HttpStatus.CREATED).body(null);
