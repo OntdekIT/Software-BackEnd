@@ -76,19 +76,32 @@ public class StationController {
     }
 
     // create new station
-    @PostMapping("createStation")
-    public ResponseEntity<stationDto> createStation(@RequestBody registerStationDto registerStationDto){
-        boolean validated = validationService.validateLongValue(registerStationDto.getUserId(),1,0);
+    @PostMapping("/registerStation")
+    public ResponseEntity<stationDto> registerStation(@RequestBody registerStationDto registerStationDto){
+
+        // Check input
+        boolean validated = false;
+        validated = validationService.validateLongValue(registerStationDto.getUserId(),1,0);
         validated = validationService.validateStringLength(registerStationDto.getStationName(), 1, 30); // Max stationnaam lengte
+
+        // Get station
+        stationService.findStationByRegistrationCode(registerStationDto.getRegisterCode());
+
+        // Update station
+
+
 
         boolean created = false;
         if (validated){
 /*
             StationDto stationDto = stationService.findStationByRegistrationCode(registerStationDto.getRegisterCode());
 */
-            created = stationService.createStation(registerStationDto);
+            created = stationService.registerStation(registerStationDto);
 
         }
+
+
+        // Return locatie id
 
         if (created) {
             return ResponseEntity.status(HttpStatus.CREATED).body(null);
@@ -114,13 +127,27 @@ public class StationController {
     }
 
     @GetMapping("/available/{registrationCode}")
-    public boolean checkRegistrationCode(@PathVariable long registrationCode){
-        List<Station> resultStations = stationService.findAllByRegistrationCode(registrationCode);
-        boolean availibility = true;
+    public ResponseEntity<String> checkRegistrationCode(@PathVariable long registrationCode){
+        List<Station> resultStations = stationService.findByRegistrationCode(registrationCode);
 
         if(resultStations.size() > 0){
-            availibility = false;
+            return new ResponseEntity<>("Registrationcode is not available", HttpStatus.BAD_REQUEST);
         }
-        return availibility;
+        return new ResponseEntity<>("Registrationcode is available", HttpStatus.ACCEPTED);
     }
+
+    @PostMapping("/createStation")
+    public ResponseEntity<String> createStation(@RequestBody createStationDto createStation){
+        boolean succes = stationService.createStation(createStation);
+
+        if (succes){
+            return new ResponseEntity<>("Station created", HttpStatus.CREATED);
+        }
+
+        return new ResponseEntity<>("Station not created", HttpStatus.BAD_REQUEST);
+    }
+
+
+
+
 }

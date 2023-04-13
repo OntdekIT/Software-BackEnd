@@ -120,7 +120,7 @@ public class StationService {
 
     // Returns false if not all information is filled in
     // Returns true if successful
-    public boolean createStation(registerStationDto stationDto) {
+    public boolean registerStation(registerStationDto stationDto) {
         User owner = new User();
         owner.setUserID(stationDto.getUserId());
 
@@ -141,18 +141,30 @@ public class StationService {
 
     public void editStation(editStationDto stationDto) {
         Station currentStation = stationRepository.findById(stationDto.getId()).get();
-
         currentStation.setName(stationDto.getName());
-        currentStation.setPublic(stationDto.isIspublic());
-        currentStation.setRegistrationCode(stationDto.getRegistrationCode());
-
-        Location location = new Location(stationDto.getAddress(), stationDto.getLatitude(), stationDto.getLongitude(), stationDto.getHeight());
-        currentStation.setLocation(location);
+        currentStation.setPublic(stationDto.isPublic());
 
         stationRepository.save(currentStation);
     }
 
-    public List<Station> findAllByRegistrationCode(long registrationCode){
+    public List<Station> findByRegistrationCode(long registrationCode){
         return stationRepository.findAllByRegistrationCode(registrationCode);
     }
+
+    public boolean createStation(createStationDto createStationDto){
+        boolean succes = false;
+        if(createStationDto.getLocationId() > 0 && createStationDto.getRegistrationCode() > 0){
+            Station station = new Station();
+            station.setRegistrationCode(createStationDto.getRegistrationCode());
+
+            Location location = new Location();
+            location.setLocationID(createStationDto.getLocationId());
+            station.setLocation(location);
+
+            stationRepository.save(station);
+            succes = true;
+        }
+        return succes;
+    }
+
 }

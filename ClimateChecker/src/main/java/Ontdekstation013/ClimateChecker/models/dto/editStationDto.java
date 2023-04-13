@@ -9,11 +9,6 @@ public class editStationDto extends Dto{
 
     long Id;
     String name;
+    boolean isPublic;
     long registrationCode;
-    float height;
-    String address;
-    float latitude;
-    float longitude;
-    boolean ispublic;
-
 }

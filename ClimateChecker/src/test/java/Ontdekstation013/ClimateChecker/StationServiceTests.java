@@ -179,7 +179,7 @@ class StationServiceTests {
 
 
 	@Test
-	void createStationTest() {
+	void registerStationTest() {
 		registerStationDto dto = new registerStationDto();
 
 		dto.setUserId(4);
@@ -190,7 +190,7 @@ class StationServiceTests {
 		dto.setAddress("AddressTitle");
 		dto.setIspublic(true);
 
-		Assertions.assertTrue(stationService.createStation(dto));
+		Assertions.assertTrue(stationService.registerStation(dto));
 
 		Station result = mockRepo.stations.get(3);
 
@@ -203,10 +203,10 @@ class StationServiceTests {
 	}
 
 	@Test
-	void createStationTest_ShouldFail() {
+	void registerStationTest_ShouldFail() {
 		registerStationDto dto = new registerStationDto();
 
-		boolean created = stationService.createStation(dto);
+		boolean created = stationService.registerStation(dto);
 
 		Assertions.assertFalse(created);
 	}
