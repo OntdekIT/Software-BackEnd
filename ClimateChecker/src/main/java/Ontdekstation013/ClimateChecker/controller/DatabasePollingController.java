@@ -3,8 +3,11 @@ package Ontdekstation013.ClimateChecker.controller;
 import Ontdekstation013.ClimateChecker.models.Location;
 import Ontdekstation013.ClimateChecker.models.Station;
 import Ontdekstation013.ClimateChecker.models.dto.MeetJeStadCreateStationDto;
+import Ontdekstation013.ClimateChecker.models.dto.createLocationDto;
+import Ontdekstation013.ClimateChecker.models.dto.createStationDto;
 import Ontdekstation013.ClimateChecker.models.dto.stationDto;
 import Ontdekstation013.ClimateChecker.services.DatabasePollingService;
+import Ontdekstation013.ClimateChecker.services.LocationService;
 import Ontdekstation013.ClimateChecker.services.SensorService;
 import Ontdekstation013.ClimateChecker.services.StationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +24,14 @@ public class DatabasePollingController {
 
     private final SensorService sensorService;
     private final StationService stationService;
+    private final LocationService locationService;
     private final DatabasePollingService databasePollingService;
 
     @Autowired
-    public DatabasePollingController(SensorService sensorService, StationService stationService, DatabasePollingService databasePollingService) {
+    public DatabasePollingController(SensorService sensorService, StationService stationService, LocationService locationService, DatabasePollingService databasePollingService) {
         this.sensorService = sensorService;
         this.stationService = stationService;
+        this.locationService = locationService;
         this.databasePollingService = databasePollingService;
     }
 
@@ -58,11 +63,18 @@ public class DatabasePollingController {
             // Nu doen we het zo
             ResponseEntity<String> response = restTemplate.getForEntity(query, String.class);
             MeetJeStadCreateStationDto MJSstation = new MeetJeStadCreateStationDto();
-            MJSstation.GetValuesFromJSONString(response.getBody());
+            MJSstation.GetValuesFromJSONString(response.getBody(), registrationCode);
 
+            createLocationDto locationDto = new createLocationDto();
+            locationDto.setLatitude(MJSstation.latitude);
+            locationDto.setLongitude(MJSstation.longitude);
+            long locationId = locationService.createLocation(locationDto);
 
+            createStationDto createStationDto = new createStationDto();
+            createStationDto.setRegistrationCode(registrationCode);
+            createStationDto.setLocationId(locationId);
 
-//            stationService.createStation()
+            stationService.createStation(createStationDto);
 
             return new ResponseEntity<>("Station has been added to the database", HttpStatus.ACCEPTED);
         }

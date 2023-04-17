@@ -46,9 +46,9 @@ public class LocationController {
 
     @PostMapping()
     public ResponseEntity<String> createLocation(@RequestBody createLocationDto createLocationDto){
-        boolean succes = locationService.createLocation(createLocationDto);
+        long locationId = locationService.createLocation(createLocationDto);
 
-        if(succes){
+        if(locationId > 0){
             return new ResponseEntity<>("Location added", HttpStatus.CREATED);
 
         }

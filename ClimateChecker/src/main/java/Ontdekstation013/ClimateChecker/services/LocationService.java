@@ -44,15 +44,15 @@ public class LocationService {
         return succes;
     }
 
-    public boolean createLocation(createLocationDto createLocationDto){
+    public long createLocation(createLocationDto createLocationDto){
         boolean succes = false;
 
         Location location = new Location();
         location.setLatitude(createLocationDto.getLatitude());
         location.setLongitude(createLocationDto.getLongitude());
-        locationRepository.save(location);
+        Location locationResult = locationRepository.save(location);
         succes = true;
 
-        return succes;
+        return locationResult.getLocationID();
     }
 }

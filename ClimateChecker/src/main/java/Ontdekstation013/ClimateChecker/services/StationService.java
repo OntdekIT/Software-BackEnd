@@ -152,17 +152,17 @@ public class StationService {
     // Zet meetjestad station in de database
     public boolean createStation(createStationDto createStationDto){
         boolean succes = false;
-        if(createStationDto.getLocationId() > 0 && createStationDto.getRegistrationCode() > 0){
-            Station station = new Station();
-            station.setRegistrationCode(createStationDto.getRegistrationCode());
 
-            Location location = new Location();
-            location.setLocationID(createStationDto.getLocationId());
-            station.setLocation(location);
-
-            stationRepository.save(station);
+        Location location = new Location();
+        location.setLocationID(createStationDto.getLocationId());
+        Station station = new Station();
+        station.setRegistrationCode((createStationDto.registrationCode));
+        station.setLocation(location);
+        Station check = stationRepository.save(station);
+        if (check != null){
             succes = true;
         }
+
         return succes;
     }
 
