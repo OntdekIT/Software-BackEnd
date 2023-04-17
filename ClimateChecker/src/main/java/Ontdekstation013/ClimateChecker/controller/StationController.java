@@ -2,7 +2,6 @@ package Ontdekstation013.ClimateChecker.controller;
 
 import Ontdekstation013.ClimateChecker.models.Station;
 import Ontdekstation013.ClimateChecker.models.dto.*;
-import Ontdekstation013.ClimateChecker.repositories.StationRepository;
 import Ontdekstation013.ClimateChecker.services.SensorService;
 import Ontdekstation013.ClimateChecker.services.StationService;
 import Ontdekstation013.ClimateChecker.services.ValidationService;
@@ -136,9 +135,9 @@ public class StationController {
         return new ResponseEntity<>("Registrationcode is available", HttpStatus.ACCEPTED);
     }
 
-    @PostMapping("/createStation")
-    public ResponseEntity<String> createStation(@RequestBody createStationDto createStation){
-        boolean succes = stationService.createStation(createStation);
+    @PostMapping("/registerStation")
+    public ResponseEntity<String> registerStation(@RequestBody createStationDto createStation){
+        boolean succes = stationService.registerStation(createStation);
 
         if (succes){
             return new ResponseEntity<>("Station created", HttpStatus.CREATED);

@@ -1,7 +1,6 @@
 package Ontdekstation013.ClimateChecker.services;
 
 import Ontdekstation013.ClimateChecker.models.Location;
-import Ontdekstation013.ClimateChecker.models.Sensor;
 import Ontdekstation013.ClimateChecker.models.Station;
 
 import java.util.ArrayList;
@@ -11,8 +10,6 @@ import Ontdekstation013.ClimateChecker.models.User;
 import Ontdekstation013.ClimateChecker.models.dto.*;
 import Ontdekstation013.ClimateChecker.repositories.StationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -151,7 +148,7 @@ public class StationService {
         return stationRepository.findAllByRegistrationCode(registrationCode);
     }
 
-    public boolean createStation(createStationDto createStationDto){
+    public boolean registerStation(createStationDto createStationDto){
         boolean succes = false;
         if(createStationDto.getLocationId() > 0 && createStationDto.getRegistrationCode() > 0){
             Station station = new Station();
@@ -166,5 +163,16 @@ public class StationService {
         }
         return succes;
     }
+
+    public boolean createStationByRegistrationCode(long registrationCode){
+        boolean succes = false;
+
+
+        return succes;
+    }
+
+
+
+
 
 }

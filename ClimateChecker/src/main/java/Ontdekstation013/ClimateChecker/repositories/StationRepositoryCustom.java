@@ -11,5 +11,5 @@ public interface StationRepositoryCustom {
     List<Station> findAllByUserId(long userId);
 
     @Query(value = "SELECT * FROM STATION WHERE REGISTRATION_CODE = ?1", nativeQuery = true)
-    List<Station> findAllByRegistrationCode(long registationCode);
+    List<Station> findAllByRegistrationCode(long registrationCode);
 }
