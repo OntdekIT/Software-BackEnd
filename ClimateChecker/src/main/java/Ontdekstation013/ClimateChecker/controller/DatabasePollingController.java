@@ -1,6 +1,8 @@
 package Ontdekstation013.ClimateChecker.controller;
 
-import Ontdekstation013.ClimateChecker.models.dto.sensorDto;
+import Ontdekstation013.ClimateChecker.models.Location;
+import Ontdekstation013.ClimateChecker.models.Station;
+import Ontdekstation013.ClimateChecker.models.dto.MeetJeStadCreateStationDto;
 import Ontdekstation013.ClimateChecker.models.dto.stationDto;
 import Ontdekstation013.ClimateChecker.services.DatabasePollingService;
 import Ontdekstation013.ClimateChecker.services.SensorService;
@@ -9,9 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
-import java.util.Iterator;
-import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/Data")
@@ -43,8 +45,25 @@ public class DatabasePollingController {
 
     @PostMapping("/createStation/{registrationCode}")
     public ResponseEntity<String> createStationByRegistrationCode(@PathVariable long registrationCode){
-        if (stationService.createStationByRegistrationCode(registrationCode)){
+        stationDto station = stationService.findStationByRegistrationCode(registrationCode);
+
+        if (station == null){
             String query = databasePollingService.BuildQueryCreateStationFromMeetJeStad(registrationCode);
+            RestTemplate restTemplate = new RestTemplate();
+
+            // Zo hoort het te werken
+            //ResponseEntity<MeetJeStadCreateStationDto> response = restTemplate.getForEntity(query, MeetJeStadCreateStationDto.class);
+            //MeetJeStadCreateStationDto stationResponse = response.getBody();
+
+            // Nu doen we het zo
+            ResponseEntity<String> response = restTemplate.getForEntity(query, String.class);
+            MeetJeStadCreateStationDto MJSstation = new MeetJeStadCreateStationDto();
+            MJSstation.GetValuesFromJSONString(response.getBody());
+
+
+
+//            stationService.createStation()
+
             return new ResponseEntity<>("Station has been added to the database", HttpStatus.ACCEPTED);
         }
         return new ResponseEntity<>("Unable to add station to the database", HttpStatus.ACCEPTED);

@@ -35,7 +35,7 @@ public class StationService {
         List<Station> stations = stationRepository.findAllByRegistrationCode(registrationCode);
         stationDto newdto = null;
         if(stations.size() > 0){
-            stationToStationDTO(stations.get(0));
+            newdto = stationToStationDTO(stations.get(0));
         }
         return newdto;
     }
@@ -115,8 +115,7 @@ public class StationService {
     }
 
 
-    // Returns false if not all information is filled in
-    // Returns true if successful
+    // Koppel een gebruiker aan bestaan station
     public boolean registerStation(registerStationDto stationDto) {
         User owner = new User();
         owner.setUserID(stationDto.getUserId());
@@ -148,7 +147,10 @@ public class StationService {
         return stationRepository.findAllByRegistrationCode(registrationCode);
     }
 
-    public boolean registerStation(createStationDto createStationDto){
+
+
+    // Zet meetjestad station in de database
+    public boolean createStation(createStationDto createStationDto){
         boolean succes = false;
         if(createStationDto.getLocationId() > 0 && createStationDto.getRegistrationCode() > 0){
             Station station = new Station();
@@ -164,12 +166,7 @@ public class StationService {
         return succes;
     }
 
-    public boolean createStationByRegistrationCode(long registrationCode){
-        boolean succes = false;
 
-
-        return succes;
-    }
 
 
 

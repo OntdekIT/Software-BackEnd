@@ -13,7 +13,7 @@ public class DatabasePollingService {
     public String BuildQueryString(List<Long> registrationCodes, Boolean lastFifteenMinutes){
         String query = new String();
 
-        query.concat("https://meetjestad.net/data/?type=sensor&ids=");
+        query.concat("https://meetjestad.net/data/?type=sensors&ids=");
 
         for(Long registrationCode : registrationCodes)
         {
@@ -43,11 +43,11 @@ public class DatabasePollingService {
 
 
     public String BuildQueryCreateStationFromMeetJeStad(Long registrationCode){
-        String query = new String();
+        String query = new String("https://meetjestad.net/data/?type=sensors&ids="+ registrationCode.toString() +",&format=json&limit=1&exclude=timestamp");
 
-        query.concat("https://meetjestad.net/data/?type=sensor&ids=");
-        query.concat(registrationCode.toString() + ",");
-        query.concat("&format=json&limit=1");
+//        query.concat("https://meetjestad.net/data/?type=sensors&ids=");
+//        query.concat(registrationCode.toString() + ",");
+//        query.concat("&format=json&limit=1");
 
         return query;
     }

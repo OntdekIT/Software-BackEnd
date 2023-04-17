@@ -135,16 +135,16 @@ public class StationController {
         return new ResponseEntity<>("Registrationcode is available", HttpStatus.ACCEPTED);
     }
 
-    @PostMapping("/registerStation")
-    public ResponseEntity<String> registerStation(@RequestBody createStationDto createStation){
-        boolean succes = stationService.registerStation(createStation);
-
-        if (succes){
-            return new ResponseEntity<>("Station created", HttpStatus.CREATED);
-        }
-
-        return new ResponseEntity<>("Station not created", HttpStatus.BAD_REQUEST);
-    }
+//    @PostMapping("/registerStation")
+//    public ResponseEntity<String> registerStation(@RequestBody createStationDto createStation){
+//        boolean succes = stationService.registerStation(createStation);
+//
+//        if (succes){
+//            return new ResponseEntity<>("Station created", HttpStatus.CREATED);
+//        }
+//
+//        return new ResponseEntity<>("Station not created", HttpStatus.BAD_REQUEST);
+//    }
 
 
 
