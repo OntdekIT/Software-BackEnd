@@ -1,4 +1,4 @@
-package Ontdekstation013.ClimateChecker.Services;
+package Ontdekstation013.ClimateChecker.services;
 
 import Ontdekstation013.ClimateChecker.models.Location;
 import Ontdekstation013.ClimateChecker.models.Sensor;
@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import Ontdekstation013.ClimateChecker.Services.converters.*;
+import Ontdekstation013.ClimateChecker.services.converters.*;
 
 @Service
 public class StationService {

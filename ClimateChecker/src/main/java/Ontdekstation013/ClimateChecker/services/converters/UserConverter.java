@@ -1,4 +1,4 @@
-package Ontdekstation013.ClimateChecker.Services.converters;
+package Ontdekstation013.ClimateChecker.services.converters;
 
 import Ontdekstation013.ClimateChecker.models.User;
 import Ontdekstation013.ClimateChecker.models.dto.userDataDto;

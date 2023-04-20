@@ -1,4 +1,4 @@
-package Ontdekstation013.ClimateChecker.Services;
+package Ontdekstation013.ClimateChecker.services;
 import Ontdekstation013.ClimateChecker.exception.BadRequestException;
 import Ontdekstation013.ClimateChecker.exception.ConflictException;
 import Ontdekstation013.ClimateChecker.exception.NotFoundException;
@@ -7,7 +7,7 @@ import Ontdekstation013.ClimateChecker.models.User;
 import Ontdekstation013.ClimateChecker.models.dto.*;
 import Ontdekstation013.ClimateChecker.repositories.TokenRepository;
 import Ontdekstation013.ClimateChecker.repositories.UserRepository;
-import Ontdekstation013.ClimateChecker.Services.converters.UserConverter;
+import Ontdekstation013.ClimateChecker.services.converters.UserConverter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
