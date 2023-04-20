@@ -1,14 +1,12 @@
-package Ontdekstation013.ClimateChecker.services;
+package Ontdekstation013.ClimateChecker.Services;
 
 import Ontdekstation013.ClimateChecker.models.Location;
-import Ontdekstation013.ClimateChecker.models.Station;
 import Ontdekstation013.ClimateChecker.models.dto.createLocationDto;
 import Ontdekstation013.ClimateChecker.models.dto.editLocationDto;
 import Ontdekstation013.ClimateChecker.repositories.LocationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service

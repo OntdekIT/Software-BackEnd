@@ -1,22 +1,18 @@
 package Ontdekstation013.ClimateChecker.controller;
 
-import Ontdekstation013.ClimateChecker.models.Location;
-import Ontdekstation013.ClimateChecker.models.Station;
 import Ontdekstation013.ClimateChecker.models.dto.MeetJeStadCreateStationDto;
 import Ontdekstation013.ClimateChecker.models.dto.createLocationDto;
 import Ontdekstation013.ClimateChecker.models.dto.createStationDto;
 import Ontdekstation013.ClimateChecker.models.dto.stationDto;
-import Ontdekstation013.ClimateChecker.services.DatabasePollingService;
-import Ontdekstation013.ClimateChecker.services.LocationService;
-import Ontdekstation013.ClimateChecker.services.SensorService;
-import Ontdekstation013.ClimateChecker.services.StationService;
+import Ontdekstation013.ClimateChecker.Services.DatabasePollingService;
+import Ontdekstation013.ClimateChecker.Services.LocationService;
+import Ontdekstation013.ClimateChecker.Services.SensorService;
+import Ontdekstation013.ClimateChecker.Services.StationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/Data")
@@ -53,28 +49,28 @@ public class DatabasePollingController {
         stationDto station = stationService.findStationByRegistrationCode(registrationCode);
 
         if (station == null){
-            String query = databasePollingService.BuildQueryCreateStationFromMeetJeStad(registrationCode);
-            RestTemplate restTemplate = new RestTemplate();
-
-            // Zo hoort het te werken
-            //ResponseEntity<MeetJeStadCreateStationDto> response = restTemplate.getForEntity(query, MeetJeStadCreateStationDto.class);
-            //MeetJeStadCreateStationDto stationResponse = response.getBody();
-
-            // Nu doen we het zo
-            ResponseEntity<String> response = restTemplate.getForEntity(query, String.class);
-            MeetJeStadCreateStationDto MJSstation = new MeetJeStadCreateStationDto();
-            MJSstation.GetValuesFromJSONString(response.getBody(), registrationCode);
-
-            createLocationDto locationDto = new createLocationDto();
-            locationDto.setLatitude(MJSstation.latitude);
-            locationDto.setLongitude(MJSstation.longitude);
-            long locationId = locationService.createLocation(locationDto);
-
-            createStationDto createStationDto = new createStationDto();
-            createStationDto.setRegistrationCode(registrationCode);
-            createStationDto.setLocationId(locationId);
-
-            stationService.createStation(createStationDto);
+//            String query = databasePollingService.BuildQueryString(registrationCode);
+//            RestTemplate restTemplate = new RestTemplate();
+//
+//            // Zo hoort het te werken
+//            //ResponseEntity<MeetJeStadCreateStationDto> response = restTemplate.getForEntity(query, MeetJeStadCreateStationDto.class);
+//            //MeetJeStadCreateStationDto stationResponse = response.getBody();
+//
+//            // Nu doen we het zo
+//            ResponseEntity<String> response = restTemplate.getForEntity(query, String.class);
+//            MeetJeStadCreateStationDto MJSstation = new MeetJeStadCreateStationDto();
+//            MJSstation.GetValuesFromJSONString(response.getBody(), registrationCode);
+//
+//            createLocationDto locationDto = new createLocationDto();
+//            locationDto.setLatitude(MJSstation.latitude);
+//            locationDto.setLongitude(MJSstation.longitude);
+//            long locationId = locationService.createLocation(locationDto);
+//
+//            createStationDto createStationDto = new createStationDto();
+//            createStationDto.setRegistrationCode(registrationCode);
+//            createStationDto.setLocationId(locationId);
+//
+//            stationService.createStation(createStationDto);
 
             return new ResponseEntity<>("Station has been added to the database", HttpStatus.ACCEPTED);
         }

@@ -4,7 +4,7 @@ package Ontdekstation013.ClimateChecker.controller;
 import Ontdekstation013.ClimateChecker.models.Location;
 import Ontdekstation013.ClimateChecker.models.dto.createLocationDto;
 import Ontdekstation013.ClimateChecker.models.dto.editLocationDto;
-import Ontdekstation013.ClimateChecker.services.LocationService;
+import Ontdekstation013.ClimateChecker.Services.LocationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

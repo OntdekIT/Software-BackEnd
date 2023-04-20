@@ -3,9 +3,8 @@ package Ontdekstation013.ClimateChecker.controller;
 
 import Ontdekstation013.ClimateChecker.models.Token;
 import Ontdekstation013.ClimateChecker.models.User;
-import Ontdekstation013.ClimateChecker.services.EmailSenderService;
-import Ontdekstation013.ClimateChecker.services.StationService;
-import Ontdekstation013.ClimateChecker.services.UserService;
+import Ontdekstation013.ClimateChecker.Services.EmailSenderService;
+import Ontdekstation013.ClimateChecker.Services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

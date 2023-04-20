@@ -194,4 +194,9 @@ public class MockStationRepo implements StationRepository {
         }
         return stationList;
     }
+
+    @Override
+    public List<Station> findAllByRegistrationCode(long registrationCode) {
+        return null;
+    }
 }

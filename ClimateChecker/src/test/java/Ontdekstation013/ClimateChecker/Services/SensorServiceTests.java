@@ -1,4 +1,4 @@
-package Ontdekstation013.ClimateChecker;
+package Ontdekstation013.ClimateChecker.Services;
 
 import Ontdekstation013.ClimateChecker.Mocks.MockSensorRepo;
 import Ontdekstation013.ClimateChecker.Mocks.MockTypeRepo;
@@ -8,7 +8,6 @@ import Ontdekstation013.ClimateChecker.models.Station;
 import Ontdekstation013.ClimateChecker.models.dto.sensorAverageDto;
 import Ontdekstation013.ClimateChecker.models.dto.sensorDto;
 import Ontdekstation013.ClimateChecker.models.dto.sensorTypeDto;
-import Ontdekstation013.ClimateChecker.services.SensorService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
