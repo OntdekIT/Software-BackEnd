@@ -8,6 +8,8 @@ import Ontdekstation013.ClimateChecker.models.Station;
 import Ontdekstation013.ClimateChecker.models.dto.sensorAverageDto;
 import Ontdekstation013.ClimateChecker.models.dto.sensorDto;
 import Ontdekstation013.ClimateChecker.models.dto.sensorTypeDto;
+import Ontdekstation013.ClimateChecker.services.SensorService;
+import Ontdekstation013.ClimateChecker.services.converters.SensorConverter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,6 +23,7 @@ class SensorServiceTests {
 	private SensorService sensorService;
 	private MockSensorRepo mockRepo;
 	private MockTypeRepo mockTypeRepo;
+	private SensorConverter sensorConverter;
 
 
 
@@ -29,6 +32,7 @@ class SensorServiceTests {
 		this.mockRepo = new MockSensorRepo();
 		this.mockTypeRepo = new MockTypeRepo();
 		this.sensorService = new SensorService(mockRepo, mockTypeRepo);
+		this.sensorConverter = new SensorConverter();
 
 		List<SensorType> sensorTypes = new ArrayList<>();
 
@@ -108,7 +112,7 @@ class SensorServiceTests {
 		sensor.setStation(new Station());
 		sensor.getStation().setStationID(3);
 
-		sensorDto newDto = sensorService.sensorToSensorDTO(sensor);
+		sensorDto newDto = sensorConverter.sensorToSensorDTO(sensor);
 
 		Assertions.assertEquals(0,newDto.getId());
 		Assertions.assertEquals(1,newDto.getData());

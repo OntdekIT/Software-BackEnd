@@ -3,6 +3,7 @@ package Ontdekstation013.ClimateChecker.Services;
 import Ontdekstation013.ClimateChecker.Mocks.MockLocationRepo;
 import Ontdekstation013.ClimateChecker.models.Location;
 import Ontdekstation013.ClimateChecker.models.Station;
+import Ontdekstation013.ClimateChecker.services.LocationService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,7 +29,6 @@ class LocationServiceTests {
 
 		// location 2
 		location.setLocationID(1);
-		location.setLocationName("name1");
 		location.setLatitude(10);
 		location.setLongitude(100);
 
@@ -42,7 +42,6 @@ class LocationServiceTests {
 		location = new Location();
 
 		location.setLocationID(2);
-		location.setLocationName("name2");
 		location.setLatitude(20);
 		location.setLongitude(200);
 
@@ -82,14 +81,12 @@ class LocationServiceTests {
 		List<Location> locations = locationService.getAll();
 
 		Assertions.assertEquals(1, locations.get(0).getLocationID());
-		Assertions.assertEquals("name1", locations.get(0).getLocationName());
 		Assertions.assertEquals(10, locations.get(0).getLatitude());
 		Assertions.assertEquals(100, locations.get(0).getLongitude());
 		Assertions.assertEquals(1000, locations.get(0).getStation().getStationID());
 
 
 		Assertions.assertEquals(2, locations.get(1).getLocationID());
-		Assertions.assertEquals("name2", locations.get(1).getLocationName());
 		Assertions.assertEquals(20, locations.get(1).getLatitude());
 		Assertions.assertEquals(200, locations.get(1).getLongitude());
 		Assertions.assertEquals(2000, locations.get(1).getStation().getStationID());

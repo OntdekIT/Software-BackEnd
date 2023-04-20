@@ -4,6 +4,8 @@ import Ontdekstation013.ClimateChecker.Mocks.MockTokenRepo;
 import Ontdekstation013.ClimateChecker.Mocks.MockUserRepo;
 import Ontdekstation013.ClimateChecker.models.User;
 import Ontdekstation013.ClimateChecker.models.dto.*;
+import Ontdekstation013.ClimateChecker.services.UserService;
+import Ontdekstation013.ClimateChecker.services.converters.UserConverter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,7 +19,7 @@ class UserServiceTests {
 	private UserService userService;
 	private MockUserRepo mockUserRepo;
 	private MockTokenRepo mockTokenRepo;
-
+	private UserConverter userConverter;
 
 	@BeforeEach
 	void setup() throws Exception{
@@ -25,6 +27,7 @@ class UserServiceTests {
 		this.mockTokenRepo = new MockTokenRepo();
 
 		this.userService = new UserService(mockUserRepo, mockTokenRepo);
+		this.userConverter = new UserConverter();
 
 		List<User> userList = new ArrayList<>();
 
@@ -68,7 +71,7 @@ class UserServiceTests {
 		user.setMailAddress("Jan@home.nl");
 
 
-		userDto newDto = userService.userToUserDto(user);
+		userDto newDto = userConverter.userToUserDto(user);
 
 		Assertions.assertEquals(user.getUserName(),newDto.getUserName());
 		Assertions.assertEquals(user.getMailAddress(),newDto.getMailAddress());
