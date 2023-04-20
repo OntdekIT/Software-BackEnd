@@ -1,9 +1,11 @@
-package Ontdekstation013.ClimateChecker.services.converters;
+package Ontdekstation013.ClimateChecker.Services.converters;
 
 import Ontdekstation013.ClimateChecker.models.User;
 import Ontdekstation013.ClimateChecker.models.dto.userDataDto;
 import Ontdekstation013.ClimateChecker.models.dto.userDto;
+import org.springframework.stereotype.Service;
 
+@Service
 public class UserConverter {
     public userDataDto userToUserDataDto (User user){
         userDataDto newdto = new userDataDto();

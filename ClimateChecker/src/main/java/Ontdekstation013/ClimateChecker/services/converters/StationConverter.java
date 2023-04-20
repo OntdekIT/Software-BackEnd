@@ -1,9 +1,11 @@
-package Ontdekstation013.ClimateChecker.services.converters;
+package Ontdekstation013.ClimateChecker.Services.converters;
 
 import Ontdekstation013.ClimateChecker.models.Station;
 import Ontdekstation013.ClimateChecker.models.dto.*;
-import Ontdekstation013.ClimateChecker.services.SensorService;
+import Ontdekstation013.ClimateChecker.Services.SensorService;
+import org.springframework.stereotype.Service;
 
+@Service
 public class StationConverter {
     private final SensorService sensorService;
 

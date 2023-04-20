@@ -8,7 +8,7 @@ import Ontdekstation013.ClimateChecker.models.dto.*;
 import Ontdekstation013.ClimateChecker.services.EmailSenderService;
 //import Ontdekstation013.ClimateChecker.services.MailService;
 import Ontdekstation013.ClimateChecker.services.JWTService;
-import Ontdekstation013.ClimateChecker.services.UserService;
+import Ontdekstation013.ClimateChecker.Services.UserService;
 import ch.qos.logback.core.encoder.EchoEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

@@ -1,4 +1,4 @@
-package Ontdekstation013.ClimateChecker.services;
+package Ontdekstation013.ClimateChecker.Services;
 
 import Ontdekstation013.ClimateChecker.models.Sensor;
 import Ontdekstation013.ClimateChecker.models.SensorType;
@@ -7,7 +7,7 @@ import Ontdekstation013.ClimateChecker.models.dto.sensorAverageDto;
 import Ontdekstation013.ClimateChecker.models.dto.sensorTypeDto;
 import Ontdekstation013.ClimateChecker.repositories.SensorRepository;
 import Ontdekstation013.ClimateChecker.repositories.TypeRepository;
-import Ontdekstation013.ClimateChecker.services.converters.SensorConverter;
+import Ontdekstation013.ClimateChecker.Services.converters.SensorConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
