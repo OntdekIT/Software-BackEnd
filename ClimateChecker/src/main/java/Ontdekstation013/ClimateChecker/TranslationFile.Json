@@ -1,0 +1,13 @@
+{
+  "Nederlands":[
+    {"LoginPage":{
+      "Email": "Email",
+      "Password": "Wachtwoord",
+      "Login": "Inloggen"
+       }
+    },
+    {"StationPage":{}},
+    {"DetailsPage": {}}
+  ],
+  "English": []
+}

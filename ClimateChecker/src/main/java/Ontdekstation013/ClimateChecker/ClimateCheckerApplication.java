@@ -19,8 +19,6 @@ public class ClimateCheckerApplication {
 		SpringApplication.run(ClimateCheckerApplication.class, args);
 	}
 
-
-
 	@Bean
 	CommandLineRunner run(LocationRepository locationRepository, TypeRepository typeRepository, RegionCordsRepository regionCordsRepository, RegionRepository regionRepository, SensorRepository sensorRepository, UserRepository userRepository, StationRepository stationRepository) {
 		return args -> {
