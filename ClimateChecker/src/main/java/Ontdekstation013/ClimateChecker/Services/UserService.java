@@ -1,4 +1,4 @@
-package Ontdekstation013.ClimateChecker.services;
+package Ontdekstation013.ClimateChecker.Services;
 import Ontdekstation013.ClimateChecker.exception.BadRequestException;
 import Ontdekstation013.ClimateChecker.exception.ConflictException;
 import Ontdekstation013.ClimateChecker.exception.NotFoundException;
@@ -235,4 +235,6 @@ public class UserService {
         String domain = "http://localhost:8082/";
         return (domain + "api/User/verify" + "?linkHash=" + token.getLinkHash() + "&oldEmail=" + token.getUser().getMailAddress() + "&newEmail=" + newEmail);
     }
+
+
 }

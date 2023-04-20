@@ -18,38 +18,41 @@ public class Location {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long LocationID;
 
-    private String locationName;
-
     @NotBlank
     private float latitude;
 
     @NotBlank
     private float longitude;
+    private float height;
+
+    private String direction;
+
+    private boolean isOutside;
 
     @OneToOne(mappedBy = "location")
     private Station station;
 
 
 
-    public Location(long id, String locationName, float latitude, float longitude, Station station) {
+    public Location(long id, float latitude, float longitude, Station station) {
         this.LocationID = id;
-        this.locationName = locationName;
         this.latitude = latitude;
         this.longitude = longitude;
         this.station = station;
     }
 
 
-    public Location(long id, String locationName, float latitude, float longitude){
+    public Location(long id, float latitude, float longitude, float height, String direction){
         this.LocationID = id;
-        this.locationName = locationName;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.height = height;
+        this.direction = direction;
     }
 
-    public Location(String locationName, float latitude, float longitude){
-        this.locationName = locationName;
+    public Location(float latitude, float longitude, float height){
         this.latitude = latitude;
         this.longitude = longitude;
+        this.height = height;
     }
 }

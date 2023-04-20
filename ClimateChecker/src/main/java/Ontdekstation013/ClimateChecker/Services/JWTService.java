@@ -1,4 +1,4 @@
-package Ontdekstation013.ClimateChecker.services;
+package Ontdekstation013.ClimateChecker.Services;
 
 import Ontdekstation013.ClimateChecker.models.JwsData;
 import Ontdekstation013.ClimateChecker.models.dto.JwsDTO;
