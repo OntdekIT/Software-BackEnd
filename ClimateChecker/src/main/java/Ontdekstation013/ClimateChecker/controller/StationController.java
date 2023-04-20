@@ -84,7 +84,7 @@ public class StationController {
         validated = validationService.validateStringLength(registerStationDto.getStationName(), 1, 30); // Max stationnaam lengte
 
         // Get station
-        stationService.findStationByRegistrationCode(registerStationDto.getRegisterCode());
+        stationService.findStationByRegistrationCode(registerStationDto.getRegisterCode(), "MJS");
 
         // Update station
 
@@ -127,7 +127,7 @@ public class StationController {
 
     @GetMapping("/available/{registrationCode}")
     public ResponseEntity<String> checkRegistrationCode(@PathVariable long registrationCode){
-        List<Station> resultStations = stationService.findByRegistrationCode(registrationCode);
+        List<Station> resultStations = stationService.findByRegistrationCode(registrationCode, "MJS");
 
         if(resultStations.size() > 0){
             return new ResponseEntity<>("Registrationcode is not available", HttpStatus.BAD_REQUEST);

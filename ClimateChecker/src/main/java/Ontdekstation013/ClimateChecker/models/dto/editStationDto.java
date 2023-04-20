@@ -11,4 +11,5 @@ public class editStationDto extends Dto{
     String name;
     boolean isPublic;
     long registrationCode;
+    String databaseTag;
 }

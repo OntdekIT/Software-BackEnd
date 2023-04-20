@@ -11,6 +11,7 @@ public class stationDto extends Dto{
 
     long id;
     long registrationCode;
+    String databaseTag;
     String name;
     float height;
     String direction;

@@ -1,6 +1,5 @@
 package Ontdekstation013.ClimateChecker.models;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,7 +7,6 @@ import lombok.Setter;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -20,7 +18,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long UserID;
+    private long userID;
 
     @OneToMany(
             mappedBy = "owner",
@@ -45,7 +43,7 @@ public class User {
 
 
     public User(long id, List<Station> stations, String firstName, String lastName, String mailAddress, String userName, boolean Admin) {
-        this.UserID = id;
+        this.userID = id;
         this.stations = stations;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -55,7 +53,7 @@ public class User {
     }
 
     public User(long id, String firstName, String lastName, String mailAddress, String userName, boolean Admin) {
-        this.UserID = id;
+        this.userID = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.userName = userName;
@@ -74,7 +72,7 @@ public class User {
 
 
     public User(String mailAddress, Long id) {
-        this.UserID = id;
+        this.userID = id;
         this.mailAddress = mailAddress;
     }
 }

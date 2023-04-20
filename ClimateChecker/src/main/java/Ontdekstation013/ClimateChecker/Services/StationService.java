@@ -9,18 +9,19 @@ import java.util.List;
 import Ontdekstation013.ClimateChecker.models.User;
 import Ontdekstation013.ClimateChecker.models.dto.*;
 import Ontdekstation013.ClimateChecker.repositories.StationRepository;
+import Ontdekstation013.ClimateChecker.repositories.StationRepositoryCustom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class StationService {
 
-    private final StationRepository stationRepository;
+    private final StationRepositoryCustom stationRepository;
     private final SensorService sensorService;
 
 
     @Autowired
-    public StationService(StationRepository stationRepository, SensorService sensorService) {
+    public StationService(StationRepositoryCustom stationRepository, SensorService sensorService) {
         this.stationRepository = stationRepository;
         this.sensorService = sensorService;
     }
@@ -31,8 +32,8 @@ public class StationService {
         return newdto;
     }
 
-    public stationDto findStationByRegistrationCode(long registrationCode) {
-        List<Station> stations = stationRepository.findAllByRegistrationCode(registrationCode);
+    public stationDto findStationByRegistrationCode(long registrationCode, String databaseTag) {
+        List<Station> stations = stationRepository.findAllByRegistrationCodeAndDatabaseTag(registrationCode, databaseTag);
         stationDto newdto = null;
         if(stations.size() > 0){
             newdto = stationToStationDTO(stations.get(0));
@@ -57,7 +58,6 @@ public class StationService {
         newdto.setHeight(station.getLocation().getHeight());
         newdto.setDirection(station.getLocation().getDirection());
         newdto.setLocationId(station.getLocation().getLocationID());
-        newdto.setLocationName(station.getLocation().getLocationName());
         newdto.setLatitude(station.getLocation().getLatitude());
         newdto.setLongitude(station.getLocation().getLongitude());
         newdto.setIspublic(station.isPublic());
@@ -68,7 +68,7 @@ public class StationService {
     }
 
     public List<stationTitleDto> getAllByUserId(long userId) {
-        Iterable<Station> stationList = stationRepository.findAllByUserId(userId);
+        Iterable<Station> stationList = stationRepository.findAllByOwner_UserID(userId);
 
         List<stationTitleDto> newDtoList = new ArrayList<>();
         for (Station station: stationList
@@ -143,8 +143,8 @@ public class StationService {
         stationRepository.save(currentStation);
     }
 
-    public List<Station> findByRegistrationCode(long registrationCode){
-        return stationRepository.findAllByRegistrationCode(registrationCode);
+    public List<Station> findByRegistrationCode(long registrationCode, String databaseTag){
+        return stationRepository.findAllByRegistrationCodeAndDatabaseTag(registrationCode, databaseTag);
     }
 
 

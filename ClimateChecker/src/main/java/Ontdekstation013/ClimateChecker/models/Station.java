@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 public class Station {
 
-    @Id
+
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long StationID;
 
@@ -29,7 +29,11 @@ public class Station {
     @JoinColumn(name = "userID")
     private User owner;
 
+    @Id
     private long registrationCode;
+
+    // In the case of multiple data sources, a tag is added to the registrationcode. in the case of "MeetJeStad" data, this is MJS[registrationcode]
+    private String databaseTag;
 
     @OneToOne(cascade = CascadeType.MERGE)
     private Location location;

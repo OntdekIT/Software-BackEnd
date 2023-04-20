@@ -3,6 +3,7 @@ package Ontdekstation013.ClimateChecker.Mocks;
 import Ontdekstation013.ClimateChecker.models.Sensor;
 import Ontdekstation013.ClimateChecker.models.Station;
 import Ontdekstation013.ClimateChecker.repositories.StationRepository;
+import Ontdekstation013.ClimateChecker.repositories.StationRepositoryCustom;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-public class MockStationRepo implements StationRepository {
+public class MockStationRepo implements StationRepositoryCustom {
     public List<Station> stations;
 
     public MockStationRepo() {
@@ -181,22 +182,21 @@ public class MockStationRepo implements StationRepository {
         return null;
     }
 
+
     @Override
-    public List<Station> findAllByUserId(long userId) {
+    public List<Station> findAllByOwner_UserID(long userId) {
         List<Station> stationList = new ArrayList<>();
         for (Station station: stations
         ) {
-
             if (station.getOwner().getUserID() == userId){
                 stationList.add(station);
             }
-
         }
         return stationList;
     }
 
     @Override
-    public List<Station> findAllByRegistrationCode(long registrationCode) {
+    public List<Station> findAllByRegistrationCodeAndDatabaseTag(long registrationCode, String databaseTag) {
         return null;
     }
 }

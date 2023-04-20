@@ -9,6 +9,7 @@ public class registerStationDto extends Dto{
 
     long userId;
     long registerCode;
+    String databaseTag;
     String stationName;
     float height;
     String direction;
