@@ -2,9 +2,9 @@ package Ontdekstation013.ClimateChecker.controller;
 
 import Ontdekstation013.ClimateChecker.models.Station;
 import Ontdekstation013.ClimateChecker.models.dto.*;
-import Ontdekstation013.ClimateChecker.Services.SensorService;
-import Ontdekstation013.ClimateChecker.Services.StationService;
-import Ontdekstation013.ClimateChecker.Services.ValidationService;
+import Ontdekstation013.ClimateChecker.services.SensorService;
+import Ontdekstation013.ClimateChecker.services.StationService;
+import Ontdekstation013.ClimateChecker.services.ValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -25,9 +25,7 @@ public class StationConverter {
         stationDto newdto = new stationDto();
         newdto.setId(station.getStationID());
         newdto.setName(station.getName());
-        newdto.setHeight(station.getHeight());
         newdto.setLocationId(station.getLocation().getLocationID());
-        newdto.setLocationName(station.getLocation().getLocationName());
         newdto.setLatitude(station.getLocation().getLatitude());
         newdto.setLongitude(station.getLocation().getLongitude());
         newdto.setIspublic(station.isPublic());
