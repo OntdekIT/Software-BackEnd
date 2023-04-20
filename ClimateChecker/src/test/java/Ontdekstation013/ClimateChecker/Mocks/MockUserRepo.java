@@ -1,8 +1,6 @@
 package Ontdekstation013.ClimateChecker.Mocks;
 
-import Ontdekstation013.ClimateChecker.models.Station;
 import Ontdekstation013.ClimateChecker.models.User;
-import Ontdekstation013.ClimateChecker.repositories.StationRepository;
 import Ontdekstation013.ClimateChecker.repositories.UserRepository;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -15,8 +13,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
+
 public class MockUserRepo implements UserRepository {
-    public List<User> userList;
+
+public List<User> userList;
+
 
     @Override
     public List<User> findAll() {
@@ -50,6 +51,9 @@ public class MockUserRepo implements UserRepository {
 
     @Override
     public void delete(User entity) {
+        if(userList.contains(entity)){
+            userList.remove(entity);
+        }
 
     }
 
@@ -134,7 +138,13 @@ public class MockUserRepo implements UserRepository {
 
     @Override
     public User getById(Long aLong) {
-        return null;
+        User resultUser = null;
+        for (int i = 0; i < userList.size(); i++) {
+            if(userList.get(i).getUserID() == aLong){
+                resultUser = userList.get(i);
+            }
+        }
+        return resultUser;
     }
 
     @Override
@@ -180,9 +190,6 @@ public class MockUserRepo implements UserRepository {
         this.userList = userList;
     }
 
-    public boolean existsUserByUserNameOrMailAddress(String Username, String MailAddress) {
-        return false;
-    }
 
     @Override
     public boolean existsUserByUserName(String userName) {

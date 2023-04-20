@@ -1,11 +1,10 @@
-package Ontdekstation013.ClimateChecker;
+package Ontdekstation013.ClimateChecker.Services;
 
+import Ontdekstation013.ClimateChecker.Mocks.MockSensorRepo;
 import Ontdekstation013.ClimateChecker.Mocks.MockStationRepo;
+import Ontdekstation013.ClimateChecker.Mocks.MockTypeRepo;
 import Ontdekstation013.ClimateChecker.models.*;
 import Ontdekstation013.ClimateChecker.models.dto.*;
-import Ontdekstation013.ClimateChecker.services.SensorService;
-import Ontdekstation013.ClimateChecker.services.StationService;
-import Ontdekstation013.ClimateChecker.services.converters.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,16 +16,20 @@ import java.util.List;
 @SpringBootTest
 class StationServiceTests {
 	private StationService stationService;
+	private SensorService SensorService;
 	private MockStationRepo mockRepo;
-	private StationConverter stationConverter;
+	private MockSensorRepo mockSensorRepo;
+	private MockTypeRepo mockTypeRepo;
 
 
 
 	@BeforeEach
 	void setup() throws Exception{
 		this.mockRepo = new MockStationRepo();
-		this.stationService = new StationService(mockRepo, stationService.sensorService);
-		this.stationConverter = new StationConverter(stationService.sensorService);
+		this.mockSensorRepo = new MockSensorRepo();
+		this.mockTypeRepo = new MockTypeRepo();
+		this.SensorService = new SensorService(mockSensorRepo, mockTypeRepo);
+		this.stationService = new StationService(mockRepo, SensorService);
 
 
 		List<Station> stations = new ArrayList<>();
@@ -37,7 +40,6 @@ class StationServiceTests {
 		// station 1
 		station.setStationID(1);
 		station.setName("name1");
-		station.setHeight(10);
 		station.setPublic(true);
 
 		User user = new User();
@@ -55,7 +57,6 @@ class StationServiceTests {
 		station = new Station();
 		station.setStationID(2);
 		station.setName("name2");
-		station.setHeight(20);
 		station.setPublic(false);
 
 		user = new User();
@@ -73,7 +74,6 @@ class StationServiceTests {
 		station = new Station();
 		station.setStationID(3);
 		station.setName("name3");
-		station.setHeight(30);
 		station.setPublic(true);
 
 		user = new User();
@@ -108,17 +108,15 @@ class StationServiceTests {
 	void stationToStationDTOTest() {
 		Station station = new Station();
 		station.setStationID(1);
-		station.setHeight(2);
 		station.setLocation(new Location());
 		station.setOwner(new User());
 		station.setSensors(new ArrayList<>());
 		station.setPublic(true);
 
-		stationDto newDto = stationConverter.stationToStationDTO(station);
+		stationDto newDto = stationService.stationToStationDTO(station);
 
 		Assertions.assertEquals(station.getStationID(),newDto.getId());
-		Assertions.assertEquals(station.getHeight(),newDto.getHeight());
-		Assertions.assertEquals(station.getLocation().getLocationName(),newDto.getLocationName());
+		Assertions.assertEquals(station.getLocation().getHeight(),newDto.getHeight());
 		Assertions.assertEquals(station.getLocation().getLocationID(),newDto.getLocationId());
 		Assertions.assertEquals(station.getLocation().getLongitude(),newDto.getLongitude());
 		Assertions.assertEquals(station.getLocation().getLatitude(),newDto.getLatitude());
@@ -174,34 +172,28 @@ class StationServiceTests {
 
 
 	@Test
-	void createStationTest() {
+	void registerStationTest() {
 		registerStationDto dto = new registerStationDto();
 
 		dto.setUserId(4);
-		dto.setStationname("nameTest");
+		dto.setStationName("nameTest");
 		dto.setHeight(54);
-		dto.setLatitude(5687);
-		dto.setLongitude(89767);
-		dto.setAddress("AddressTitle");
-		dto.setIspublic(true);
+		dto.setPublic(true);
 
-		Assertions.assertTrue(stationService.createStation(dto));
+		Assertions.assertTrue(stationService.registerStation(dto));
 
 		Station result = mockRepo.stations.get(3);
 
-		Assertions.assertEquals(dto.getStationname(), result.getName());
-		Assertions.assertEquals(dto.getHeight(), result.getHeight());
-		Assertions.assertEquals(dto.getLatitude(), result.getLocation().getLatitude());
-		Assertions.assertEquals(dto.getLongitude(), result.getLocation().getLongitude());
-		Assertions.assertEquals(dto.getAddress(), result.getLocation().getLocationName());
-		Assertions.assertEquals(dto.isIspublic(), result.isPublic());
+		Assertions.assertEquals(dto.getStationName(), result.getName());
+		Assertions.assertEquals(dto.getHeight(), result.getLocation().getHeight());
+		Assertions.assertEquals(dto.isPublic(), result.isPublic());
 	}
 
 	@Test
-	void createStationTest_ShouldFail() {
+	void registerStationTest_ShouldFail() {
 		registerStationDto dto = new registerStationDto();
 
-		boolean created = stationService.createStation(dto);
+		boolean created = stationService.registerStation(dto);
 
 		Assertions.assertFalse(created);
 	}
@@ -224,22 +216,14 @@ class StationServiceTests {
 
 		dto2.setId(3);
 		dto2.setName("TestNameNEW");
-		dto2.setHeight(876);
-		dto2.setLatitude(9843);
-		dto2.setLongitude(8745);
-		dto2.setAddress("NEW");
-		dto2.setIspublic(false);
+		dto2.setPublic(false);
 
 		stationService.editStation(dto2);
 
 		Station result = mockRepo.stations.get(3);
 
 		Assertions.assertEquals(dto2.getName(), result.getName());
-		Assertions.assertEquals(dto2.getHeight(), result.getHeight());
-		Assertions.assertEquals(dto2.getLatitude(), result.getLocation().getLatitude());
-		Assertions.assertEquals(dto2.getLongitude(), result.getLocation().getLongitude());
-		Assertions.assertEquals(dto2.getAddress(), result.getLocation().getLocationName());
-		Assertions.assertEquals(dto2.isIspublic(), result.isPublic());
+		Assertions.assertEquals(dto2.isPublic(), result.isPublic());
 	}
 
 }

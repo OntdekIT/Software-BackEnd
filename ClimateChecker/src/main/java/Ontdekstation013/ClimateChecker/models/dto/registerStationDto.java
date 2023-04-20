@@ -8,10 +8,11 @@ import lombok.Setter;
 public class registerStationDto extends Dto{
 
     long userId;
-    String stationname;
+    long registerCode;
+    String databaseTag;
+    String stationName;
     float height;
-    String address;
-    float latitude;
-    float longitude;
-    boolean ispublic;
+    String direction;
+    boolean isPublic;
+    boolean isOutside;
 }

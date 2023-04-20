@@ -2,13 +2,12 @@ package Ontdekstation013.ClimateChecker.controller;
 
 import Ontdekstation013.ClimateChecker.models.Region;
 import Ontdekstation013.ClimateChecker.models.dto.RegionInfoDto;
-import Ontdekstation013.ClimateChecker.services.RegionCordsService;
-import Ontdekstation013.ClimateChecker.services.RegionService;
+import Ontdekstation013.ClimateChecker.Services.RegionCordsService;
+import Ontdekstation013.ClimateChecker.Services.RegionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 

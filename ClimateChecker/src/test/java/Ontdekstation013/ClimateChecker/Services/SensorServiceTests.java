@@ -1,4 +1,4 @@
-package Ontdekstation013.ClimateChecker;
+package Ontdekstation013.ClimateChecker.Services;
 
 import Ontdekstation013.ClimateChecker.Mocks.MockSensorRepo;
 import Ontdekstation013.ClimateChecker.Mocks.MockTypeRepo;
@@ -8,8 +8,6 @@ import Ontdekstation013.ClimateChecker.models.Station;
 import Ontdekstation013.ClimateChecker.models.dto.sensorAverageDto;
 import Ontdekstation013.ClimateChecker.models.dto.sensorDto;
 import Ontdekstation013.ClimateChecker.models.dto.sensorTypeDto;
-import Ontdekstation013.ClimateChecker.services.SensorService;
-import Ontdekstation013.ClimateChecker.services.converters.SensorConverter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,8 +19,6 @@ import java.util.List;
 @SpringBootTest
 class SensorServiceTests {
 	private SensorService sensorService;
-
-	private SensorConverter sensorConverter;
 	private MockSensorRepo mockRepo;
 	private MockTypeRepo mockTypeRepo;
 
@@ -33,7 +29,6 @@ class SensorServiceTests {
 		this.mockRepo = new MockSensorRepo();
 		this.mockTypeRepo = new MockTypeRepo();
 		this.sensorService = new SensorService(mockRepo, mockTypeRepo);
-		this.sensorConverter = new SensorConverter();
 
 		List<SensorType> sensorTypes = new ArrayList<>();
 
@@ -113,7 +108,7 @@ class SensorServiceTests {
 		sensor.setStation(new Station());
 		sensor.getStation().setStationID(3);
 
-		sensorDto newDto = sensorConverter.sensorToSensorDTO(sensor);
+		sensorDto newDto = sensorService.sensorToSensorDTO(sensor);
 
 		Assertions.assertEquals(0,newDto.getId());
 		Assertions.assertEquals(1,newDto.getData());
