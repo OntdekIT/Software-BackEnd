@@ -16,7 +16,7 @@ public class Station {
 
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long StationID;
+    private long stationID;
 
     @OneToMany(
             mappedBy = "station",
@@ -44,7 +44,7 @@ public class Station {
 
 
     public Station(long id, List<Sensor> sensors, User owner, Location location, String name, boolean isPublic) {
-        this.StationID = id;
+        this.stationID = id;
         this.sensors = sensors;
         this.owner = owner;
         this.location = location;
@@ -60,7 +60,7 @@ public class Station {
     }
 
     public Station(long id, String name, Location location, User owner, boolean isPublic){
-        this.StationID = id;
+        this.stationID = id;
         this.Name = name;
         this.location = location;
         this.owner = owner;
@@ -68,7 +68,7 @@ public class Station {
     }
 
     public Station(long id, long registrationCode, String name, Location location, User owner, boolean isPublic){
-        this.StationID = id;
+        this.stationID = id;
         this.registrationCode = registrationCode;
         this.Name = name;
         this.location = location;

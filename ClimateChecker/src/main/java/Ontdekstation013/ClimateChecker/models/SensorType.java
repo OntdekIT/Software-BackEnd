@@ -18,8 +18,8 @@ public class SensorType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
-    private long TypeID;
-    private String TypeName;
+    private long typeID;
+    private String typeName;
 
     @OneToMany(
             mappedBy = "sensorType",
@@ -32,14 +32,14 @@ public class SensorType {
 
 
     public SensorType(long id, String typeName, List<Sensor> sensors){
-        this.TypeID = id;
-        this.TypeName = typeName;
+        this.typeID = id;
+        this.typeName = typeName;
         this.sensors = sensors;
     }
 
 
     public SensorType(long id, String typeName){
-        this.TypeID = id;
-        this.TypeName = typeName;
+        this.typeID = id;
+        this.typeName = typeName;
     }
 }
