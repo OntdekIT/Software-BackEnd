@@ -1,5 +1,7 @@
 package Ontdekstation013.ClimateChecker.Services;
 
+import Ontdekstation013.ClimateChecker.models.dto.MeetJeStadDto;
+import Ontdekstation013.ClimateChecker.models.dto.stationDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -11,16 +13,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @Tag("Services")
 class DatabasePollingServiceTest {
     private DatabasePollingService service;
+    private MJSValidationService validator;
     private List<Long> registrationCodes;
 
     @BeforeEach
     void setUp(){
-        this.service = new DatabasePollingService();
+        this.validator = new MJSValidationService();
+        this.service = new DatabasePollingService(validator);
 
         registrationCodes = new ArrayList<>();
         registrationCodes.add(378L);
@@ -91,6 +96,22 @@ class DatabasePollingServiceTest {
 
         //Assert
         assertEquals(expected, result);
+    }
+
+    @Test
+    void GetStationToRegister_Pass(){
+        //Act
+        MeetJeStadDto result = service.GetStation(registrationCodes.get(0));
+        //Assert
+        assertEquals(378L, result.id);
+    }
+
+    @Test
+    void GetRecentStations_Pass(){
+        //Act
+        var stations = service.GetAllRecentStations(registrationCodes);
+
+        assertEquals(378L, stations.get(0).id);
     }
 
 }
