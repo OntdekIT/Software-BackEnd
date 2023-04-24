@@ -134,13 +134,13 @@ public class ClimateCheckerApplication {
 			//Seed Station
 			List<Station> stations = new ArrayList<>();
 
-			stations.add(new Station(1L, 4,"Voortuin", locations.get(0), users.get(0), true));
+			stations.add(new Station(1L, 4, "MJS","Voortuin", locations.get(0), users.get(0), true));
 			stations.add(new Station(2L, 60, "MJS",  "Industrieterrein", locations.get(1), users.get(0), false));
-			stations.add(new Station(3L, 33,"Fontys dak", locations.get(2), users.get(1), true));
-			stations.add(new Station(4L, 2,"Besterdplein", locations.get(3), users.get(1), true));
-			stations.add(new Station(5L, 11,"Wagnerplein", locations.get(4), users.get(2), true));
-			stations.add(new Station(6L, 98,"013 Poppodium", locations.get(5), users.get(3), true));
-			stations.add(new Station(7L, 51,"Heikantlaan", locations.get(6), users.get(4), true));
+			stations.add(new Station(3L, 33, "MJS","Fontys dak", locations.get(2), users.get(1), true));
+			stations.add(new Station(4L, 2, "MJS","Besterdplein", locations.get(3), users.get(1), true));
+			stations.add(new Station(5L, 11, "MJS","Wagnerplein", locations.get(4), users.get(2), true));
+			stations.add(new Station(6L, 98, "MJS","013 Poppodium", locations.get(5), users.get(3), true));
+			stations.add(new Station(7L, 51, "MJS","Heikantlaan", locations.get(6), users.get(4), true));
 
 			for (Station station : stations) {
 				stationRepository.save(station);

@@ -232,7 +232,7 @@ class SensorServiceTests {
 	@Test
 	void getSensorByStation(){
 
-		List<sensorDto> newDtoList = sensorService.getSensorsByStation(5);
+		List<sensorDto> newDtoList = sensorService.getSensorsByStationId(5);
 
 		Assertions.assertEquals(newDtoList.get(0).getId() ,1);
 		Assertions.assertEquals(newDtoList.get(0).getTypeId() ,4);

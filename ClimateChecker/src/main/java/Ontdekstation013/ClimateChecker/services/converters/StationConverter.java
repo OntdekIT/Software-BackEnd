@@ -29,7 +29,7 @@ public class StationConverter {
         newdto.setLatitude(station.getLocation().getLatitude());
         newdto.setLongitude(station.getLocation().getLongitude());
         newdto.setIspublic(station.isPublic());
-        newdto.setSensors(sensorService.getSensorsByStation(station.getStationID()));
+        newdto.setSensors(sensorService.getSensorsByStationId(station.getStationID()));
 
         return newdto;
     }

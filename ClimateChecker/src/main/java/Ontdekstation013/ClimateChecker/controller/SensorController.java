@@ -58,7 +58,7 @@ public class SensorController {
     // get all sensors by station
     @GetMapping("station/{stationId}")
     public ResponseEntity<List<sensorDto>> getSensorsByStation(@PathVariable long stationId) {
-        List<sensorDto> dto = sensorService.getSensorsByStation(stationId);
+        List<sensorDto> dto = sensorService.getSensorsByStationId(stationId);
         return ResponseEntity.ok(dto);
     }
 
