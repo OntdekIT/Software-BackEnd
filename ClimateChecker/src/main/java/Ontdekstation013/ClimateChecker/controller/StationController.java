@@ -74,7 +74,7 @@ public class StationController {
         return ResponseEntity.ok(newDtoList);
     }
 
-    // create new station
+    // register new station
     @PostMapping("/registerStation")
     public ResponseEntity<stationDto> registerStation(@RequestBody registerStationDto registerStationDto){
 
@@ -84,24 +84,15 @@ public class StationController {
         validated = validationService.validateStringLength(registerStationDto.getStationName(), 1, 30); // Max stationnaam lengte
 
         // Get station
-        stationService.findStationByRegistrationCode(registerStationDto.getRegisterCode(), "MJS");
+        stationDto station = stationService.findStationByRegistrationCode(registerStationDto.getRegisterCode(), registerStationDto.getDatabaseTag());
 
         // Update station
-
-
-
         boolean created = false;
-        if (validated){
-/*
-            StationDto stationDto = stationService.findStationByRegistrationCode(registerStationDto.getRegisterCode());
-*/
+        if (validated && station != null){
             created = stationService.registerStation(registerStationDto);
-
         }
 
-
         // Return locatie id
-
         if (created) {
             return ResponseEntity.status(HttpStatus.CREATED).body(null);
         }
@@ -127,26 +118,12 @@ public class StationController {
 
     @GetMapping("/available/{registrationCode}")
     public ResponseEntity<String> checkRegistrationCode(@PathVariable long registrationCode){
-        List<Station> resultStations = stationService.findByRegistrationCode(registrationCode, "MJS");
+        Station resultStations = stationService.findByRegistrationCode(registrationCode, "MJS");
 
-        if(resultStations.size() > 0){
+        if(resultStations != null){
             return new ResponseEntity<>("Registrationcode is not available", HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>("Registrationcode is available", HttpStatus.ACCEPTED);
     }
-
-//    @PostMapping("/registerStation")
-//    public ResponseEntity<String> registerStation(@RequestBody createStationDto createStation){
-//        boolean succes = stationService.registerStation(createStation);
-//
-//        if (succes){
-//            return new ResponseEntity<>("Station created", HttpStatus.CREATED);
-//        }
-//
-//        return new ResponseEntity<>("Station not created", HttpStatus.BAD_REQUEST);
-//    }
-
-
-
 
 }

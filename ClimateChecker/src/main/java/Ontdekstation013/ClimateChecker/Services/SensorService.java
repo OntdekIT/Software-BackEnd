@@ -6,6 +6,7 @@ import Ontdekstation013.ClimateChecker.models.dto.sensorDto;
 import Ontdekstation013.ClimateChecker.models.dto.sensorAverageDto;
 import Ontdekstation013.ClimateChecker.models.dto.sensorTypeDto;
 import Ontdekstation013.ClimateChecker.repositories.SensorRepository;
+import Ontdekstation013.ClimateChecker.repositories.SensorRepositoryCustom;
 import Ontdekstation013.ClimateChecker.repositories.TypeRepository;
 import Ontdekstation013.ClimateChecker.services.converters.SensorConverter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,7 @@ import java.util.Locale;
 @Service
 public class SensorService {
 
-    private final SensorRepository sensorRepository;
+    private final SensorRepositoryCustom sensorRepository;
     private TypeRepository typeRepository;
 
     private SensorConverter sensorConverter;
@@ -36,7 +37,7 @@ public class SensorService {
     }
 
     @Autowired
-    public SensorService(SensorRepository sensorRepository, TypeRepository typeRepository) {
+    public SensorService(SensorRepositoryCustom sensorRepository, TypeRepository typeRepository) {
         this.sensorRepository = sensorRepository;
         this.typeRepository = typeRepository;
     }
@@ -144,7 +145,7 @@ public class SensorService {
 
     // not yet functional
     public List<sensorDto> getSensorsByStation(long stationId) {
-        Iterable<Sensor> sensorList = sensorRepository.findAllByStation(stationId);
+        Iterable<Sensor> sensorList = sensorRepository.findByStation_StationID(stationId);
 
         List<sensorDto> newDtoList = new ArrayList<>();
         for (Sensor sensor: sensorList) {

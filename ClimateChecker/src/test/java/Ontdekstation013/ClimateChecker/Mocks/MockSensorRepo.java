@@ -3,6 +3,7 @@ package Ontdekstation013.ClimateChecker.Mocks;
 import Ontdekstation013.ClimateChecker.models.Sensor;
 import Ontdekstation013.ClimateChecker.models.SensorType;
 import Ontdekstation013.ClimateChecker.repositories.SensorRepository;
+import Ontdekstation013.ClimateChecker.repositories.SensorRepositoryCustom;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-public class MockSensorRepo implements SensorRepository {
+public class MockSensorRepo implements SensorRepositoryCustom {
     public List<Sensor> sensors;
 
 
@@ -180,8 +181,9 @@ public class MockSensorRepo implements SensorRepository {
         return false;
     }
 
+
     @Override
-    public List<Sensor> findAllByType(long typeId) {
+    public List<Sensor> findAllBySensorType_TypeID(long typeId) {
         List<Sensor> sensorList = new ArrayList<>();
 
         for (Sensor sensor: sensors
@@ -195,8 +197,9 @@ public class MockSensorRepo implements SensorRepository {
         return sensorList;
     }
 
+
     @Override
-    public List<Sensor> findAllByStation(long stationId) {
+    public List<Sensor> findByStation_StationID(long stationId) {
         List<Sensor> sensorList = new ArrayList<>();
 
         for (Sensor sensor: sensors
