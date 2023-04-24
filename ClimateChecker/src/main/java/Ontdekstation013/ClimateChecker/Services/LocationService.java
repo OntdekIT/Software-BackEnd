@@ -46,8 +46,6 @@ public class LocationService {
         boolean succes = false;
 
         Location location = new Location();
-        location.setLatitude(createLocationDto.getLatitude());
-        location.setLongitude(createLocationDto.getLongitude());
         Location locationResult = locationRepository.save(location);
         succes = true;
 

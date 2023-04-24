@@ -161,8 +161,11 @@ public class StationService {
 
         Location location = new Location();
         location.setLocationID(createStationDto.getLocationId());
+        location.setLongitude(createStationDto.longitude);
+        location.setLatitude(createStationDto.latitude);
         Station station = new Station();
         station.setRegistrationCode((createStationDto.registrationCode));
+        station.setDatabaseTag(createStationDto.databaseTag);
         station.setLocation(location);
         Station check = stationRepository.save(station);
         if (check != null){
