@@ -196,7 +196,7 @@ public class MockStationRepo implements StationRepositoryCustom {
     }
 
     @Override
-    public List<Station> findAllByRegistrationCodeAndDatabaseTag(long registrationCode, String databaseTag) {
+    public Optional<Station> findByRegistrationCodeAndDatabaseTag(long registrationCode, String databaseTag) {
         return null;
     }
 }

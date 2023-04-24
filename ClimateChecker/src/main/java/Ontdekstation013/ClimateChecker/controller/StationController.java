@@ -2,9 +2,9 @@ package Ontdekstation013.ClimateChecker.controller;
 
 import Ontdekstation013.ClimateChecker.models.Station;
 import Ontdekstation013.ClimateChecker.models.dto.*;
-import Ontdekstation013.ClimateChecker.Services.SensorService;
-import Ontdekstation013.ClimateChecker.Services.StationService;
-import Ontdekstation013.ClimateChecker.Services.ValidationService;
+import Ontdekstation013.ClimateChecker.services.SensorService;
+import Ontdekstation013.ClimateChecker.services.StationService;
+import Ontdekstation013.ClimateChecker.services.ValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -74,7 +74,7 @@ public class StationController {
         return ResponseEntity.ok(newDtoList);
     }
 
-    // create new station
+    // register new station
     @PostMapping("/registerStation")
     public ResponseEntity<stationDto> registerStation(@RequestBody registerStationDto registerStationDto){
 
@@ -84,24 +84,15 @@ public class StationController {
         validated = validationService.validateStringLength(registerStationDto.getStationName(), 1, 30); // Max stationnaam lengte
 
         // Get station
-        stationService.findStationByRegistrationCode(registerStationDto.getRegisterCode(), "MJS");
+        stationDto station = stationService.findStationByRegistrationCode(registerStationDto.getRegisterCode(), registerStationDto.getDatabaseTag());
 
         // Update station
-
-
-
         boolean created = false;
-        if (validated){
-/*
-            StationDto stationDto = stationService.findStationByRegistrationCode(registerStationDto.getRegisterCode());
-*/
+        if (validated && station != null){
             created = stationService.registerStation(registerStationDto);
-
         }
 
-
         // Return locatie id
-
         if (created) {
             return ResponseEntity.status(HttpStatus.CREATED).body(null);
         }
@@ -125,28 +116,14 @@ public class StationController {
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
-    @GetMapping("/available/{registrationCode}")
-    public ResponseEntity<String> checkRegistrationCode(@PathVariable long registrationCode){
-        List<Station> resultStations = stationService.findByRegistrationCode(registrationCode, "MJS");
+    @GetMapping("/available")
+    public ResponseEntity<String> checkRegistrationCode(@RequestParam("databaseTag") String databaseTag, @RequestParam("registrationCode") long registrationCode){
+        Station resultStations = stationService.findByRegistrationCode(databaseTag, registrationCode);
 
-        if(resultStations.size() > 0){
+        if(resultStations != null){
             return new ResponseEntity<>("Registrationcode is not available", HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>("Registrationcode is available", HttpStatus.ACCEPTED);
     }
-
-//    @PostMapping("/registerStation")
-//    public ResponseEntity<String> registerStation(@RequestBody createStationDto createStation){
-//        boolean succes = stationService.registerStation(createStation);
-//
-//        if (succes){
-//            return new ResponseEntity<>("Station created", HttpStatus.CREATED);
-//        }
-//
-//        return new ResponseEntity<>("Station not created", HttpStatus.BAD_REQUEST);
-//    }
-
-
-
 
 }

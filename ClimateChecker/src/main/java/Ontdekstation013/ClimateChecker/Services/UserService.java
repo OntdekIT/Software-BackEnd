@@ -1,4 +1,4 @@
-package Ontdekstation013.ClimateChecker.Services;
+package Ontdekstation013.ClimateChecker.services;
 import Ontdekstation013.ClimateChecker.exception.BadRequestException;
 import Ontdekstation013.ClimateChecker.exception.ConflictException;
 import Ontdekstation013.ClimateChecker.exception.NotFoundException;
@@ -7,6 +7,7 @@ import Ontdekstation013.ClimateChecker.models.User;
 import Ontdekstation013.ClimateChecker.models.dto.*;
 import Ontdekstation013.ClimateChecker.repositories.TokenRepository;
 import Ontdekstation013.ClimateChecker.repositories.UserRepository;
+import Ontdekstation013.ClimateChecker.services.converters.UserConverter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -25,38 +26,21 @@ public class UserService {
     private final TokenRepository tokenRepository;
     private PasswordEncoder encoder = new BCryptPasswordEncoder();
 
+    private final UserConverter userConverter;
+
     @Autowired
     public UserService(UserRepository userRepository, TokenRepository tokenRepository) {
         this.userRepository = userRepository;
         this.tokenRepository = tokenRepository;
+        this.userConverter = new UserConverter();
     }
 
     public userDto findUserById(long id) {
         User user = userRepository.findById(id).get();
-        userDto newdto = userToUserDto(user);
+        userDto newdto = userConverter.userToUserDto(user);
         return newdto;
     }
 
-    public userDataDto userToUserDataDto (User user){
-        userDataDto newdto = new userDataDto();
-        newdto.setId(user.getUserID());
-        newdto.setUserName(user.getUserName());
-        newdto.setMailAddress(user.getMailAddress());
-        newdto.setFirstName(user.getFirstName());
-        newdto.setLastName(user.getLastName());
-        newdto.setUserName(user.getUserName());
-        return newdto;
-    }
-
-    public userDto userToUserDto (User user){
-        userDto newdto = new userDto();
-        newdto.setId(user.getUserID());
-        newdto.setMailAddress(user.getMailAddress());
-        newdto.setLastName(user.getLastName());
-        newdto.setFirstName(user.getFirstName());
-        newdto.setUserName(user.getUserName());
-        return newdto;
-    }
 
     // not yet functional
     public List<userDataDto> getAllUsers() {
@@ -64,7 +48,7 @@ public class UserService {
         List<userDataDto> newDtoList = new ArrayList<>();
 
         for (User user: userList) {
-            newDtoList.add(userToUserDataDto(user));
+            newDtoList.add(userConverter.userToUserDataDto(user));
         }
 
         return newDtoList;
@@ -125,7 +109,7 @@ public class UserService {
     public userDto deleteUser(long id) {
         User user = userRepository.getById(id);
         userRepository.deleteById(id);
-        return (userToUserDto(user));
+        return (userConverter.userToUserDto(user));
     }
 
     public User createNewUser(registerDto registerDto) throws Exception {

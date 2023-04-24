@@ -1,4 +1,4 @@
-package Ontdekstation013.ClimateChecker.Services;
+package Ontdekstation013.ClimateChecker.services;
 
 import Ontdekstation013.ClimateChecker.models.Location;
 import Ontdekstation013.ClimateChecker.models.Station;
@@ -6,9 +6,7 @@ import Ontdekstation013.ClimateChecker.models.Station;
 import java.util.ArrayList;
 import java.util.List;
 
-import Ontdekstation013.ClimateChecker.models.User;
 import Ontdekstation013.ClimateChecker.models.dto.*;
-import Ontdekstation013.ClimateChecker.repositories.StationRepository;
 import Ontdekstation013.ClimateChecker.repositories.StationRepositoryCustom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +16,7 @@ public class StationService {
 
     private final StationRepositoryCustom stationRepository;
     private final SensorService sensorService;
+
 
 
     @Autowired
@@ -33,10 +32,10 @@ public class StationService {
     }
 
     public stationDto findStationByRegistrationCode(long registrationCode, String databaseTag) {
-        List<Station> stations = stationRepository.findAllByRegistrationCodeAndDatabaseTag(registrationCode, databaseTag);
+        Station station = stationRepository.findByRegistrationCodeAndDatabaseTag(registrationCode, databaseTag). orElse(null);
         stationDto newdto = null;
-        if(stations.size() > 0){
-            newdto = stationToStationDTO(stations.get(0));
+        if(station != null){
+            newdto = stationToStationDTO(station);
         }
         return newdto;
     }
@@ -62,7 +61,7 @@ public class StationService {
         newdto.setLongitude(station.getLocation().getLongitude());
         newdto.setIspublic(station.isPublic());
         newdto.setIsoutside(station.getLocation().isOutside());
-        newdto.setSensors(sensorService.getSensorsByStation(station.getStationID()));
+        newdto.setSensors(sensorService.getSensorsByStationId(station.getStationID()));
 
         return newdto;
     }
@@ -115,19 +114,26 @@ public class StationService {
     }
 
 
-    // Koppel een gebruiker aan bestaan station
+    // Koppel een gebruiker aan bestaand station
     public boolean registerStation(registerStationDto stationDto) {
-        User owner = new User();
-        owner.setUserID(stationDto.getUserId());
+        Station station = stationRepository.findByRegistrationCodeAndDatabaseTag(stationDto.getRegisterCode(), stationDto.getDatabaseTag()).orElse(null);
 
-        Location location = new Location(); //stationDto.getHeight()
-        location.setLocationID(3);
+        boolean succes = false;
 
-        Station station = new Station();
+        if (station != null){
+            station.getOwner().setUserID(stationDto.getUserId());
+            station.setPublic(stationDto.isPublic());
+            station.setName(stationDto.getStationName());
 
-        stationRepository.save(station);
+            station.getLocation().setHeight(stationDto.getHeight());
+            station.getLocation().setDirection(stationDto.getDirection());
+            station.getLocation().setOutside(stationDto.isOutside());
 
-        return true;
+            stationRepository.save(station);
+            succes = true;
+        }
+
+        return succes;
     }
 
     public void deleteStation(long id) {
@@ -143,8 +149,8 @@ public class StationService {
         stationRepository.save(currentStation);
     }
 
-    public List<Station> findByRegistrationCode(long registrationCode, String databaseTag){
-        return stationRepository.findAllByRegistrationCodeAndDatabaseTag(registrationCode, databaseTag);
+    public Station findByRegistrationCode(String databaseTag, long registrationCode){
+        return stationRepository.findByRegistrationCodeAndDatabaseTag(registrationCode, databaseTag).orElse(null);
     }
 
 
