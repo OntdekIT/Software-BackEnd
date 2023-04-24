@@ -144,7 +144,7 @@ public class SensorService {
     }
 
     // not yet functional
-    public List<sensorDto> getSensorsByStation(long stationId) {
+    public List<sensorDto> getSensorsByStationId(long stationId) {
         Iterable<Sensor> sensorList = sensorRepository.findByStation_StationID(stationId);
 
         List<sensorDto> newDtoList = new ArrayList<>();

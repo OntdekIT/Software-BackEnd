@@ -61,7 +61,7 @@ public class StationService {
         newdto.setLongitude(station.getLocation().getLongitude());
         newdto.setIspublic(station.isPublic());
         newdto.setIsoutside(station.getLocation().isOutside());
-        newdto.setSensors(sensorService.getSensorsByStation(station.getStationID()));
+        newdto.setSensors(sensorService.getSensorsByStationId(station.getStationID()));
 
         return newdto;
     }
