@@ -116,9 +116,9 @@ public class StationController {
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
-    @GetMapping("/available/{registrationCode}")
-    public ResponseEntity<String> checkRegistrationCode(@PathVariable long registrationCode){
-        Station resultStations = stationService.findByRegistrationCode(registrationCode, "MJS");
+    @GetMapping("/available")
+    public ResponseEntity<String> checkRegistrationCode(@RequestParam("databaseTag") String databaseTag, @RequestParam("registrationCode") long registrationCode){
+        Station resultStations = stationService.findByRegistrationCode(databaseTag, registrationCode);
 
         if(resultStations != null){
             return new ResponseEntity<>("Registrationcode is not available", HttpStatus.BAD_REQUEST);

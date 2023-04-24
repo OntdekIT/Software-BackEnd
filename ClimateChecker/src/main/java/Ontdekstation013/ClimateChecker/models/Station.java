@@ -77,4 +77,15 @@ public class Station {
     }
 
 
+    public Station(long id, long registrationCode,String databaseTag, String name, Location location, User owner, boolean isPublic){
+        this.stationID = id;
+        this.registrationCode = registrationCode;
+        this.databaseTag = databaseTag;
+        this.Name = name;
+        this.location = location;
+        this.owner = owner;
+        this.isPublic = isPublic;
+    }
+
+
 }

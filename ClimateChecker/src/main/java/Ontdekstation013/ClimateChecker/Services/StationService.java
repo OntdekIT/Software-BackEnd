@@ -149,7 +149,7 @@ public class StationService {
         stationRepository.save(currentStation);
     }
 
-    public Station findByRegistrationCode(long registrationCode, String databaseTag){
+    public Station findByRegistrationCode(String databaseTag, long registrationCode){
         return stationRepository.findByRegistrationCodeAndDatabaseTag(registrationCode, databaseTag).orElse(null);
     }
 

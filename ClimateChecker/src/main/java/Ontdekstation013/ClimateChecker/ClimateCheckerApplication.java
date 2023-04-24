@@ -135,7 +135,7 @@ public class ClimateCheckerApplication {
 			List<Station> stations = new ArrayList<>();
 
 			stations.add(new Station(1L, 4,"Voortuin", locations.get(0), users.get(0), true));
-			stations.add(new Station(2L, 60,"Industrieterrein", locations.get(1), users.get(0), false));
+			stations.add(new Station(2L, 60, "MJS",  "Industrieterrein", locations.get(1), users.get(0), false));
 			stations.add(new Station(3L, 33,"Fontys dak", locations.get(2), users.get(1), true));
 			stations.add(new Station(4L, 2,"Besterdplein", locations.get(3), users.get(1), true));
 			stations.add(new Station(5L, 11,"Wagnerplein", locations.get(4), users.get(2), true));
