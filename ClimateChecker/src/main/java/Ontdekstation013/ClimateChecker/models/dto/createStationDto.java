@@ -10,4 +10,6 @@ public class createStationDto extends Dto{
     public long registrationCode;
     public String databaseTag;
     public long locationId;
+    public float latitude;
+    public float longitude;
 }

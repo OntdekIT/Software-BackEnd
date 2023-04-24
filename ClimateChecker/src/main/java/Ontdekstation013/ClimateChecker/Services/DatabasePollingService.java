@@ -1,7 +1,9 @@
 package Ontdekstation013.ClimateChecker.services;
 
+import Ontdekstation013.ClimateChecker.services.MJSValidationService;
 import Ontdekstation013.ClimateChecker.models.dto.MeetJeStadDto;
 import Ontdekstation013.ClimateChecker.models.dto.sensorDto;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,7 @@ public class DatabasePollingService {
 
     private MJSValidationService validator;
 
+    @Autowired
     public DatabasePollingService(MJSValidationService validatorService){
         this.validator = validatorService;
     }
@@ -79,7 +82,7 @@ public class DatabasePollingService {
         return query;
     }
 
-    private MeetJeStadDto GetStationToRegister(Long registrationCode){
+    public MeetJeStadDto GetStationToRegister(Long registrationCode){
 
         RestTemplate restTemplate = new RestTemplate();
 
@@ -118,9 +121,9 @@ public class DatabasePollingService {
         }
 
         MeetJeStadDto found = GetStationToRegister(registrationCode);
-
         return found;
     }
+
     public List<MeetJeStadDto> GetAllRecentStations(List<Long> registrationCodes){
         var dtos = GetStationsForData(registrationCodes, true);
 

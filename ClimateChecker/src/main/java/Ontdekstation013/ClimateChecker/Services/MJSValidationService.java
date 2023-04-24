@@ -1,11 +1,13 @@
-package Ontdekstation013.ClimateChecker.Services;
+package Ontdekstation013.ClimateChecker.services;
 
 import Ontdekstation013.ClimateChecker.models.dto.MeetJeStadDto;
+import org.springframework.stereotype.Service;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class MJSValidationService extends ValidationService {
 
     public MeetJeStadDto ValidateDTO(MeetJeStadDto inputDto){
