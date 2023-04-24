@@ -1,14 +1,18 @@
 package Ontdekstation013.ClimateChecker.Services;
 
 import Ontdekstation013.ClimateChecker.models.dto.MeetJeStadDto;
+import Ontdekstation013.ClimateChecker.services.MJSValidationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest
 class MJSValidationServiceTest {
 
     private MJSValidationService validatorService;
