@@ -6,8 +6,10 @@ import Ontdekstation013.ClimateChecker.models.Station;
 import java.util.ArrayList;
 import java.util.List;
 
+import Ontdekstation013.ClimateChecker.models.User;
 import Ontdekstation013.ClimateChecker.models.dto.*;
 import Ontdekstation013.ClimateChecker.repositories.StationRepositoryCustom;
+import Ontdekstation013.ClimateChecker.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,12 +19,13 @@ public class StationService {
     private final StationRepositoryCustom stationRepository;
     private final SensorService sensorService;
 
-
+    private final UserRepository userRepository;
 
     @Autowired
-    public StationService(StationRepositoryCustom stationRepository, SensorService sensorService) {
+    public StationService(StationRepositoryCustom stationRepository, SensorService sensorService, UserRepository userRepository) {
         this.stationRepository = stationRepository;
         this.sensorService = sensorService;
+        this.userRepository = userRepository;
     }
 
     public stationDto findStationById(long id) {
@@ -117,12 +120,12 @@ public class StationService {
     // Koppel een gebruiker aan bestaand station
     public boolean registerStation(registerStationDto stationDto) {
         Station station = stationRepository.findByRegistrationCodeAndDatabaseTag(stationDto.getRegisterCode(), stationDto.getDatabaseTag()).orElse(null);
-
+        User owner = userRepository.findById(stationDto.getUserId()).orElse(null);
         boolean succes = false;
 
-        if (station != null){
-            station.getOwner().setUserID(stationDto.getUserId());
-            station.setPublic(stationDto.isPublic());
+        if (station != null && owner != null){
+            station.setOwner(owner);
+            station.setPublic(stationDto.isPublicInfo());
             station.setName(stationDto.getStationName());
 
             station.getLocation().setHeight(stationDto.getHeight());

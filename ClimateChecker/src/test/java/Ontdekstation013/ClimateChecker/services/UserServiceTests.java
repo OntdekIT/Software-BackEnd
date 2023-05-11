@@ -1,10 +1,9 @@
-package Ontdekstation013.ClimateChecker.Services;
+package Ontdekstation013.ClimateChecker.services;
 
 import Ontdekstation013.ClimateChecker.Mocks.MockTokenRepo;
 import Ontdekstation013.ClimateChecker.Mocks.MockUserRepo;
 import Ontdekstation013.ClimateChecker.models.User;
 import Ontdekstation013.ClimateChecker.models.dto.*;
-import Ontdekstation013.ClimateChecker.services.UserService;
 import Ontdekstation013.ClimateChecker.services.converters.UserConverter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

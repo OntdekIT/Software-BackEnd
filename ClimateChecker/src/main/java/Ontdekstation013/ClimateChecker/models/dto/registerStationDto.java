@@ -13,6 +13,7 @@ public class registerStationDto extends Dto{
     String stationName;
     float height;
     String direction;
-    boolean isPublic;
-    boolean isOutside;
+
+    boolean publicInfo;
+    boolean outside;
 }
