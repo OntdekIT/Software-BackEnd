@@ -37,9 +37,10 @@ public class SensorService {
     }
 
     @Autowired
-    public SensorService(SensorRepositoryCustom sensorRepository, TypeRepository typeRepository) {
+    public SensorService(SensorRepositoryCustom sensorRepository, TypeRepository typeRepository, SensorConverter sensorConverter) {
         this.sensorRepository = sensorRepository;
         this.typeRepository = typeRepository;
+        this.sensorConverter = sensorConverter;
     }
 
 
