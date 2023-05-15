@@ -31,6 +31,25 @@ public class MJSValidationService extends ValidationService {
 
         return validatedDto;
     }
+    public MeetJeStadDto ValidateRegisterDTO(MeetJeStadDto inputDto){
+        MeetJeStadDto validatedDto = new MeetJeStadDto();
+
+        try
+        {
+            validateLongValue(inputDto.id, 0, 0);
+
+            validatedDto = inputDto;
+
+        }
+        catch(Exception e)
+        {
+            validatedDto.id = inputDto.id;
+            validatedDto.errorMessage = e.getMessage();
+        }
+
+        return validatedDto;
+    }
+
 
     public List<MeetJeStadDto> ValidateAll(List<MeetJeStadDto> inputDtos){
         List<MeetJeStadDto> validatedDtos = new ArrayList<>();

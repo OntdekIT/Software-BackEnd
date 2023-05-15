@@ -49,7 +49,7 @@ public class DatabasePollingController {
 
         if (station == null){
             MeetJeStadDto MJSDto = databasePollingService.GetStationToRegister(registrationCode);
-            MJSDto = MJSvalidationService.ValidateDTO(MJSDto);
+            MJSDto = MJSvalidationService.ValidateRegisterDTO(MJSDto);
 
             createLocationDto createLocationDto = new createLocationDto();
             createLocationDto.setLongitude(MJSDto.longitude);
