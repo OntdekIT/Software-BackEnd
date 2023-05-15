@@ -101,7 +101,7 @@ public class DatabasePollingService {
         List<MeetJeStadDto> found = new ArrayList<>();
         RestTemplate restTemplate = new RestTemplate();
 
-        String query =BuildQueryString(registrationCodes,latestResults,false);
+        String query = BuildQueryString(registrationCodes,latestResults,false);
 
         ResponseEntity<MeetJeStadDto[]> response = restTemplate.getForEntity(query, MeetJeStadDto[].class);
         MeetJeStadDto[] results = response.getBody();
@@ -109,7 +109,6 @@ public class DatabasePollingService {
         for(MeetJeStadDto result : results){
             found.add(result);
         }
-
         return found;
     }
 
@@ -128,18 +127,13 @@ public class DatabasePollingService {
         var dtos = GetStationsForData(registrationCodes, true);
 
         for(MeetJeStadDto MJSdto : dtos){
-
             try{
                 validator.ValidateDTO(MJSdto);
-
-
             }
             catch(Exception e){
                 MJSdto.errorMessage = e.getMessage();
             }
-
         }
-
         return dtos;
     }
 

@@ -2,13 +2,11 @@ package Ontdekstation013.ClimateChecker.services;
 
 import Ontdekstation013.ClimateChecker.models.Sensor;
 import Ontdekstation013.ClimateChecker.models.SensorType;
-import Ontdekstation013.ClimateChecker.models.dto.sensorDto;
-import Ontdekstation013.ClimateChecker.models.dto.sensorAverageDto;
-import Ontdekstation013.ClimateChecker.models.dto.sensorTypeDto;
-import Ontdekstation013.ClimateChecker.repositories.SensorRepository;
-import Ontdekstation013.ClimateChecker.repositories.SensorRepositoryCustom;
-import Ontdekstation013.ClimateChecker.repositories.TypeRepository;
+import Ontdekstation013.ClimateChecker.models.Station;
+import Ontdekstation013.ClimateChecker.models.dto.*;
+import Ontdekstation013.ClimateChecker.repositories.*;
 import Ontdekstation013.ClimateChecker.services.converters.SensorConverter;
+import Ontdekstation013.ClimateChecker.services.converters.StationConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +23,8 @@ public class SensorService {
     private TypeRepository typeRepository;
 
     private SensorConverter sensorConverter;
+    private StationRepositoryCustom stationRepository;
+
 
 
     public static double avgformat(double num) {
@@ -37,9 +37,11 @@ public class SensorService {
     }
 
     @Autowired
-    public SensorService(SensorRepositoryCustom sensorRepository, TypeRepository typeRepository) {
+    public SensorService(SensorRepositoryCustom sensorRepository, TypeRepository typeRepository, SensorConverter sensorConverter, StationRepositoryCustom stationRepository) {
         this.sensorRepository = sensorRepository;
         this.typeRepository = typeRepository;
+        this.sensorConverter = sensorConverter;
+        this.stationRepository = stationRepository;
     }
 
 
@@ -158,6 +160,33 @@ public class SensorService {
 
         return newDtoList;
     }
+
+
+    public boolean addSensorData(MeetJeStadDto meetJeStadDto){
+
+        Station station = stationRepository.findByRegistrationCodeAndDatabaseTag(meetJeStadDto.id, "MJS").orElse(null);
+
+        boolean succes = false;
+        try{
+            SensorType temperatureType =  new SensorType(1L, "Temperatuur");
+            Sensor temperatureSensor = new Sensor((int)meetJeStadDto.temperature, temperatureType,station);
+            SensorType humidityType = new SensorType(5L, "Luchtvochtigheid");
+            Sensor humiditySensor = new Sensor((int)meetJeStadDto.humidity, humidityType, station);
+            SensorType supplyType = new SensorType(7L, "Batterij");
+            Sensor supplySensor = new Sensor((int)meetJeStadDto.supply, supplyType, station);
+
+            sensorRepository.save(temperatureSensor);
+            sensorRepository.save(humiditySensor);
+            sensorRepository.save(supplySensor);
+
+            succes = true;
+        }catch (Exception ex){
+
+        }
+        return succes;
+    }
+
+
 
     // not yet functional
     public void createSensor(sensorDto sensorDto) {

@@ -110,6 +110,7 @@ public class ClimateCheckerApplication {
 			sensorTypes.add(new SensorType(4L, "Fijnstof"));
 			sensorTypes.add(new SensorType(5L, "Luchtvochtigheid"));
 			sensorTypes.add(new SensorType(6L, "Windsnelheid"));
+			sensorTypes.add(new SensorType(7L, "Batterij"));
 
 			for (SensorType sensorType: sensorTypes) {
 				typeRepository.save(sensorType);
@@ -126,6 +127,7 @@ public class ClimateCheckerApplication {
 			locations.add(new Location(5L, (float)51.58398517610992, (float)5.086270119955303, (float) 4.0,"S"));
 			locations.add(new Location(6L, (float)51.55800402393493, (float)5.092794917662567, (float) 10.0,"W"));
 			locations.add(new Location(7L, (float)51.58102914210408, (float)5.092454772670171, (float) 10.0,"E"));
+			locations.add(new Location(8L, (float)51.5403, (float)5.08044, (float) 10.0,"E"));
 
 			for (Location location : locations) {
 				locationRepository.save(location);
@@ -141,6 +143,7 @@ public class ClimateCheckerApplication {
 			stations.add(new Station(5L, 11, "MJS","Wagnerplein", locations.get(4), users.get(2), true));
 			stations.add(new Station(6L, 98, "MJS","013 Poppodium", locations.get(5), users.get(3), true));
 			stations.add(new Station(7L, 51, "MJS","Heikantlaan", locations.get(6), users.get(4), true));
+			stations.add(new Station(8L, 378, "MJS","Fontys Campus", locations.get(7), users.get(4), true));
 
 			for (Station station : stations) {
 				stationRepository.save(station);

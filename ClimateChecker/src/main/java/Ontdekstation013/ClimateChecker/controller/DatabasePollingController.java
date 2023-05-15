@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/Data")
 public class DatabasePollingController {
@@ -29,17 +31,28 @@ public class DatabasePollingController {
         this.MJSvalidationService = MJSvalidationService;
     }
 
-//    @GetMapping("/get")
-//    public ResponseEntity<String> GetAllStationData(){
-//        //Get the registration codes > Station Repos
-//        //List<Long> registrationCodes = stationService.GetAllRegistrationCodes();
-//
-//        //Use registration codes to build a query for MeetJeStad
-//        //For all the StationIDs/Registration codes, parse the sensor data
-//        //Save the sensor data to the sensor repos.
-//
-//
-//    }
+    @GetMapping()
+    public ResponseEntity<String> GetAllSensorData(){
+        //Get the registration codes > Station Repos
+        List<Long> registrationCodes = stationService.getAllRegistrationCode();
+
+        if(registrationCodes.size() > 0){
+            //Use registration codes to build a query for MeetJeStad
+            List<MeetJeStadDto> meetJeStadDtos =  databasePollingService.GetAllRecentStations(registrationCodes);
+
+            if(meetJeStadDtos.size() > 0){
+                //For all the StationIDs/Registration codes, parse the sensor data
+                //Save the sensor data to the sensor repos.
+                for(MeetJeStadDto meetJeStadDto : meetJeStadDtos){
+                    sensorService.addSensorData(meetJeStadDto);
+                }
+                return new ResponseEntity<>("Sensor data has been added to the database", HttpStatus.ACCEPTED);
+            }
+        }
+        return new ResponseEntity<>("Unable to add sensor data to the database", HttpStatus.NOT_ACCEPTABLE);
+
+
+    }
 
 
     @PostMapping("/createStation")
@@ -64,6 +77,6 @@ public class DatabasePollingController {
 
             return new ResponseEntity<>("Station has been added to the database", HttpStatus.ACCEPTED);
         }
-        return new ResponseEntity<>("Unable to add station to the database", HttpStatus.ACCEPTED);
+        return new ResponseEntity<>("Unable to add station to the database", HttpStatus.NOT_ACCEPTABLE);
     }
 }
