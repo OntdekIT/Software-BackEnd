@@ -52,14 +52,14 @@ public class DatabasePollingController {
             MJSDto = MJSvalidationService.ValidateDTO(MJSDto);
 
             createLocationDto createLocationDto = new createLocationDto();
+            createLocationDto.setLongitude(MJSDto.longitude);
+            createLocationDto.setLatitude(MJSDto.latitude);
             long locationId = locationService.createLocation(createLocationDto);
 
             createStationDto createStationDto = new createStationDto();
             createStationDto.setLocationId(locationId);
             createStationDto.setRegistrationCode(registrationCode);
             createStationDto.setDatabaseTag(databaseTag);
-            createStationDto.setLongitude(MJSDto.longitude);
-            createStationDto.setLatitude(MJSDto.latitude);
             stationService.createStation(createStationDto);
 
             return new ResponseEntity<>("Station has been added to the database", HttpStatus.ACCEPTED);

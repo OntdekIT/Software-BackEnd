@@ -55,4 +55,9 @@ public class Location {
         this.longitude = longitude;
         this.height = height;
     }
+
+    public Location(float longitude, float latitude){
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
 }

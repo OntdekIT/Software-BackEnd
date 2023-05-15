@@ -43,11 +43,9 @@ public class LocationService {
     }
 
     public long createLocation(createLocationDto createLocationDto){
-        boolean succes = false;
+        Location location = new Location(createLocationDto.longitude,createLocationDto.latitude);
 
-        Location location = new Location();
         Location locationResult = locationRepository.save(location);
-        succes = true;
 
         return locationResult.getLocationID();
     }
