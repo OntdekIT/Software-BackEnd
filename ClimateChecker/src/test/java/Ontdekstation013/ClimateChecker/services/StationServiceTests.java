@@ -27,6 +27,7 @@ class StationServiceTests {
 
 
 
+
 	@BeforeEach
 	void setup() throws Exception{
 		this.mockRepo = new MockStationRepo();
@@ -34,7 +35,7 @@ class StationServiceTests {
 		this.mockTypeRepo = new MockTypeRepo();
 		this.sensorConverter = new SensorConverter();
 		this.stationConverter = new StationConverter();
-		this.sensorService = new SensorService(mockSensorRepo, mockTypeRepo, sensorConverter);
+		this.sensorService = new SensorService(mockSensorRepo, mockTypeRepo, sensorConverter, mockRepo);
 		this.stationService = new StationService(mockRepo, sensorService);
 
 
