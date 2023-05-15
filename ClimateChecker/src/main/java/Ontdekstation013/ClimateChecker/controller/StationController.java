@@ -118,12 +118,12 @@ public class StationController {
 
     @GetMapping("/available")
     public ResponseEntity<String> checkRegistrationCode(@RequestParam("databaseTag") String databaseTag, @RequestParam("registrationCode") long registrationCode){
-        Station resultStations = stationService.findByRegistrationCode(databaseTag, registrationCode);
+        boolean available = stationService.findByRegistrationCode(databaseTag, registrationCode);
 
-        if(resultStations != null){
-            return new ResponseEntity<>("Registrationcode is not available", HttpStatus.BAD_REQUEST);
+        if(available){
+            return new ResponseEntity<>("Registrationcode is available", HttpStatus.ACCEPTED);
         }
-        return new ResponseEntity<>("Registrationcode is available", HttpStatus.ACCEPTED);
+        return new ResponseEntity<>("Registrationcode is not available", HttpStatus.BAD_REQUEST);
     }
 
 }

@@ -152,8 +152,15 @@ public class StationService {
         stationRepository.save(currentStation);
     }
 
-    public Station findByRegistrationCode(String databaseTag, long registrationCode){
-        return stationRepository.findByRegistrationCodeAndDatabaseTag(registrationCode, databaseTag).orElse(null);
+    public boolean findByRegistrationCode(String databaseTag, long registrationCode){
+        boolean available = false;
+        Station station = stationRepository.findByRegistrationCodeAndDatabaseTag(registrationCode, databaseTag).orElse(null);
+        if(station != null) {
+            if(station.getName() == null) {
+                available = true;
+            }
+        }
+        return available;
     }
 
 
