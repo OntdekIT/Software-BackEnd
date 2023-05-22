@@ -35,79 +35,6 @@ public class ClimateCheckerApplication {
 				userRepository.save(user);
 			}
 
-
-
-			/*List<Region> regions = new ArrayList<>();
-			regions.add(new Region(1L, "Tilburg Noord"));
-			regions.add(new Region(2L, "Tilburg Oud-Noord"));
-			regions.add(new Region(3L, "Tilburg West"));
-			regions.add(new Region(4L, "Tilburg Reeshof"));
-			regions.add(new Region(5L, "Tilburg Centrum"));
-			regions.add(new Region(6L, "Tilburg Zuid"));
-			regions.add(new Region(7L, "Armhoef"));
-
-			//Seed Regions
-			for (Region region: regions) {
-				regionRepository.save(region);
-			}
-
-			//Seed Region Coords
-
-			regionCordsRepository.save(new RegionCords(1L, regions.get(0), 51.56255066080151, 5.110574072153875));
-			regionCordsRepository.save(new RegionCords(2L, regions.get(0), 51.578729761919675, 5.089185307344954));
-			regionCordsRepository.save(new RegionCords(3L, regions.get(0), 51.58073572699174, 5.051152783432803));
-			regionCordsRepository.save(new RegionCords(4L, regions.get(0), 51.597919306791404, 5.07069963024435));
-			regionCordsRepository.save(new RegionCords(5L, regions.get(0), 51.57888096194896, 5.123793169211084));
-
-			regionCordsRepository.save(new RegionCords(6L, regions.get(1), 51.56306306758613, 5.107730565503828));
-			regionCordsRepository.save(new RegionCords(7L, regions.get(1), 51.560220503931724, 5.088965879026096));
-			regionCordsRepository.save(new RegionCords(8L, regions.get(1), 51.56316143871074, 5.065365901887907));
-			regionCordsRepository.save(new RegionCords(9L, regions.get(1), 51.57828930027731, 5.066310843694255));
-			regionCordsRepository.save(new RegionCords(10L, regions.get(1), 51.57799353698609, 5.090601412591779));
-
-			regionCordsRepository.save(new RegionCords(11L, regions.get(2), 51.57850240619557, 5.065901358218249));
-			regionCordsRepository.save(new RegionCords(12L, regions.get(2), 51.58289461361321, 5.027460773334913));
-			regionCordsRepository.save(new RegionCords(13L, regions.get(2), 51.569364501176715, 5.0236293100389195));
-			regionCordsRepository.save(new RegionCords(14L, regions.get(2), 51.560472853296794, 5.025591312563916));
-			regionCordsRepository.save(new RegionCords(15L, regions.get(2), 51.557497903138355, 5.049635448082193));
-			regionCordsRepository.save(new RegionCords(16L, regions.get(2), 51.556539031553335, 5.063734032998137));
-
-			regionCordsRepository.save(new RegionCords(17L, regions.get(3), 51.58284664423249, 5.0273944712514975));
-			regionCordsRepository.save(new RegionCords(18L, regions.get(3), 51.60042319421235, 4.982040344334981));
-			regionCordsRepository.save(new RegionCords(19L, regions.get(3), 51.59192444270981, 4.974106947760719));
-			regionCordsRepository.save(new RegionCords(20L, regions.get(3), 51.5700097218146, 4.967688018248374));
-			regionCordsRepository.save(new RegionCords(21L, regions.get(3), 51.56237932491169, 5.016013009511919));
-
-			regionCordsRepository.save(new RegionCords(22L, regions.get(4), 51.56270129182065, 5.065284371322884));
-			regionCordsRepository.save(new RegionCords(23L, regions.get(4), 51.55617127808693, 5.065133469119954));
-			regionCordsRepository.save(new RegionCords(24L, regions.get(4), 51.55412292501397, 5.0855311053269885));
-			regionCordsRepository.save(new RegionCords(25L, regions.get(4), 51.54992904431306, 5.0876111787297855));
-			regionCordsRepository.save(new RegionCords(26L, regions.get(4), 51.55531861612618, 5.105617226979377));
-			regionCordsRepository.save(new RegionCords(27L, regions.get(4), 51.560652616815936, 5.10329437013893));
-			regionCordsRepository.save(new RegionCords(28L, regions.get(4), 51.55945789444568, 5.091095283523403));
-
-			regionCordsRepository.save(new RegionCords(29L, regions.get(5), 51.55784684502422, 5.041274079951624));
-			regionCordsRepository.save(new RegionCords(30L, regions.get(5), 51.54281546677295, 5.064465419727073));
-			regionCordsRepository.save(new RegionCords(31L, regions.get(5), 51.53820174172339, 5.063035560222271));
-			regionCordsRepository.save(new RegionCords(32L, regions.get(5), 51.53609745524849, 5.098102508316022));
-			regionCordsRepository.save(new RegionCords(33L, regions.get(5), 51.543196233257596, 5.112926401276529));
-			regionCordsRepository.save(new RegionCords(34L, regions.get(5), 51.55103707996244, 5.110116072477741));
-			regionCordsRepository.save(new RegionCords(35L, regions.get(5), 51.55310267677778, 5.114121361718272));
-			regionCordsRepository.save(new RegionCords(36L, regions.get(5), 51.556811513500826, 5.111992692817807));
-			regionCordsRepository.save(new RegionCords(37L, regions.get(5), 51.549448466861485, 5.087879389017815));
-			regionCordsRepository.save(new RegionCords(38L, regions.get(5), 51.55400163051958, 5.085270726191843));
-			regionCordsRepository.save(new RegionCords(39L, regions.get(5), 51.55544653351087, 5.073630409560555));
-
-
-			regionCordsRepository.save(new RegionCords(40L, regions.get(6), 51.5609016, 5.1037319));
-			regionCordsRepository.save(new RegionCords(41L, regions.get(6), 51.5614525, 5.1079274));
-			regionCordsRepository.save(new RegionCords(42L, regions.get(6), 51.5568922, 5.1106971));
-			regionCordsRepository.save(new RegionCords(43L, regions.get(6), 51.555403, 5.106216));*/
-
-
-
-
-
 			//Seed SensorType
 			List<SensorType> sensorTypes = new ArrayList<>();
 
@@ -210,23 +137,16 @@ public class ClimateCheckerApplication {
 			regions.add(new Region(21L, "Witbrant"));
 			regions.add(new Region(22L, "Groeseind"));
 			regions.add(new Region(23L, "Stokhasselt-zuid"));
-
-			// de onderste wijk is momenteel niet goed en moet nagekeken worden om de juiste naam erbij te zetten
 			regions.add(new Region(24L, "Rooi harten"));
-
 			regions.add(new Region(25L, "De Oude Warande"));
 			regions.add(new Region(26L, "Wandelbos-zuid"));
 			regions.add(new Region(27L, "Koningshoeven"));
 			regions.add(new Region(28L, "Hasselt"));
 			regions.add(new Region(29L, "Mariaziekenhuis-Vredeburcht"));
 			regions.add(new Region(30L, "Heikant"));
-
 			regions.add(new Region(31L, "Dalem"));
 			regions.add(new Region(32L, "Het Laar"));
-
-			//alle naamgeving hieronder moet nagekeken worden en op de juite plek gezet worden
 			regions.add(new Region(33L, "Vlashof"));
-
 			regions.add(new Region(34L, "Wandelbos-noord"));
 			regions.add(new Region(35L, "Stokhasselt-noord"));
 			regions.add(new Region(36L, "Huibeven"));
@@ -240,6 +160,10 @@ public class ClimateCheckerApplication {
 			regions.add(new Region(44L, "Heyhoef"));
 			regions.add(new Region(45L, "De Quirijnstok"));
 			regions.add(new Region(46L, "Industriestrook Lovense-Kanaaldijk"));
+			regions.add(new Region(47L, "Bouwmeester"));
+			regions.add(new Region(48L, "Noordhoek"));
+			regions.add(new Region(49L, "Binnenstad"));
+			regions.add(new Region(50L, "Fatima"));
 
 
 
@@ -254,7 +178,6 @@ public class ClimateCheckerApplication {
 			regionCordsRepository.save(new RegionCords(2L, regions.get(0), 51.578095, 5.073574));
 			regionCordsRepository.save(new RegionCords(3L, regions.get(0), 51.593915, 5.081886));
 			regionCordsRepository.save(new RegionCords(4L, regions.get(0), 51.596827, 5.071576));
-//			regionCordsRepository.save(new RegionCords(5L, regions.get(0), 51.586323, 5.079426));
 			regionCordsRepository.save(new RegionCords(6L, regions.get(1), 51.560042,5.091805));
 			regionCordsRepository.save(new RegionCords(7L, regions.get(1), 51.561754,5.093154));
 			regionCordsRepository.save(new RegionCords(8L, regions.get(1), 51.561874,5.091833));
@@ -387,8 +310,9 @@ public class ClimateCheckerApplication {
 			regionCordsRepository.save(new RegionCords(135L, regions.get(15), 51.558026,5.041310));
 			regionCordsRepository.save(new RegionCords(136L, regions.get(15), 51.547288,5.056807));
 			regionCordsRepository.save(new RegionCords(137L, regions.get(15), 51.550597,5.060732));
-			regionCordsRepository.save(new RegionCords(138L, regions.get(15), 51.554680,5.063565));
+			regionCordsRepository.save(new RegionCords(138L, regions.get(15), 51.550597,5.060732));
 			regionCordsRepository.save(new RegionCords(139L, regions.get(15), 51.554680,5.063565));
+			regionCordsRepository.save(new RegionCords(394L, regions.get(15), 51.556189,5.063961));
 			regionCordsRepository.save(new RegionCords(140L, regions.get(16), 51.554890,5.106476));
 			regionCordsRepository.save(new RegionCords(141L, regions.get(16), 51.551731,5.110063));
 			regionCordsRepository.save(new RegionCords(142L, regions.get(16), 51.552812,5.114336));
@@ -436,14 +360,12 @@ public class ClimateCheckerApplication {
 			regionCordsRepository.save(new RegionCords(184L, regions.get(22), 51.578096,5.073415));
 			regionCordsRepository.save(new RegionCords(185L, regions.get(22), 51.582830,5.076271));
 			regionCordsRepository.save(new RegionCords(186L, regions.get(22), 51.583843,5.067980));
-
 			regionCordsRepository.save(new RegionCords(187L, regions.get(23), 51.553087,5.064632));
 			regionCordsRepository.save(new RegionCords(188L, regions.get(23), 51.553774,5.072124));
 			regionCordsRepository.save(new RegionCords(189L, regions.get(23), 51.554995,5.077640));
 			regionCordsRepository.save(new RegionCords(190L, regions.get(23), 51.555301,5.077790));
 			regionCordsRepository.save(new RegionCords(191L, regions.get(23), 51.556282,5.064034));
 			regionCordsRepository.save(new RegionCords(192L, regions.get(23), 51.554788,5.063540));
-
 			regionCordsRepository.save(new RegionCords(193L, regions.get(24), 51.561571,5.018270));
 			regionCordsRepository.save(new RegionCords(194L, regions.get(24), 51.558717,5.038783));
 			regionCordsRepository.save(new RegionCords(195L, regions.get(24), 51.566400,5.042620));
@@ -507,7 +429,6 @@ public class ClimateCheckerApplication {
 			regionCordsRepository.save(new RegionCords(253L, regions.get(31), 51.544591,5.054509));
 			regionCordsRepository.save(new RegionCords(254L, regions.get(31), 51.545672,5.053875));
 			regionCordsRepository.save(new RegionCords(255L, regions.get(31), 51.542276,5.049163));
-
 			regionCordsRepository.save(new RegionCords(267L, regions.get(32), 51.582777,5.076349));
 			regionCordsRepository.save(new RegionCords(268L, regions.get(32), 51.581590,5.082305));
 			regionCordsRepository.save(new RegionCords(269L, regions.get(32), 51.587523,5.084923));
@@ -517,7 +438,6 @@ public class ClimateCheckerApplication {
 			regionCordsRepository.save(new RegionCords(273L, regions.get(32), 51.594109,5.081811));
 			regionCordsRepository.save(new RegionCords(274L, regions.get(32), 51.592622,5.082134));
 			regionCordsRepository.save(new RegionCords(275L, regions.get(32), 51.587216,5.079773));
-
 			regionCordsRepository.save(new RegionCords(276L, regions.get(33), 51.578830,5.022727));
 			regionCordsRepository.save(new RegionCords(277L, regions.get(33), 51.576269,5.029168));
 			regionCordsRepository.save(new RegionCords(278L, regions.get(33), 51.575009,5.037397));
@@ -526,7 +446,6 @@ public class ClimateCheckerApplication {
 			regionCordsRepository.save(new RegionCords(281L, regions.get(33), 51.577270,5.048028));
 			regionCordsRepository.save(new RegionCords(282L, regions.get(33), 51.580850,5.044936));
 			regionCordsRepository.save(new RegionCords(283L, regions.get(33), 51.582930,5.028005));
-
 			regionCordsRepository.save(new RegionCords(284L, regions.get(34), 51.583870,5.067962));
 			regionCordsRepository.save(new RegionCords(285L, regions.get(34), 51.582810,5.076385));
 			regionCordsRepository.save(new RegionCords(286L, regions.get(34), 51.587576,5.079978));
@@ -534,7 +453,6 @@ public class ClimateCheckerApplication {
 			regionCordsRepository.save(new RegionCords(288L, regions.get(34), 51.594069,5.081855));
 			regionCordsRepository.save(new RegionCords(289L, regions.get(34), 51.596341,5.071626));
 			regionCordsRepository.save(new RegionCords(290L, regions.get(34), 51.591416,5.070508));
-
 			regionCordsRepository.save(new RegionCords(291L, regions.get(35), 51.572149,5.005452));
 			regionCordsRepository.save(new RegionCords(292L, regions.get(35), 51.570095,5.017970));
 			regionCordsRepository.save(new RegionCords(293L, regions.get(35), 51.578776,5.022796));
@@ -543,13 +461,11 @@ public class ClimateCheckerApplication {
 			regionCordsRepository.save(new RegionCords(296L, regions.get(35), 51.584423,5.007131));
 			regionCordsRepository.save(new RegionCords(297L, regions.get(35), 51.579276,5.005272));
 			regionCordsRepository.save(new RegionCords(298L, regions.get(35), 51.576763,5.007129));
-
 			regionCordsRepository.save(new RegionCords(299L, regions.get(36), 51.580170,4.995583));
 			regionCordsRepository.save(new RegionCords(300L, regions.get(36), 51.578143,5.002161));
 			regionCordsRepository.save(new RegionCords(301L, regions.get(36), 51.579236,5.005146));
 			regionCordsRepository.save(new RegionCords(302L, regions.get(36), 51.584463,5.007087));
 			regionCordsRepository.save(new RegionCords(303L, regions.get(36), 51.585903,4.997417));
-
 			regionCordsRepository.save(new RegionCords(304L, regions.get(37), 51.562399,5.109120));
 			regionCordsRepository.save(new RegionCords(305L, regions.get(37), 51.562919,5.111632));
 			regionCordsRepository.save(new RegionCords(306L, regions.get(37), 51.570028,5.117786));
@@ -557,7 +473,6 @@ public class ClimateCheckerApplication {
 			regionCordsRepository.save(new RegionCords(308L, regions.get(37), 51.570181,5.114715));
 			regionCordsRepository.save(new RegionCords(309L, regions.get(37), 51.570822,5.100909));
 			regionCordsRepository.save(new RegionCords(310L, regions.get(37), 51.565853,5.106810));
-
 			regionCordsRepository.save(new RegionCords(311L, regions.get(38), 51.573749,4.993533));
 			regionCordsRepository.save(new RegionCords(312L, regions.get(38), 51.572129,5.005436));
 			regionCordsRepository.save(new RegionCords(313L, regions.get(38), 51.576749,5.007107));
@@ -571,8 +486,11 @@ public class ClimateCheckerApplication {
 			regionCordsRepository.save(new RegionCords(321L, regions.get(39), 51.568448,5.098271));
 			regionCordsRepository.save(new RegionCords(322L, regions.get(39), 51.568381,5.096660));
 			regionCordsRepository.save(new RegionCords(323L, regions.get(39), 51.567534,5.095050));
+			regionCordsRepository.save(new RegionCords(366L, regions.get(39), 51.567496,5.088350));
+			regionCordsRepository.save(new RegionCords(365L, regions.get(39), 51.567209,5.090116));
+			regionCordsRepository.save(new RegionCords(367L, regions.get(39), 51.561894,5.091869));
+			regionCordsRepository.save(new RegionCords(368L, regions.get(39), 51.561747,5.093159));
 			regionCordsRepository.save(new RegionCords(324L, regions.get(39), 51.567441,5.094449));
-			regionCordsRepository.save(new RegionCords(325L, regions.get(39), 51.564953,5.094975));
 			regionCordsRepository.save(new RegionCords(326L, regions.get(40), 51.574809,4.986881));
 			regionCordsRepository.save(new RegionCords(327L, regions.get(40), 51.573829,4.993423));
 			regionCordsRepository.save(new RegionCords(328L, regions.get(40), 51.582497,4.996515));
@@ -601,7 +519,6 @@ public class ClimateCheckerApplication {
 			regionCordsRepository.save(new RegionCords(351L, regions.get(43), 51.576823,5.007153));
 			regionCordsRepository.save(new RegionCords(352L, regions.get(43), 51.579270,5.005186));
 			regionCordsRepository.save(new RegionCords(353L, regions.get(43), 51.578276,5.002244));
-
 			regionCordsRepository.save(new RegionCords(256L, regions.get(44), 51.574229,5.096950));
 			regionCordsRepository.save(new RegionCords(257L, regions.get(44), 51.574009,5.100450));
 			regionCordsRepository.save(new RegionCords(258L, regions.get(44), 51.577130,5.104387));
@@ -613,7 +530,6 @@ public class ClimateCheckerApplication {
 			regionCordsRepository.save(new RegionCords(264L, regions.get(44), 51.581103,5.093764));
 			regionCordsRepository.save(new RegionCords(265L, regions.get(44), 51.578216,5.090900));
 			regionCordsRepository.save(new RegionCords(266L, regions.get(44), 51.577756,5.091028));
-
 			regionCordsRepository.save(new RegionCords(354L, regions.get(45), 51.561278,5.103800));
 			regionCordsRepository.save(new RegionCords(355L, regions.get(45), 51.562292,5.108631));
 			regionCordsRepository.save(new RegionCords(356L, regions.get(45), 51.565306,5.106610));
@@ -625,6 +541,35 @@ public class ClimateCheckerApplication {
 			regionCordsRepository.save(new RegionCords(362L, regions.get(45), 51.575483,5.090253));
 			regionCordsRepository.save(new RegionCords(363L, regions.get(45), 51.572469,5.094227));
 			regionCordsRepository.save(new RegionCords(364L, regions.get(45), 51.568348,5.098736));
+			regionCordsRepository.save(new RegionCords(369L, regions.get(46), 51.563058,5.065315));
+			regionCordsRepository.save(new RegionCords(370L, regions.get(46), 51.560983,5.080015));
+			regionCordsRepository.save(new RegionCords(371L, regions.get(46), 51.567164,5.081833));
+			regionCordsRepository.save(new RegionCords(372L, regions.get(46), 51.566984,5.081033));
+			regionCordsRepository.save(new RegionCords(373L, regions.get(46), 51.566970,5.079450));
+			regionCordsRepository.save(new RegionCords(374L, regions.get(46), 51.567224,5.076741));
+			regionCordsRepository.save(new RegionCords(375L, regions.get(46), 51.568144,5.074971));
+			regionCordsRepository.save(new RegionCords(376L, regions.get(46), 51.568548,5.074182));
+			regionCordsRepository.save(new RegionCords(377L, regions.get(46), 51.568568,5.073341));
+			regionCordsRepository.save(new RegionCords(378L, regions.get(46), 51.568101,5.072338));
+			regionCordsRepository.save(new RegionCords(379L, regions.get(46), 51.567911,5.069858));
+			regionCordsRepository.save(new RegionCords(380L, regions.get(46), 51.568601,5.066372));
+			regionCordsRepository.save(new RegionCords(381L, regions.get(47), 51.556242,5.063942));
+			regionCordsRepository.save(new RegionCords(382L, regions.get(47), 51.555298,5.077830));
+			regionCordsRepository.save(new RegionCords(383L, regions.get(47), 51.561165,5.078619));
+			regionCordsRepository.save(new RegionCords(384L, regions.get(47), 51.563046,5.065309));
+			regionCordsRepository.save(new RegionCords(385L, regions.get(48), 51.550815,5.078250));
+			regionCordsRepository.save(new RegionCords(386L, regions.get(48), 51.551205,5.084617));
+			regionCordsRepository.save(new RegionCords(387L, regions.get(48), 51.552356,5.088275));
+			regionCordsRepository.save(new RegionCords(388L, regions.get(48), 51.552600,5.090567));
+			regionCordsRepository.save(new RegionCords(389L, regions.get(48), 51.557206,5.093051));
+			regionCordsRepository.save(new RegionCords(390L, regions.get(48), 51.559981,5.091740));
+			regionCordsRepository.save(new RegionCords(391L, regions.get(48), 51.561128,5.078738));
+			regionCordsRepository.save(new RegionCords(392L, regions.get(48), 51.555095,5.077750));
+			regionCordsRepository.save(new RegionCords(393L, regions.get(48), 51.553103,5.079236));
+			regionCordsRepository.save(new RegionCords(395L, regions.get(49), 51.548930,5.104022));
+			regionCordsRepository.save(new RegionCords(396L, regions.get(49), 51.551732,5.110137));
+			regionCordsRepository.save(new RegionCords(397L, regions.get(49), 51.554861,5.106464));
+			regionCordsRepository.save(new RegionCords(398L, regions.get(49), 51.552553,5.100233));
 		};
 	}
 }
