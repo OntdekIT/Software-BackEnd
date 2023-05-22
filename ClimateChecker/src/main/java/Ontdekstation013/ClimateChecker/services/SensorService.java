@@ -151,8 +151,7 @@ public class SensorService {
 
         List<sensorDto> newDtoList = new ArrayList<>();
         for (Sensor sensor: sensorList) {
-
-            if (sensor.getStation().getStationID() == stationId)
+            if (sensor.getStation().getStationID() == stationId && sensor.isActiveData()) // Sensorvalidator
             newDtoList.add(sensorConverter.sensorToSensorDTO(sensor));
 
         }
@@ -169,11 +168,11 @@ public class SensorService {
         boolean succes = false;
         try{
             SensorType temperatureType =  new SensorType(1L, "Temperatuur");
-            Sensor temperatureSensor = new Sensor((int)meetJeStadDto.temperature, temperatureType,station);
+            Sensor temperatureSensor = new Sensor((int)meetJeStadDto.temperature, temperatureType,station, true);
             SensorType humidityType = new SensorType(5L, "Luchtvochtigheid");
-            Sensor humiditySensor = new Sensor((int)meetJeStadDto.humidity, humidityType, station);
+            Sensor humiditySensor = new Sensor((int)meetJeStadDto.humidity, humidityType, station, true);
             SensorType supplyType = new SensorType(7L, "Batterij");
-            Sensor supplySensor = new Sensor((int)meetJeStadDto.supply, supplyType, station);
+            Sensor supplySensor = new Sensor((int)meetJeStadDto.supply, supplyType, station, true);
 
             sensorRepository.save(temperatureSensor);
             sensorRepository.save(humiditySensor);
@@ -182,6 +181,18 @@ public class SensorService {
             succes = true;
         }catch (Exception ex){
 
+        }
+        return succes;
+    }
+
+    public boolean OldSensorDataToInactive(){
+        boolean succes = false;
+        List<Sensor> oldSensorData = sensorRepository.findAllByActiveData(true).orElse(null);
+        if (oldSensorData != null){
+            for(Sensor sensor: oldSensorData){
+                sensor.setActiveData(false);
+                sensorRepository.save(sensor);
+            }
         }
         return succes;
     }

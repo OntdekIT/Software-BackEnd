@@ -43,7 +43,9 @@ public class DatabasePollingController {
             if(meetJeStadDtos.size() > 0){
                 //For all the StationIDs/Registration codes, parse the sensor data
                 //Save the sensor data to the sensor repos.
+                sensorService.OldSensorDataToInactive();
                 for(MeetJeStadDto meetJeStadDto : meetJeStadDtos){
+
                     sensorService.addSensorData(meetJeStadDto);
                 }
                 return new ResponseEntity<>("Sensor data has been added to the database", HttpStatus.ACCEPTED);

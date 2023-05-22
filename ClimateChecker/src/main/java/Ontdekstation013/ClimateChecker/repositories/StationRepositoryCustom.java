@@ -12,4 +12,5 @@ public interface StationRepositoryCustom extends StationRepository{
     List<Station> findAllByOwner_UserID(long userId);
 
     Optional<Station> findByRegistrationCodeAndDatabaseTag(long registrationCode, String databaseTag);
+
 }
