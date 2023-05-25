@@ -6,6 +6,7 @@ import Ontdekstation013.ClimateChecker.Mocks.MockTypeRepo;
 import Ontdekstation013.ClimateChecker.Mocks.MockUserRepo;
 import Ontdekstation013.ClimateChecker.models.*;
 import Ontdekstation013.ClimateChecker.models.dto.*;
+import Ontdekstation013.ClimateChecker.services.converters.SensorConverter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,6 +23,7 @@ class StationServiceTests {
 	private MockSensorRepo mockSensorRepo;
 	private MockTypeRepo mockTypeRepo;
 
+	private SensorConverter sensorConverter;
 	private MockUserRepo mockUserRepo;
 
 
@@ -30,7 +32,8 @@ class StationServiceTests {
 		this.mockRepo = new MockStationRepo();
 		this.mockSensorRepo = new MockSensorRepo();
 		this.mockTypeRepo = new MockTypeRepo();
-		this.sensorService = new SensorService(mockSensorRepo, mockTypeRepo);
+		this.sensorConverter = new SensorConverter();
+		this.sensorService = new SensorService(mockSensorRepo, mockTypeRepo, sensorConverter);
 		this.stationService = new StationService(mockRepo, sensorService, mockUserRepo);
 
 

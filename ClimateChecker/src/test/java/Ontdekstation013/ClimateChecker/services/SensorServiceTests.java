@@ -30,9 +30,8 @@ class SensorServiceTests {
 	void setup() throws Exception{
 		this.mockRepo = new MockSensorRepo();
 		this.mockTypeRepo = new MockTypeRepo();
-		this.sensorService = new SensorService(mockRepo, mockTypeRepo);
 		this.sensorConverter = new SensorConverter();
-
+		this.sensorService = new SensorService(mockRepo, mockTypeRepo, sensorConverter);
 		List<SensorType> sensorTypes = new ArrayList<>();
 
 		//sensor type 1
