@@ -33,7 +33,7 @@ public class HeatmapController {
         this.locationService = locationService;
     }
 
-    @GetMapping("{typeId}")
+    @GetMapping("/{typeId}")
     public ResponseEntity<List<heatmapPointDto>> getDataBySensorType(@PathVariable long typeId)
     {
         try

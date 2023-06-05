@@ -97,13 +97,22 @@ public class SensorService {
             // get all sensor values per sensor type
             List<sensorDto> sensors = getSensorsByType(type.getTypeID());
 
+            // Validate data, remove obviously faulty data from the equation
+            List<sensorDto> validatedSensors = new ArrayList<>();
+            for(sensorDto sensorDtoInput: sensors){
+                if(validateSensorData(sensorDtoInput)){
+                    validatedSensors.add(sensorDtoInput);
+                }
+            }
+
+
             //calculate the average for each type
             double avgData = 0;
                 //type var: array
-            for (sensorDto sensor : sensors) {
+            for (sensorDto sensor : validatedSensors) {
                 avgData += sensor.getData();
             }
-            avgData /= sensors.size();
+            avgData /= validatedSensors.size();
             double avgRounded = avgformat(avgData);
 
             switch ((int) type.getTypeID()) {
@@ -210,5 +219,40 @@ public class SensorService {
 
 
     public void deleteSensor(long sensorId) {
+    }
+
+
+    public boolean validateSensorData(sensorDto sensorDtoInput){
+        boolean succes = false;
+        switch ((int)sensorDtoInput.getTypeId()){
+            // Temperature
+            case 1:
+                if(sensorDtoInput.getData() > -30 || sensorDtoInput.getData() < 75){
+                    succes = true;
+                }
+                break;
+            // Stikstof
+            case 2:
+                break;
+            // Koolstofdioxide
+            case 3:
+                break;
+            // Fijnstof
+            case 4:
+                break;
+            // Luchtvochtigheid
+            case 5:
+                if(sensorDtoInput.getData() > -5.0 || sensorDtoInput.getData() < 105.0){
+                    succes = true;
+                }
+                break;
+            // Windsnelheid
+            case 6:
+                break;
+            // Batterij
+            case 7:
+                break;
+        }
+        return succes;
     }
 }
