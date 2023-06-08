@@ -9,17 +9,17 @@ import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
 @Getter
+//@Entity
 @Setter
 public class TranslationPage {
 
     public TranslationPage(){
-        Bloks = new ArrayList<>();
+        bloks = new ArrayList<>();
     }
-    @Id
-    private int ID;
-    private String LanguageID;
+//    @Id
+//    private int ID;
+//    private String LanguageID;
     @OneToMany
-    public List<Translation> Bloks;
+    public List<Translation> bloks;
 }
