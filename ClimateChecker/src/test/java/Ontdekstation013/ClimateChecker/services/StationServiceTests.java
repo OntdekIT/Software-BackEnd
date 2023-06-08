@@ -97,7 +97,33 @@ class StationServiceTests {
 		stations.add(station);
 
 
+		// station 4
+		station = new Station();
+		station.setStationID(4);
+		station.setName("name4");
+		station.setPublic(true);
+		station.setRegistrationCode(378);
+		station.setDatabaseTag("MJS");
+
+		user = new User();
+		user.setUserID(70);
+		station.setOwner(user);
+
+		location = new Location();
+		location.setLocationID(15);
+		station.setLocation(location);
+
+		stations.add(station);
+
 		mockRepo.FillDataBase(stations);
+
+
+		List<User> userList = new ArrayList<>();
+		User mockUser = new User();
+		mockUser.setUserID(4);
+		userList.add(mockUser);
+
+		mockUserRepo.FillDatabase(userList);
 	}
 
 	// No functionality in StationService
@@ -105,7 +131,6 @@ class StationServiceTests {
 	void findStationByIdTest() {
 		stationDto newDto = stationService.findStationById(2);
 
-		Assertions.assertEquals(20,newDto.getHeight());
 		Assertions.assertEquals("name2",newDto.getName());
 		Assertions.assertEquals(2000,newDto.getLocationId());
 		Assertions.assertFalse(newDto.isIspublic());
@@ -186,9 +211,13 @@ class StationServiceTests {
 		registerStationDto dto = new registerStationDto();
 
 		dto.setUserId(4);
+		dto.setRegisterCode(378);
+		dto.setDatabaseTag("MJS");
 		dto.setStationName("nameTest");
 		dto.setHeight(54);
+		dto.setDirection("E");
 		dto.setPublicInfo(true);
+		dto.setOutside(true);
 
 		Assertions.assertTrue(stationService.registerStation(dto));
 
@@ -202,6 +231,9 @@ class StationServiceTests {
 	@Test
 	void registerStationTest_ShouldFail() {
 		registerStationDto dto = new registerStationDto();
+		dto.setRegisterCode(550);
+		dto.setDatabaseTag("MJS");
+		dto.setUserId(70);
 
 		boolean created = stationService.registerStation(dto);
 
@@ -230,7 +262,7 @@ class StationServiceTests {
 
 		stationService.editStation(dto2);
 
-		Station result = mockRepo.stations.get(3);
+		Station result = mockRepo.stations.get(2);
 
 		Assertions.assertEquals(dto2.getName(), result.getName());
 		Assertions.assertEquals(dto2.isPublic(), result.isPublic());

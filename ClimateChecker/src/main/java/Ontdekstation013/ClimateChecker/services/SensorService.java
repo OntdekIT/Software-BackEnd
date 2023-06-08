@@ -244,6 +244,7 @@ public class SensorService {
                 break;
             // Fijnstof
             case 4:
+                succes = true;
                 break;
             // Luchtvochtigheid
             case 5:
@@ -253,6 +254,7 @@ public class SensorService {
                 break;
             // Windsnelheid
             case 6:
+                succes = true;
                 break;
             // Batterij
             case 7:

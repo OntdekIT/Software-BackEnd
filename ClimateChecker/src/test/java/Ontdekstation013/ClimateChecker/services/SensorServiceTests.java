@@ -35,6 +35,7 @@ class SensorServiceTests {
 		this.mockRepo = new MockSensorRepo();
 		this.mockTypeRepo = new MockTypeRepo();
 		this.stationRepo = new MockStationRepo();
+		this.sensorConverter = new SensorConverter();
 		this.sensorService = new SensorService(mockRepo, mockTypeRepo, sensorConverter, stationRepo);
 
 
@@ -61,6 +62,7 @@ class SensorServiceTests {
 		// sensor 1
 		sensor.setSensorID(1);
 		sensor.setSensorData(2);
+		sensor.setActiveData(true);
 
 		Station station = new Station();
 		station.setStationID(5);
@@ -78,6 +80,7 @@ class SensorServiceTests {
 		type = new SensorType();
 		sensor.setSensorID(2);
 		sensor.setSensorData(1);
+		sensor.setActiveData(true);
 
 		station.setStationID(7);
 		sensor.setStation(station);
@@ -93,6 +96,8 @@ class SensorServiceTests {
 		type = new SensorType();
 		sensor.setSensorID(3);
 		sensor.setSensorData(4);
+		sensor.setActiveData(true);
+
 
 		station.setStationID(5);
 		sensor.setStation(station);

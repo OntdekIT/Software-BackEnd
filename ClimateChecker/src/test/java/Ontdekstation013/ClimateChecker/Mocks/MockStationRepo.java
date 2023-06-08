@@ -197,6 +197,12 @@ public class MockStationRepo implements StationRepositoryCustom {
 
     @Override
     public Optional<Station> findByRegistrationCodeAndDatabaseTag(long registrationCode, String databaseTag) {
-        return null;
+        List<Station> stationList = new ArrayList<>();
+        for (Station station: stations) {
+            if (station.getRegistrationCode() == registrationCode && station.getDatabaseTag().equals(databaseTag)){
+                return Optional.of(station);
+            }
+        }
+        return Optional.of(new Station());
     }
 }

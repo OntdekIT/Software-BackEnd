@@ -89,8 +89,5 @@ class LocationServiceTests {
 		Assertions.assertEquals(20, locations.get(1).getLatitude());
 		Assertions.assertEquals(200, locations.get(1).getLongitude());
 		Assertions.assertEquals(2000, locations.get(1).getStation().getStationID());
-
-
-
 	}
 }
