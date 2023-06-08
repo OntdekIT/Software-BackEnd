@@ -3,6 +3,7 @@ package Ontdekstation013.ClimateChecker.services;
 import Ontdekstation013.ClimateChecker.Mocks.MockSensorRepo;
 import Ontdekstation013.ClimateChecker.Mocks.MockStationRepo;
 import Ontdekstation013.ClimateChecker.Mocks.MockTypeRepo;
+import Ontdekstation013.ClimateChecker.Mocks.MockUserRepo;
 import Ontdekstation013.ClimateChecker.models.*;
 import Ontdekstation013.ClimateChecker.models.dto.*;
 import Ontdekstation013.ClimateChecker.services.converters.SensorConverter;
@@ -22,6 +23,7 @@ class StationServiceTests {
 	private MockStationRepo mockRepo;
 	private MockSensorRepo mockSensorRepo;
 	private MockTypeRepo mockTypeRepo;
+	private MockUserRepo mockUserRepo;
 	private SensorConverter sensorConverter;
 	private StationConverter stationConverter;
 
@@ -33,10 +35,11 @@ class StationServiceTests {
 		this.mockRepo = new MockStationRepo();
 		this.mockSensorRepo = new MockSensorRepo();
 		this.mockTypeRepo = new MockTypeRepo();
+		this.mockUserRepo = new MockUserRepo();
 		this.sensorConverter = new SensorConverter();
 		this.stationConverter = new StationConverter();
 		this.sensorService = new SensorService(mockSensorRepo, mockTypeRepo, sensorConverter, mockRepo);
-		this.stationService = new StationService(mockRepo, sensorService);
+		this.stationService = new StationService(mockRepo, sensorService, mockUserRepo);
 
 
 		List<Station> stations = new ArrayList<>();
@@ -185,7 +188,7 @@ class StationServiceTests {
 		dto.setUserId(4);
 		dto.setStationName("nameTest");
 		dto.setHeight(54);
-		dto.setPublic(true);
+		dto.setPublicInfo(true);
 
 		Assertions.assertTrue(stationService.registerStation(dto));
 
@@ -193,7 +196,7 @@ class StationServiceTests {
 
 		Assertions.assertEquals(dto.getStationName(), result.getName());
 		Assertions.assertEquals(dto.getHeight(), result.getLocation().getHeight());
-		Assertions.assertEquals(dto.isPublic(), result.isPublic());
+		Assertions.assertEquals(dto.isPublicInfo(), result.isPublic());
 	}
 
 	@Test

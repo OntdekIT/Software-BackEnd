@@ -212,4 +212,9 @@ public class MockSensorRepo implements SensorRepositoryCustom {
         }
         return sensorList;
     }
+
+    @Override
+    public Optional<List<Sensor>> findAllByActiveData(boolean activeDataInput) {
+        return Optional.empty();
+    }
 }
