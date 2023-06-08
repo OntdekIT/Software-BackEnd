@@ -94,6 +94,7 @@ public class SensorService {
 
         //foreach type
         for (SensorType type: sensorTypes){
+
             // get all sensor values per sensor type
             List<sensorDto> sensors = getSensorsByType(type.getTypeID());
 
@@ -160,7 +161,11 @@ public class SensorService {
 
         List<sensorDto> newDtoList = new ArrayList<>();
         for (Sensor sensor: sensorList) {
-            if (sensor.getStation().getStationID() == stationId && sensor.isActiveData()) // Sensorvalidator
+            // Dont show battery data
+            if(sensor.getSensorType().getTypeID() == 7){
+
+            }
+            else if (sensor.getStation().getStationID() == stationId && sensor.isActiveData()) // Sensorvalidator
             newDtoList.add(sensorConverter.sensorToSensorDTO(sensor));
 
         }

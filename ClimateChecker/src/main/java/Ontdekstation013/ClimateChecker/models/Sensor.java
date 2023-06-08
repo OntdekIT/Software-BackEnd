@@ -16,7 +16,7 @@ public class Sensor {
     private long SensorID;
 
     @ManyToOne
-    @JoinColumn(name= "registrationCode") //, referencedColumnName="registrationCode")
+    @JoinColumn(name= "stationID")
     private Station station;
 
     private int sensorData;

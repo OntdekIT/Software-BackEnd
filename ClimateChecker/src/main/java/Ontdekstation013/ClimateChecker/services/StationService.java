@@ -1,6 +1,7 @@
 package Ontdekstation013.ClimateChecker.services;
 
 import Ontdekstation013.ClimateChecker.models.Location;
+import Ontdekstation013.ClimateChecker.models.Sensor;
 import Ontdekstation013.ClimateChecker.models.Station;
 
 import java.util.ArrayList;
