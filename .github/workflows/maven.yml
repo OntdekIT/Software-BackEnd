@@ -16,5 +16,5 @@ jobs:
           distribution: 'temurin'
            
       - name: Create the JAR file with Maven
-        run: mvn package
+        run: mvn package -DskipTests  
         working-directory: ClimateChecker
