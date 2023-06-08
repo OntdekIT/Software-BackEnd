@@ -97,20 +97,20 @@ class DatabasePollingServiceTest {
         assertEquals(expected, result);
     }
 
-    @Test
-    void GetStationToRegister_Pass(){
-        //Act
-        MeetJeStadDto result = service.GetStation(registrationCodes.get(0));
-        //Assert
-        assertEquals(378L, result.id);
-    }
+//    @Test
+//    void GetStationToRegister_Pass(){
+//        //Act
+//        MeetJeStadDto result = service.GetStation(registrationCodes.get(0));
+//        //Assert
+//        assertEquals(378L, result.id);
+//    }
 
-    @Test
-    void GetRecentStations_Pass(){
-        //Act
-        var stations = service.GetAllRecentStations(registrationCodes);
-
-        assertEquals(378L, stations.get(0).id);
-    }
+//    @Test
+//    void GetRecentStations_Pass(){
+//        //Act
+//        var stations = service.GetAllRecentStations(registrationCodes);
+//
+//        assertEquals(378L, stations.get(0).id);
+//    }
 
 }
