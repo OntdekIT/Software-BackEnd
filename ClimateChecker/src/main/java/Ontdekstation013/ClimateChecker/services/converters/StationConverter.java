@@ -3,15 +3,12 @@ package Ontdekstation013.ClimateChecker.services.converters;
 import Ontdekstation013.ClimateChecker.models.Station;
 import Ontdekstation013.ClimateChecker.models.dto.*;
 import Ontdekstation013.ClimateChecker.services.SensorService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class StationConverter {
-    private final SensorService sensorService;
 
-    public StationConverter(SensorService sensorService) {
-        this.sensorService = sensorService;
-    }
 
     public stationTitleDto stationToStationTitleDTo(Station station){
         stationTitleDto newdto = new stationTitleDto();
@@ -29,9 +26,9 @@ public class StationConverter {
         newdto.setLatitude(station.getLocation().getLatitude());
         newdto.setLongitude(station.getLocation().getLongitude());
         newdto.setIspublic(station.isPublic());
-        newdto.setSensors(sensorService.getSensorsByStationId(station.getStationID()));
 
         return newdto;
     }
+
 
 }

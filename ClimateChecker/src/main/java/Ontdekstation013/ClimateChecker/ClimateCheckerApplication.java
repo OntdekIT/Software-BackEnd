@@ -35,8 +35,6 @@ public class ClimateCheckerApplication {
 				userRepository.save(user);
 			}
 
-
-
 			List<Region> regions = new ArrayList<>();
 			regions.add(new Region(1L, "Tilburg Noord"));
 			regions.add(new Region(2L, "Tilburg Oud-Noord"));
@@ -97,10 +95,6 @@ public class ClimateCheckerApplication {
 			regionCordsRepository.save(new RegionCords(38L, regions.get(5), 51.55400163051958, 5.085270726191843));
 			regionCordsRepository.save(new RegionCords(39L, regions.get(5), 51.55544653351087, 5.073630409560555));
 
-
-
-
-
 			//Seed SensorType
 			List<SensorType> sensorTypes = new ArrayList<>();
 
@@ -110,22 +104,31 @@ public class ClimateCheckerApplication {
 			sensorTypes.add(new SensorType(4L, "Fijnstof"));
 			sensorTypes.add(new SensorType(5L, "Luchtvochtigheid"));
 			sensorTypes.add(new SensorType(6L, "Windsnelheid"));
+			sensorTypes.add(new SensorType(7L, "Batterij"));
 
 			for (SensorType sensorType: sensorTypes) {
 				typeRepository.save(sensorType);
 			}
 
-
 			//Seed Location
 			List<Location> locations = new ArrayList<>();
 
-			locations.add(new Location(1L, (float)51.581124, (float)4.994231, (float) 1.0, "N"));
-			locations.add(new Location(2L, (float)51.575043, (float)5.002305, (float) 6.0, "E"));
-			locations.add(new Location(3L, (float)51.539151, (float)5.079001, (float) 38.2, "N"));
-			locations.add(new Location(4L, (float)51.56664652915646, (float)5.0888906124543665, (float) 2.0, "E"));
-			locations.add(new Location(5L, (float)51.58398517610992, (float)5.086270119955303, (float) 4.0,"S"));
-			locations.add(new Location(6L, (float)51.55800402393493, (float)5.092794917662567, (float) 10.0,"W"));
-			locations.add(new Location(7L, (float)51.58102914210408, (float)5.092454772670171, (float) 10.0,"E"));
+//			locations.add(new Location(1L, (float)51.581124, (float)4.994231, (float) 1.0, "N"));
+//			locations.add(new Location(2L, (float)51.575043, (float)5.002305, (float) 6.0, "E"));
+//			locations.add(new Location(3L, (float)51.539151, (float)5.079001, (float) 38.2, "N"));
+//			locations.add(new Location(4L, (float)51.56664652915646, (float)5.0888906124543665, (float) 2.0, "E"));
+//			locations.add(new Location(5L, (float)51.58398517610992, (float)5.086270119955303, (float) 4.0,"S"));
+//			locations.add(new Location(6L, (float)51.55800402393493, (float)5.092794917662567, (float) 10.0,"W"));
+//			locations.add(new Location(7L, (float)51.58102914210408, (float)5.092454772670171, (float) 10.0,"E"));
+			locations.add(new Location(1L, (float)51.5404, (float)5.08051, (float) 10.0,"E"));
+			locations.add(new Location(2L, (float)51.577, (float)5.09702, (float) 10.0,"E"));
+			locations.add(new Location(3L, (float)51.5782, (float)5.09769, (float) 10.0,"E"));
+			locations.add(new Location(4L, (float)51.5776, (float)5.09738, (float) 10.0,"E"));
+			locations.add(new Location(5L, (float)51.5403, (float)5.08044, (float) 10.0,"E"));
+			locations.add(new Location(6L, (float)51.5772, (float)5.09912, (float) 10.0,"E"));
+			locations.add(new Location(7L, (float)51.5475, (float)5.04715, (float) 10.0,"E"));
+			locations.add(new Location(8L, (float)51.5613, (float)5.06723, (float) 10.0,"E"));
+
 
 			for (Location location : locations) {
 				locationRepository.save(location);
@@ -134,43 +137,29 @@ public class ClimateCheckerApplication {
 			//Seed Station
 			List<Station> stations = new ArrayList<>();
 
-			stations.add(new Station(1L, 4, "MJS","Voortuin", locations.get(0), users.get(0), true));
-			stations.add(new Station(2L, 60, "MJS",  "Industrieterrein", locations.get(1), users.get(0), false));
-			stations.add(new Station(3L, 33, "MJS","Fontys dak", locations.get(2), users.get(1), true));
-			stations.add(new Station(4L, 2, "MJS","Besterdplein", locations.get(3), users.get(1), true));
-			stations.add(new Station(5L, 11, "MJS","Wagnerplein", locations.get(4), users.get(2), true));
-			stations.add(new Station(6L, 98, "MJS","013 Poppodium", locations.get(5), users.get(3), true));
-			stations.add(new Station(7L, 51, "MJS","Heikantlaan", locations.get(6), users.get(4), true));
+//			stations.add(new Station(1L, 4, "MJS","Voortuin", locations.get(0), users.get(0), true));
+//			stations.add(new Station(2L, 60, "MJS",  "Industrieterrein", locations.get(1), users.get(0), false));
+//			stations.add(new Station(3L, 33, "MJS","Fontys dak", locations.get(2), users.get(1), true));
+//			stations.add(new Station(4L, 2, "MJS","Besterdplein", locations.get(3), users.get(1), true));
+//			stations.add(new Station(5L, 11, "MJS","Wagnerplein", locations.get(4), users.get(2), true));
+//			stations.add(new Station(6L, 98, "MJS","013 Poppodium", locations.get(5), users.get(3), true));
+//			stations.add(new Station(7L, 51, "MJS","Heikantlaan", locations.get(6), users.get(4), true));
+			stations.add(new Station(1L, 378, "MJS","Fontys Campus", locations.get(0), users.get(4), true));
+			stations.add(new Station(2L, 402, "MJS","402", locations.get(1), users.get(4), true));
+			stations.add(new Station(3L, 452, "MJS","452", locations.get(2), users.get(4), true));
+			stations.add(new Station(4L, 472, "MJS","472", locations.get(3), users.get(4), true));
+			stations.add(new Station(5L, 480, "MJS","480", locations.get(4), users.get(4), true));
+			stations.add(new Station(6L, 483, "MJS","483", locations.get(5), users.get(4), true));
+			stations.add(new Station(7L, 580, "MJS","580", locations.get(6), users.get(4), true));
+			stations.add(new Station(8L, 674, "MJS","674", locations.get(7), users.get(4), true));
 
 			for (Station station : stations) {
 				stationRepository.save(station);
 			}
 
 			//Seed Sensor
-			sensorRepository.save(new Sensor(1L, 10, sensorTypes.get(0), stations.get(0)));
-			sensorRepository.save(new Sensor(2L, 12, sensorTypes.get(0), stations.get(1)));
-			sensorRepository.save(new Sensor(3L, 9, sensorTypes.get(0), stations.get(2)));
-			sensorRepository.save(new Sensor(4L, 1, sensorTypes.get(1), stations.get(0)));
-			sensorRepository.save(new Sensor(5L, 5, sensorTypes.get(1), stations.get(1)));
-			sensorRepository.save(new Sensor(6L, 3, sensorTypes.get(1), stations.get(2)));
-			sensorRepository.save(new Sensor(7L, 4, sensorTypes.get(2), stations.get(0)));
-
-			sensorRepository.save(new Sensor(8L, 6, sensorTypes.get(2), stations.get(1)));
-			sensorRepository.save(new Sensor(9L, 2, sensorTypes.get(1), stations.get(1)));
-			sensorRepository.save(new Sensor(10L, 4, sensorTypes.get(3), stations.get(0)));
-			sensorRepository.save(new Sensor(11L, 1, sensorTypes.get(3), stations.get(1)));
-			sensorRepository.save(new Sensor(12L, 1, sensorTypes.get(3), stations.get(2)));
-
-			sensorRepository.save(new Sensor(13L, 10, sensorTypes.get(4), stations.get(0)));
-			sensorRepository.save(new Sensor(14L, 1, sensorTypes.get(4), stations.get(1)));
-			sensorRepository.save(new Sensor(15L, 4, sensorTypes.get(5), stations.get(2)));
-			sensorRepository.save(new Sensor(16L, 6, sensorTypes.get(5), stations.get(0)));
-			sensorRepository.save(new Sensor(17L, 5, sensorTypes.get(5), stations.get(1)));
-
-			sensorRepository.save(new Sensor(19L, 12, sensorTypes.get(0), stations.get(3)));
-			sensorRepository.save(new Sensor(20L, 13, sensorTypes.get(0), stations.get(4)));
-			sensorRepository.save(new Sensor(21L, 9, sensorTypes.get(0), stations.get(5)));
-			sensorRepository.save(new Sensor(22L, 14, sensorTypes.get(0), stations.get(6)));
+			sensorRepository.save(new Sensor(1L, 10, sensorTypes.get(0), stations.get(0),true));
+			sensorRepository.save(new Sensor(11L, 1, sensorTypes.get(3), stations.get(1), true));
 
 		};
 	}

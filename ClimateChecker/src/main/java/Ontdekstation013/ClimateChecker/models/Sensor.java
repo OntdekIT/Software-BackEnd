@@ -16,7 +16,7 @@ public class Sensor {
     private long SensorID;
 
     @ManyToOne
-    @JoinColumn(name= "stationId")
+    @JoinColumn(name= "registrationCode") //, referencedColumnName="registrationCode")
     private Station station;
 
     private int sensorData;
@@ -25,20 +25,32 @@ public class Sensor {
     @JoinColumn(name = "sensorTypeID")
     private SensorType sensorType;
 
+    private boolean activeData;
 
-
-
-    public Sensor(long id, Station station, int sensorData, SensorType sensorType){
-        this.SensorID = id;
-        this.station = station;
-        this.sensorData = sensorData;
-        this.sensorType = sensorType;
-    }
 
     public Sensor(long id, int sensorData, SensorType sensorType, Station station){
         this.SensorID = id;
         this.station = station;
         this.sensorData = sensorData;
         this.sensorType = sensorType;
+    }
+    public Sensor(long id, int sensorData, SensorType sensorType, Station station, boolean activeData){
+        this.SensorID = id;
+        this.station = station;
+        this.sensorData = sensorData;
+        this.sensorType = sensorType;
+        this.activeData = activeData;
+    }
+
+    public Sensor(int sensorData, SensorType sensorType, Station station){
+        this.station = station;
+        this.sensorData = sensorData;
+        this.sensorType = sensorType;
+    }
+    public Sensor(int sensorData, SensorType sensorType, Station station, boolean activeData){
+        this.station = station;
+        this.sensorData = sensorData;
+        this.sensorType = sensorType;
+        this.activeData = activeData;
     }
 }

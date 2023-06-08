@@ -108,6 +108,7 @@ public class StationService {
         return newDtoList;
     }
 
+
     // not yet functional
     public List<stationTitleDto> getAllByPageId(long pageId) {
         List<stationTitleDto> newDtoList = new ArrayList<stationTitleDto>();
@@ -165,6 +166,7 @@ public class StationService {
 
 
 
+
     // Zet meetjestad station in de database
     public boolean createStation(createStationDto createStationDto){
         boolean succes = false;
@@ -186,6 +188,15 @@ public class StationService {
     }
 
 
+    public List<Long> getAllRegistrationCode(){
+        Iterable<Station> StationList = stationRepository.findAll();
+        List<Long> registrationCodeList = new ArrayList<>();
+        for (Station station: StationList)
+        {
+            registrationCodeList.add(station.getRegistrationCode());
+        }
+        return registrationCodeList;
+    }
 
 
 
