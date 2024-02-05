@@ -24,7 +24,6 @@ RUN mvn clean package
 FROM base AS release
 # copy target .jar file
 COPY --from=dependencies /${APP_PATH}/target/*.jar climatechecker.jar
-COPY default.conf /etc/nginx/conf.d/default.conf
 
 # start the application
 ENTRYPOINT ["java", "-jar", "/climatechecker.jar"]
