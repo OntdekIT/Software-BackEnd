@@ -1,6 +1,7 @@
 version: "3.7"
 services:
   api_service:
+    container_name: backend
     restart: always
     build:
       context: .
@@ -13,11 +14,12 @@ services:
       - springapimysql-net
     environment:
       - spring.datasource.url=jdbc:mariadb://mariadb:3306/ontdekstation013?allowPublicKeyRetrieval=true
-
     volumes:
       - .m2:/root/.m2
+      - ./res/nginx.conf:/etc/nginx/conf.d/default.conf
 
   mariadb:
+    container_name: database
     image: "mariadb:lts"
     restart: always
     ports:
@@ -30,7 +32,7 @@ services:
       MYSQL_PASSWORD: ontdekstation013
       MYSQL_ROOT_PASSWORD: ontdekstation
     volumes:
-      - "./dump-ontdekstation013.sql:/docker-entrypoint-initdb.d/1.sql"
+      - "./res/dump-ontdekstation013.sql:/docker-entrypoint-initdb.d/1.sql"
 
 networks:
   springapimysql-net:
