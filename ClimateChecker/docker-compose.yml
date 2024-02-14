@@ -1,5 +1,16 @@
 version: "3.7"
 services:
+  nginx_service:
+    container_name: nginx
+    restart: always
+    build:
+      context: /home/student/dev/Software-FrontEnd/
+      dockerfile: Dockerfile.release
+    ports:
+      - 80:80
+    networks:
+      - springapimysql-net
+
   api_service:
     container_name: backend
     restart: always
