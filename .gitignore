@@ -33,7 +33,6 @@ build/
 .vscode/
 
 ### H2 Database ###
-*.sql
 */Database/
 
 ClimateChecker/Database/climateCheckerDB.mv.db

@@ -1,6 +1,6 @@
 package Ontdekstation013.ClimateChecker.features.user;
-import Ontdekstation013.ClimateChecker.exception.BadRequestException;
-import Ontdekstation013.ClimateChecker.exception.ConflictException;
+import Ontdekstation013.ClimateChecker.exception.ExistingUniqueIdentifierException;
+import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.exception.NotFoundException;
 import Ontdekstation013.ClimateChecker.features.authentication.Token;
 import Ontdekstation013.ClimateChecker.features.authentication.TokenRepository;
@@ -69,12 +69,12 @@ public class UserService {
         if (editUserDto.getFirstName().length() < 256)
             user.setFirstName(editUserDto.getFirstName());
         else
-            throw new BadRequestException(null); //First name can't be longer than 256 characters
+            throw new InvalidArgumentException("First name can't be longer than 256 characters");
 
         if (editUserDto.getLastName().length() < 256)
             user.setLastName(editUserDto.getLastName());
         else
-            throw new BadRequestException(null); //Last name can't be longer than 256 characters
+            throw new InvalidArgumentException("Last name can't be longer than 256 characters");
 
 
         if (editUserDto.getUserName().length() < 256) {
@@ -82,11 +82,11 @@ public class UserService {
                 if (!userRepository.existsUserByUserName(editUserDto.getUserName())) {
                     user.setUserName(editUserDto.getUserName());
                 } else {
-                    throw new ConflictException(1); //Username previously used
+                    throw new ExistingUniqueIdentifierException("Username Already in use");
                 }
             }
         } else {
-            throw new BadRequestException(null); //Last name can't be longer than 256 characters
+            throw new InvalidArgumentException("Last name can't be longer than 256 characters");
         }
 
         editUserDto.setMailAddress(editUserDto.getMailAddress().toLowerCase());
@@ -98,10 +98,10 @@ public class UserService {
                     userRepository.save(user);
                     user.setMailAddress(mail);
                 } else {
-                    throw new ConflictException(2); //Email already previously used
+                    throw new ExistingUniqueIdentifierException("Email already in use");
                 }
             } else {
-                throw new BadRequestException(null); //Invalid email address
+                throw new InvalidArgumentException("Invalid email address");
             }
         }
 
@@ -117,20 +117,20 @@ public class UserService {
     public User createNewUser(registerDto registerDto) throws Exception {
         User user = new User();
         if (registerDto.getFirstName().length() > 256) {
-            throw new BadRequestException(null); //First name can't be longer than 256 characters
+            throw new InvalidArgumentException("First name can't be longer than 256 characters");
         }
         if (registerDto.getLastName().length() > 256) {
-            throw new BadRequestException(null); //Last name can't be longer than 256 characters
+            throw new InvalidArgumentException("Last name can't be longer than 256 characters");
         }
 
         if (registerDto.getUserName().length() < 256) {
             if (!userRepository.existsUserByUserName(registerDto.getUserName())) {
                 user.setUserName(registerDto.getUserName());
             } else {
-                throw new ConflictException(1); //Username previously used
+                throw new ExistingUniqueIdentifierException("Username already in use");
             }
         } else {
-            throw new BadRequestException(null); //Last name can't be longer than 256 characters
+            throw new InvalidArgumentException("Last name can't be longer than 256 characters");
         }
 
         registerDto.setMailAddress(registerDto.getMailAddress().toLowerCase());
@@ -138,20 +138,20 @@ public class UserService {
             if (!userRepository.existsUserByMailAddress(registerDto.getMailAddress())) {
                 user = new User(registerDto.getMailAddress(), registerDto.getFirstName(), registerDto.getLastName(), registerDto.getUserName());
             } else {
-                throw new ConflictException(2); //Username previously used
+                throw new ExistingUniqueIdentifierException("Email already in use");
             }
         } else {
-            throw new BadRequestException(null); //invalid email adress
+            throw new InvalidArgumentException("invalid email address");
         }
 
         user = userRepository.save(user);
         return user;
     }
 
-    public User verifyMail(loginDto loginDto) throws Exception {
+    public User verifyMail(loginDto loginDto) {
         User user = userRepository.findByMailAddress(loginDto.getMailAddress());
         if (user == null){
-            throw new NotFoundException(null); //user not found
+            throw new NotFoundException("User not found");
         }
         return user;
     }

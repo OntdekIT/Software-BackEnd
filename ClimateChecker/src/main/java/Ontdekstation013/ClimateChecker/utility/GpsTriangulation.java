@@ -1,5 +1,9 @@
 package Ontdekstation013.ClimateChecker.utility;
 
+import Ontdekstation013.ClimateChecker.features.neighbourhood.NeighbourhoodCoords;
+
+import java.util.List;
+
 public class GpsTriangulation {
     // Algorithm for finding a gps point inside an area
     public static boolean pointInPolygon(float[][] polygon, float[] point) {

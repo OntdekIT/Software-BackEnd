@@ -2,12 +2,8 @@ package Ontdekstation013.ClimateChecker.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.util.HashMap;
-import java.util.Map;
 
 // LARS
 @Slf4j
@@ -26,5 +22,19 @@ public class ExceptionHandler {
     public OntdekstationException handleApiInvalidArgumentException(InvalidArgumentException e){
         log.warn("An InvalidArgumentException occurred", e);
         return new OntdekstationException(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @org.springframework.web.bind.annotation.ExceptionHandler
+    public OntdekstationException handleNotFoundException(NotFoundException e){
+        log.warn("A NotFoundException occurred", e);
+        return new OntdekstationException(HttpStatus.NO_CONTENT,e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @org.springframework.web.bind.annotation.ExceptionHandler
+    public OntdekstationException handleExistingUniqueIdentifierException (ExistingUniqueIdentifierException e){
+        log.warn("An ExistingUniqueIdentifierException occurred", e);
+        return new OntdekstationException(HttpStatus.CONFLICT, e.getMessage());
     }
 }

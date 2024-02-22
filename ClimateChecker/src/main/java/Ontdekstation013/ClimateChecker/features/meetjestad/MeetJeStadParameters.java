@@ -8,5 +8,6 @@ public class MeetJeStadParameters {
     public Instant StartDate;
     public Instant EndDate;
     public List<Integer> StationIds = new ArrayList<>();
-    public int Limit = 0;
+    public int Limit;
+    public boolean includeFaultyMeasurements;
 }

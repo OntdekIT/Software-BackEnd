@@ -1,8 +1,12 @@
 package Ontdekstation013.ClimateChecker.features.measurement;
 
+import io.micrometer.core.lang.Nullable;
 import lombok.*;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.*;
 
 @Getter
 @Setter
@@ -13,6 +17,6 @@ public class Measurement {
     private Instant timestamp;
     private float latitude;
     private float longitude;
-    private float temperature;
-    private float humidity;
+    private Float temperature;
+    private Float humidity;
 }
