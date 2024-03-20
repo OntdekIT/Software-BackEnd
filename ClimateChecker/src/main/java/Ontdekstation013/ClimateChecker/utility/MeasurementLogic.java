@@ -35,7 +35,8 @@ public class MeasurementLogic {
         }
 
         // process into DayMeasurementResponses
-        DateTimeFormatter pattern = DateTimeFormatter.ofPattern("dd-MM");
+        //TODO make it give the ISO back
+        DateTimeFormatter pattern = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
         List<DayMeasurementResponse> responseList = new ArrayList<>();
         for (Map.Entry<LocalDate, Set<Measurement>> entry : dayMeasurements.entrySet()) {
             DayMeasurementResponse response = new DayMeasurementResponse();
