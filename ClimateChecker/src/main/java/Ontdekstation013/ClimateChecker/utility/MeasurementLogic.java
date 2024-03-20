@@ -36,7 +36,10 @@ public class MeasurementLogic {
 
         // process into DayMeasurementResponses
         //TODO make it give the ISO back
-        DateTimeFormatter pattern = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+        //the entry key is the date in yyyy-MM-dd format
+        //the response is an average over multiple days dus individual measurements are in correct times but they are grouped by day
+
+        DateTimeFormatter pattern = DateTimeFormatter.ofPattern("dd-MM");
         List<DayMeasurementResponse> responseList = new ArrayList<>();
         for (Map.Entry<LocalDate, Set<Measurement>> entry : dayMeasurements.entrySet()) {
             DayMeasurementResponse response = new DayMeasurementResponse();
