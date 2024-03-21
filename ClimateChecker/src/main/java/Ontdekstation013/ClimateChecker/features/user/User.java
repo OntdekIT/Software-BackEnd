@@ -27,29 +27,25 @@ public class User {
     @NotBlank
     private String lastName;
 
-    private String userName;
-
     @NotBlank
     @Email
     private String mailAddress;
 
     private boolean Admin;
 
-    public User(long id, String firstName, String lastName, String mailAddress, String userName, boolean Admin) {
+    public User(long id, String firstName, String lastName, String mailAddress, boolean Admin) {
         this.userID = id;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.userName = userName;
         this.mailAddress = mailAddress;
         this.Admin = Admin;
     }
 
     //register
-    public User(String mailAddress, String firstName, String lastName, String userName) {
+    public User(String mailAddress, String firstName, String lastName) {
         this.mailAddress = mailAddress;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.userName = userName;
     }
 
 

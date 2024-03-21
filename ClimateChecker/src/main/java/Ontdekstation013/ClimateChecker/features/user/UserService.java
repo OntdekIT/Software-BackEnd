@@ -77,18 +77,6 @@ public class UserService {
             throw new InvalidArgumentException("Last name can't be longer than 256 characters");
 
 
-        if (editUserDto.getUserName().length() < 256) {
-            if (!editUserDto.getUserName().equals(user.getUserName())) {
-                if (!userRepository.existsUserByUserName(editUserDto.getUserName())) {
-                    user.setUserName(editUserDto.getUserName());
-                } else {
-                    throw new ExistingUniqueIdentifierException("Username Already in use");
-                }
-            }
-        } else {
-            throw new InvalidArgumentException("Last name can't be longer than 256 characters");
-        }
-
         editUserDto.setMailAddress(editUserDto.getMailAddress().toLowerCase());
         if (!user.getMailAddress().equals(editUserDto.getMailAddress())) {
             if (editUserDto.getMailAddress().contains("@")) {
@@ -123,20 +111,10 @@ public class UserService {
             throw new InvalidArgumentException("Last name can't be longer than 256 characters");
         }
 
-        if (registerDto.getUserName().length() < 256) {
-            if (!userRepository.existsUserByUserName(registerDto.getUserName())) {
-                user.setUserName(registerDto.getUserName());
-            } else {
-                throw new ExistingUniqueIdentifierException("Username already in use");
-            }
-        } else {
-            throw new InvalidArgumentException("Last name can't be longer than 256 characters");
-        }
-
         registerDto.setMailAddress(registerDto.getMailAddress().toLowerCase());
         if (registerDto.getMailAddress().contains("@")) {
             if (!userRepository.existsUserByMailAddress(registerDto.getMailAddress())) {
-                user = new User(registerDto.getMailAddress(), registerDto.getFirstName(), registerDto.getLastName(), registerDto.getUserName());
+                user = new User(registerDto.getMailAddress(), registerDto.getFirstName(), registerDto.getLastName());
             } else {
                 throw new ExistingUniqueIdentifierException("Email already in use");
             }

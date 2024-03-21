@@ -10,11 +10,9 @@ public class UserConverter {
     public userDataDto userToUserDataDto (User user){
         userDataDto newdto = new userDataDto();
         newdto.setId(user.getUserID());
-        newdto.setUserName(user.getUserName());
         newdto.setMailAddress(user.getMailAddress());
         newdto.setFirstName(user.getFirstName());
         newdto.setLastName(user.getLastName());
-        newdto.setUserName(user.getUserName());
         return newdto;
     }
 
@@ -24,7 +22,6 @@ public class UserConverter {
         newdto.setMailAddress(user.getMailAddress());
         newdto.setLastName(user.getLastName());
         newdto.setFirstName(user.getFirstName());
-        newdto.setUserName(user.getUserName());
         return newdto;
     };
 }
