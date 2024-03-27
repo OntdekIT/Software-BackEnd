@@ -10,6 +10,6 @@ public class registerDto extends Dto{
 
     String firstName;
     String lastName;
-    String userName;
     String mailAddress;
+    String password;
 }

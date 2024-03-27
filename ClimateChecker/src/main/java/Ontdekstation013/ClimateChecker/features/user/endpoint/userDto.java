@@ -7,11 +7,13 @@ import lombok.Setter;
 @Setter
 public class userDto extends Dto{
 
-    long id;
+    Long id;
     private String firstName;
     private String lastName;
     private String userName;
     private String mailAddress;
     private String jwsString;
     private boolean admin;
+
+    private String password;
 }

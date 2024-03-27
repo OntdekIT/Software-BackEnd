@@ -8,4 +8,6 @@ import lombok.Setter;
 @Setter
 public class loginDto extends Dto{
     String mailAddress;
+
+    String password;
 }

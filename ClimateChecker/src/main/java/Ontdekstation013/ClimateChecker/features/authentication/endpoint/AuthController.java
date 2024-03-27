@@ -44,7 +44,7 @@ public class AuthController {
     // login user
     @PostMapping("login")
     public ResponseEntity<Void> loginUser(@RequestBody loginDto loginDto) throws Exception {
-        User user = userService.verifyMail(loginDto);
+        User user = userService.login(loginDto);
         if (user != null) {
             Token token = userService.createToken(user);
             userService.saveToken(token);

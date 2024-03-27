@@ -13,6 +13,7 @@ public class UserConverter {
         newdto.setMailAddress(user.getMailAddress());
         newdto.setFirstName(user.getFirstName());
         newdto.setLastName(user.getLastName());
+        newdto.setPassword(user.getPassword());
         return newdto;
     }
 
@@ -22,6 +23,7 @@ public class UserConverter {
         newdto.setMailAddress(user.getMailAddress());
         newdto.setLastName(user.getLastName());
         newdto.setFirstName(user.getFirstName());
+        newdto.setPassword(user.getPassword());
         return newdto;
     };
 }

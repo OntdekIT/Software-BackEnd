@@ -57,6 +57,7 @@ public class UserService {
     }
 
     // not yet functional
+    // why?
     public List<userDataDto> getAllByPageId(long pageId) {
         List<userDataDto> newDtoList = new ArrayList<userDataDto>();
 
@@ -76,13 +77,14 @@ public class UserService {
         else
             throw new InvalidArgumentException("Last name can't be longer than 256 characters");
 
-
+        //TODO Wachtwoord veranderen toevoegen
         editUserDto.setMailAddress(editUserDto.getMailAddress().toLowerCase());
         if (!user.getMailAddress().equals(editUserDto.getMailAddress())) {
             if (editUserDto.getMailAddress().contains("@")) {
                 if (!userRepository.existsUserByMailAddress(editUserDto.getMailAddress())) {
                     String mail = user.getMailAddress();
                     user.setMailAddress(editUserDto.getMailAddress());
+                    userRepository.save(user);
                     userRepository.save(user);
                     user.setMailAddress(mail);
                 } else {
@@ -96,7 +98,7 @@ public class UserService {
         return user;
     }
 
-    public userDto deleteUser(long id) {
+    public userDto deleteUser(Long id) {
         User user = userRepository.getById(id);
         userRepository.deleteById(id);
         return (userConverter.userToUserDto(user));
@@ -111,10 +113,14 @@ public class UserService {
             throw new InvalidArgumentException("Last name can't be longer than 256 characters");
         }
 
+        if (registerDto.getPassword().length() > 256) {
+            throw new InvalidArgumentException("Password can't be longer than 256 characters");
+        }
+
         registerDto.setMailAddress(registerDto.getMailAddress().toLowerCase());
         if (registerDto.getMailAddress().contains("@")) {
             if (!userRepository.existsUserByMailAddress(registerDto.getMailAddress())) {
-                user = new User(registerDto.getMailAddress(), registerDto.getFirstName(), registerDto.getLastName());
+                user = new User(registerDto.getMailAddress(), registerDto.getFirstName(), registerDto.getLastName(), registerDto.getPassword());
             } else {
                 throw new ExistingUniqueIdentifierException("Email already in use");
             }
@@ -126,7 +132,8 @@ public class UserService {
         return user;
     }
 
-    public User verifyMail(loginDto loginDto) {
+    //TODO email en wachtwoord verifyen
+    public User login(loginDto loginDto) {
         User user = userRepository.findByMailAddress(loginDto.getMailAddress());
         if (user == null){
             throw new NotFoundException("User not found");
