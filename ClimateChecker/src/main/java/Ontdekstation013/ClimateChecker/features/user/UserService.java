@@ -156,14 +156,11 @@ public class UserService {
 
     public Token createToken(User user) {
         UserConverter userConverter = new UserConverter();
-        return jwtService.generateJWS(userConverter.userToUserDto(user)).getJwsString();
-//        Token token = new Token();
-//        token.setUser(user);
-//        token.setCreationTime(LocalDateTime.now());
-//
-//        token.setLinkHash(randomString(32));
-
-        //return token;
+        Token token = new Token();
+        token.setUser(user);
+        token.setCreationTime(LocalDateTime.now());
+        token.setLinkHash(jwtService.createJWT(userConverter.userToUserDto(user)));
+        return token;
     }
 
     private String randomString(int length) {
@@ -222,7 +219,7 @@ public class UserService {
 
     public String createLink(Token token){
         String domain = "http://localhost:3000/";
-        String test = domain + "verify" + "?linkHash=" + token.getLinkHash() + "&email=" + token.getUser().getMailAddress();
+        String test = domain + "verify" + "?linkHash=" + token.getLinkHash() + "&email=" + "OwO";
         return (test);
     }
 

@@ -4,6 +4,7 @@ import Ontdekstation013.ClimateChecker.features.authentication.EmailSenderServic
 import Ontdekstation013.ClimateChecker.features.authentication.JWTService;
 import Ontdekstation013.ClimateChecker.features.authentication.Token;
 import Ontdekstation013.ClimateChecker.features.user.User;
+import Ontdekstation013.ClimateChecker.features.user.UserConverter;
 import Ontdekstation013.ClimateChecker.features.user.UserService;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.userDto;
 
@@ -37,7 +38,8 @@ public class AuthController {
         if (user != null){
             Token token = userService.createToken(user);
             userService.saveToken(token);
-            emailSenderService.sendSignupMail(user.getMailAddress(), user.getFirstName(), user.getLastName(), userService.createLink(token));
+            UserConverter converter = new UserConverter();
+            emailSenderService.sendLoginMail(user.getMailAddress(), user.getFirstName(), user.getLastName(), userService.createLink(token));
             return ResponseEntity.status(HttpStatus.CREATED).body(null);
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
@@ -51,6 +53,7 @@ public class AuthController {
 
             Token token = userService.createToken(user);
             userService.saveToken(token);
+            UserConverter converter = new UserConverter();
             emailSenderService.sendLoginMail(user.getMailAddress(), user.getFirstName(), user.getLastName(), userService.createLink(token));
             return ResponseEntity.status(HttpStatus.OK).body(null);
         }

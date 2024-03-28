@@ -1,7 +1,13 @@
 package Ontdekstation013.ClimateChecker.features.authentication;
 
 import Ontdekstation013.ClimateChecker.features.authentication.endpoint.JwsDTO;
+import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.userDto;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Service;
@@ -10,6 +16,7 @@ import javax.crypto.SecretKey;
 import javax.validation.constraints.NotNull;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * This {@code Service Layer} is responsible for the JWS tokens. For more information look in the following documentation.
@@ -17,6 +24,39 @@ import java.util.Date;
  */
 @Service
 public class JWTService {
+
+    Algorithm algorithm = Algorithm.HMAC256("s3cr3tK3y");
+
+    JWTVerifier verifier = JWT.require(algorithm)
+            .withIssuer("ontdekstation013")
+            .build();
+
+    public String createJWT(userDto dto){
+        return JWT.create()
+                .withIssuer("ontdekstation013")
+                .withClaim("id", dto.getId())
+                .withIssuedAt(new Date())
+                .withExpiresAt(new Date(System.currentTimeMillis() + 5000L))
+                .withJWTId(UUID.randomUUID()
+                        .toString())
+                .withNotBefore(new Date(System.currentTimeMillis() + 1000L))
+                .sign(algorithm);
+    }
+
+    public boolean verifyJWT(String token){
+        try {
+            DecodedJWT decodedJWT = verifier.verify(token);
+            return true;
+        } catch (JWTVerificationException e) {
+            System.out.println(e.getMessage());
+        }
+        return false;
+    }
+
+    public Integer getIdFromJWT(String token){
+        DecodedJWT decodedJWT = verifier.verify(token);
+        return decodedJWT.getClaim("id").asInt();
+    }
 
     Calendar calendar;
     /**
