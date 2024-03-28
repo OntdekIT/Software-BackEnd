@@ -2,6 +2,7 @@ package Ontdekstation013.ClimateChecker.features.user;
 import Ontdekstation013.ClimateChecker.exception.ExistingUniqueIdentifierException;
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.exception.NotFoundException;
+import Ontdekstation013.ClimateChecker.features.authentication.JWTService;
 import Ontdekstation013.ClimateChecker.features.authentication.Token;
 import Ontdekstation013.ClimateChecker.features.authentication.TokenRepository;
 import Ontdekstation013.ClimateChecker.features.authentication.endpoint.loginDto;
@@ -27,14 +28,17 @@ public class UserService {
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
     private PasswordEncoder encoder = new BCryptPasswordEncoder();
+    private final JWTService jwtService;
+
 
     private final UserConverter userConverter;
 
     @Autowired
-    public UserService(UserRepository userRepository, TokenRepository tokenRepository) {
+    public UserService(UserRepository userRepository, TokenRepository tokenRepository, JWTService jwtService) {
         this.userRepository = userRepository;
         this.tokenRepository = tokenRepository;
         this.userConverter = new UserConverter();
+        this.jwtService = jwtService;
     }
 
     public userDto findUserById(long id) {
@@ -143,20 +147,23 @@ public class UserService {
     public userDto getUserByMail(String mail) {
         ModelMapper mapper = new ModelMapper();
         userDto dto = new userDto();
-        mapper.map(userRepository.findByMailAddress(mail), dto);
+        UserConverter converter = new UserConverter();
+        dto = converter.userToUserDto(userRepository.findByMailAddress(mail));
+        //dto = new userDto(mail);
          return dto;
     }
 
 
     public Token createToken(User user) {
-        Token token = new Token();
+        UserConverter userConverter = new UserConverter();
+        return jwtService.generateJWS(userConverter.userToUserDto(user)).getJwsString();
+//        Token token = new Token();
+//        token.setUser(user);
+//        token.setCreationTime(LocalDateTime.now());
+//
+//        token.setLinkHash(randomString(32));
 
-        token.setUser(user);
-        token.setCreationTime(LocalDateTime.now());
-
-        token.setLinkHash(randomString(32));
-
-        return token;
+        //return token;
     }
 
     private String randomString(int length) {
@@ -188,7 +195,7 @@ public class UserService {
         if (officialToken != null){
             if (officialToken.getLinkHash().equals(linkHash)) {
                 if (officialToken.getCreationTime().isBefore(LocalDateTime.now().plusMinutes(5))) {
-                    tokenRepository.delete(officialToken);
+                    //tokenRepository.delete(officialToken);
                     return true;
                 }
             }
@@ -215,7 +222,8 @@ public class UserService {
 
     public String createLink(Token token){
         String domain = "http://localhost:3000/";
-        return (domain + "Verify/" + token.getLinkHash() + "/" + token.getUser().getMailAddress());
+        String test = domain + "verify" + "?linkHash=" + token.getLinkHash() + "&email=" + token.getUser().getMailAddress();
+        return (test);
     }
 
     public String createLink(Token token, String newEmail){ //for changing to new email address

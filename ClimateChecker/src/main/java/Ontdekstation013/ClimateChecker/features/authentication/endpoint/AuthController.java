@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/Authentication")
 
@@ -46,6 +48,7 @@ public class AuthController {
     public ResponseEntity<Void> loginUser(@RequestBody loginDto loginDto) throws Exception {
         User user = userService.login(loginDto);
         if (user != null) {
+
             Token token = userService.createToken(user);
             userService.saveToken(token);
             emailSenderService.sendLoginMail(user.getMailAddress(), user.getFirstName(), user.getLastName(), userService.createLink(token));
@@ -55,12 +58,16 @@ public class AuthController {
     }
 
     // verify the login / (or first register)
-    @GetMapping("verify")
-    public ResponseEntity<userDto> fetchLink(@RequestParam String linkHash, @RequestParam String email){
+    @PostMapping("verify")
+    public ResponseEntity<userDto> verifyLink(@RequestBody Map<String, String> requestBody) {
+        String linkHash = requestBody.get("linkHash");
+        String email = requestBody.get("email");
+
         if (userService.verifyToken(linkHash, email)){
             userDto dto = jwtService.generateJWS(userService.getUserByMail(email));
             return ResponseEntity.ok(dto);
         }
+
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
     }
 }

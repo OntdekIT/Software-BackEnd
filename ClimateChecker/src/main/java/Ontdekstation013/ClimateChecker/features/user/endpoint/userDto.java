@@ -16,4 +16,9 @@ public class userDto extends Dto{
     private boolean admin;
 
     private String password;
+
+    public userDto (){}
+    public userDto (String email){
+        mailAddress = email;
+    }
 }

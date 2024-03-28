@@ -35,6 +35,7 @@ public class User {
 
     @NotBlank
     private String password;
+    private boolean verified = false;
 
     public User(Long id, String firstName, String lastName, String mailAddress, boolean Admin, String password) {
         this.userID = id;
@@ -58,5 +59,9 @@ public class User {
         this.userID = id;
         this.mailAddress = mailAddress;
         this.password = password;
+    }
+
+    public User(String token, String email){
+
     }
 }
