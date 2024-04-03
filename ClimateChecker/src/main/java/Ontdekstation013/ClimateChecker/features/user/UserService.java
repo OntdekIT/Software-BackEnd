@@ -17,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.Cookie;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -154,12 +155,27 @@ public class UserService {
     }
 
 
-    public Token createToken(User user) {
-        UserConverter userConverter = new UserConverter();
+    public Cookie createCookie(User user) {
+        Cookie jwtTokenCookie = new Cookie("user-id", user.getUserID().toString());
+        jwtTokenCookie.setMaxAge(6000);
+        jwtTokenCookie.setSecure(true);
+        jwtTokenCookie.setHttpOnly(true);
+        jwtTokenCookie.setPath("/user/");
+
+        return jwtTokenCookie;
+//        UserConverter userConverter = new UserConverter();
+//        Token token = new Token();
+//        token.setUser(user);
+//        token.setCreationTime(LocalDateTime.now());
+//        token.setLinkHash(jwtService.createJWT(userConverter.userToUserDto(user)));
+//        return token;
+    }
+
+    public Token createVerifyToken(User user){
         Token token = new Token();
         token.setUser(user);
         token.setCreationTime(LocalDateTime.now());
-        token.setLinkHash(jwtService.createJWT(userConverter.userToUserDto(user)));
+        token.setLinkHash(randomString(32));
         return token;
     }
 

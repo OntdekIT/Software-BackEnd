@@ -1,5 +1,6 @@
 package Ontdekstation013.ClimateChecker.features.user;
 
+import Ontdekstation013.ClimateChecker.features.user.endpoint.userDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -63,5 +64,11 @@ public class User {
 
     public User(String token, String email){
 
+    }
+
+    public User(userDto dto){
+        this.userID = dto.getId();
+        this.firstName = dto.getFirstName();
+        this.lastName = dto.getLastName();
     }
 }

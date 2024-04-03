@@ -4,7 +4,6 @@ import Ontdekstation013.ClimateChecker.features.authentication.EmailSenderServic
 import Ontdekstation013.ClimateChecker.features.authentication.JWTService;
 import Ontdekstation013.ClimateChecker.features.authentication.Token;
 import Ontdekstation013.ClimateChecker.features.user.User;
-import Ontdekstation013.ClimateChecker.features.user.UserConverter;
 import Ontdekstation013.ClimateChecker.features.user.UserService;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.userDto;
 
@@ -13,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.Cookie;
 import java.util.Map;
 
 @RestController
@@ -36,9 +36,8 @@ public class AuthController {
     public ResponseEntity<Void> createNewUser(@RequestBody registerDto registerDto) throws Exception {
         User user = userService.createNewUser(registerDto);
         if (user != null){
-            Token token = userService.createToken(user);
+            Token token = userService.createVerifyToken(user);
             userService.saveToken(token);
-            UserConverter converter = new UserConverter();
             emailSenderService.sendLoginMail(user.getMailAddress(), user.getFirstName(), user.getLastName(), userService.createLink(token));
             return ResponseEntity.status(HttpStatus.CREATED).body(null);
         }
@@ -51,9 +50,8 @@ public class AuthController {
         User user = userService.login(loginDto);
         if (user != null) {
 
-            Token token = userService.createToken(user);
+            Token token = userService.createVerifyToken(user);
             userService.saveToken(token);
-            UserConverter converter = new UserConverter();
             emailSenderService.sendLoginMail(user.getMailAddress(), user.getFirstName(), user.getLastName(), userService.createLink(token));
             return ResponseEntity.status(HttpStatus.OK).body(null);
         }
@@ -67,8 +65,8 @@ public class AuthController {
         String email = requestBody.get("email");
 
         if (userService.verifyToken(linkHash, email)){
-            userDto dto = jwtService.generateJWS(userService.getUserByMail(email));
-            return ResponseEntity.ok(dto);
+            Cookie cookie = userService.createCookie(new User(userService.getUserByMail(email)));
+            return ResponseEntity.ok().header("Set-Cookie", cookie.toString()).body(null);
         }
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
