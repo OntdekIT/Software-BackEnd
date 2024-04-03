@@ -192,7 +192,7 @@ public class UserService {
         if (officialToken != null){
             if (officialToken.getLinkHash().equals(linkHash)) {
                 if (officialToken.getCreationTime().isBefore(LocalDateTime.now().plusMinutes(5))) {
-                    //tokenRepository.delete(officialToken);
+                    tokenRepository.delete(officialToken);
                     return true;
                 }
             }
@@ -219,7 +219,7 @@ public class UserService {
 
     public String createLink(Token token){
         String domain = "http://localhost:3000/";
-        String test = domain + "verify" + "?linkHash=" + token.getLinkHash() + "&email=" + "OwO";
+        String test = domain + "verify" + "?linkHash=" + token.getLinkHash() + "&email=" + token.getUser().getMailAddress();
         return (test);
     }
 
