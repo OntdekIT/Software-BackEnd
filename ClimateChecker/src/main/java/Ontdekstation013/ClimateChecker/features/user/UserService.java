@@ -158,9 +158,9 @@ public class UserService {
     public Cookie createCookie(User user) {
         Cookie jwtTokenCookie = new Cookie("user-id", user.getUserID().toString());
         jwtTokenCookie.setMaxAge(6000);
-        jwtTokenCookie.setSecure(true);
+        jwtTokenCookie.setSecure(false);
         jwtTokenCookie.setHttpOnly(true);
-        jwtTokenCookie.setPath("/user/");
+        jwtTokenCookie.setPath("/");
 
         return jwtTokenCookie;
 //        UserConverter userConverter = new UserConverter();
