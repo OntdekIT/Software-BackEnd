@@ -41,7 +41,7 @@ public class AuthController {
         if (user != null){
             Token token = userService.createVerifyToken(user);
             userService.saveToken(token);
-            emailSenderService.sendLoginMail(user.getMailAddress(), user.getFirstName(), user.getLastName(), userService.createLink(token));
+            emailSenderService.sendLoginMail(user.getMailAddress(), user.getFirstName(), user.getLastName(), token.getNumericCode());
             return ResponseEntity.status(HttpStatus.CREATED).body(null);
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
@@ -55,19 +55,16 @@ public class AuthController {
 
             Token token = userService.createVerifyToken(user);
             userService.saveToken(token);
-            emailSenderService.sendLoginMail(user.getMailAddress(), user.getFirstName(), user.getLastName(), userService.createLink(token));
+            emailSenderService.sendLoginMail(user.getMailAddress(), user.getFirstName(), user.getLastName(), token.getNumericCode());
             return ResponseEntity.status(HttpStatus.OK).body(null);
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
     }
 
     @PostMapping("verify")
-    public ResponseEntity<Void> verifyLink(@RequestBody Map<String, String> requestBody, HttpServletResponse response, HttpServletRequest request) {
-        String linkHash = requestBody.get("linkHash");
-        String email = requestBody.get("email");
-
-        if (userService.verifyToken(linkHash, email)){
-            Cookie cookie = userService.createCookie(new User(userService.getUserByMail(email)));
+    public ResponseEntity<Void> verifyLink(@RequestBody verifyDto verifyDto, HttpServletResponse response, HttpServletRequest request) {
+        if (userService.verifyToken(verifyDto.getCode(), verifyDto.getMailAddress())){
+            Cookie cookie = userService.createCookie(new User(userService.getUserByMail(verifyDto.getMailAddress())));
             HttpHeaders headers = new HttpHeaders();
             headers.add("Set-Cookie", "token=" + cookie.toString() + "; HttpOnly; SameSite=none; Secure");
             return ResponseEntity.status(200).headers(headers).body(null);

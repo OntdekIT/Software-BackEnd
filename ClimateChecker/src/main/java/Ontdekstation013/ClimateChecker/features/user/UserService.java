@@ -139,11 +139,11 @@ public class UserService {
 
     //TODO email en wachtwoord verifyen
     public User login(loginDto loginDto) {
-        User user = userRepository.findByMailAddress(loginDto.getMailAddress());
-        if (user == null){
-            throw new NotFoundException("User not found");
-        }
-        return user;
+        return userRepository.findByMailAddress(loginDto.getMailAddress());
+//        if (user == null){
+//            throw new NotFoundException("User not found");
+//        }
+//        return user;
     }
     public userDto getUserByMail(String mail) {
         ModelMapper mapper = new ModelMapper();
@@ -175,7 +175,7 @@ public class UserService {
         Token token = new Token();
         token.setUser(user);
         token.setCreationTime(LocalDateTime.now());
-        token.setLinkHash(randomString(32));
+        token.setNumericCode(randomCode(6));
         return token;
     }
 
@@ -194,6 +194,21 @@ public class UserService {
         return string.toString();
     }
 
+    private String randomCode(float length){
+        char[] NUMERIC ="0123456789".toCharArray();
+
+        StringBuilder string = new StringBuilder();
+
+        Random random = new Random();
+
+        for(int i = 0; i < length; i++) {
+            int index = random.nextInt(NUMERIC.length);
+
+            string.append(NUMERIC[index]);
+        }
+        return string.toString();
+    }
+
     public void saveToken(Token token){
         if (tokenRepository.existsByUser(token.getUser())) {
             token.setUser(token.getUser());
@@ -206,7 +221,7 @@ public class UserService {
         User user = userRepository.findByMailAddress(email);
         Token officialToken = tokenRepository.findByUser(user);
         if (officialToken != null){
-            if (officialToken.getLinkHash().equals(linkHash)) {
+            if (officialToken.getNumericCode().equals(linkHash)) {
                 if (officialToken.getCreationTime().isBefore(LocalDateTime.now().plusMinutes(5))) {
                     tokenRepository.delete(officialToken);
                     return true;
@@ -221,7 +236,7 @@ public class UserService {
         User user = userRepository.findByMailAddress(oldEmail);
         Token officialToken = tokenRepository.findByUser(user);
         if (officialToken != null){
-            if (officialToken.getLinkHash().equals(linkHash) && encoder.matches(newEmail + user.getUserID(), officialToken.getLinkHash())) {
+            if (officialToken.getNumericCode().equals(linkHash) && encoder.matches(newEmail + user.getUserID(), officialToken.getNumericCode())) {
                 if (officialToken.getCreationTime().isBefore(LocalDateTime.now().plusMinutes(5))) {
                     user.setMailAddress(newEmail);
                     userRepository.save(user);
@@ -235,13 +250,13 @@ public class UserService {
 
     public String createLink(Token token){
         String domain = "http://localhost:3000/";
-        String test = domain + "verify" + "?linkHash=" + token.getLinkHash() + "&email=" + token.getUser().getMailAddress();
+        String test = domain + "verify" + "?linkHash=" + token.getNumericCode() + "&email=" + token.getUser().getMailAddress();
         return (test);
     }
 
     public String createLink(Token token, String newEmail){ //for changing to new email address
         String domain = "http://localhost:8082/";
-        return (domain + "api/User/verify" + "?linkHash=" + token.getLinkHash() + "&oldEmail=" + token.getUser().getMailAddress() + "&newEmail=" + newEmail);
+        return (domain + "api/User/verify" + "?linkHash=" + token.getNumericCode() + "&oldEmail=" + token.getUser().getMailAddress() + "&newEmail=" + newEmail);
     }
 
 
