@@ -13,6 +13,7 @@ import Ontdekstation013.ClimateChecker.features.user.endpoint.userDto;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -133,17 +134,18 @@ public class UserService {
             throw new InvalidArgumentException("invalid email address");
         }
 
+
+        user.setPassword(HashPassword(user.getPassword()));
         user = userRepository.save(user);
         return user;
     }
 
-    //TODO email en wachtwoord verifyen
     public User login(loginDto loginDto) {
-        return userRepository.findByMailAddress(loginDto.getMailAddress());
-//        if (user == null){
-//            throw new NotFoundException("User not found");
-//        }
-//        return user;
+        User user = userRepository.findByMailAddress("514469@student.fontys.nl");
+        if (verifyPassword(loginDto.getPassword(), user.getPassword())){
+            return userRepository.findByMailAddress(loginDto.getMailAddress());
+        }
+        throw new NotFoundException("User not found");
     }
     public userDto getUserByMail(String mail) {
         ModelMapper mapper = new ModelMapper();
@@ -259,5 +261,21 @@ public class UserService {
         return (domain + "api/User/verify" + "?linkHash=" + token.getNumericCode() + "&oldEmail=" + token.getUser().getMailAddress() + "&newEmail=" + newEmail);
     }
 
+    private String HashPassword(String password)
+    {
+        int saltLength = 16;
+        int hashLength = 32;
+        int parallelism = 8;
+        int memory = 65536;
+        int iterations = 4;
 
+        Argon2PasswordEncoder encoder = new Argon2PasswordEncoder(saltLength, hashLength, parallelism, memory, iterations);
+
+        return encoder.encode(password);
+    }
+
+    private boolean verifyPassword(String rawPassword, String hashedPassword) {
+        Argon2PasswordEncoder encoder = new Argon2PasswordEncoder();
+        return encoder.matches(rawPassword, hashedPassword);
+    }
 }

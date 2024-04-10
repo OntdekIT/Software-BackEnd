@@ -9,9 +9,6 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
-import java.util.LinkedList;
-import java.util.List;
-
 @Entity
 @Getter
 @Setter
@@ -36,6 +33,7 @@ public class User {
 
     @NotBlank
     private String password;
+
     private boolean verified = false;
 
     public User(Long id, String firstName, String lastName, String mailAddress, boolean Admin, String password) {
