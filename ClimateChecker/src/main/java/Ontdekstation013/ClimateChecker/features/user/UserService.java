@@ -140,9 +140,10 @@ public class UserService {
         return user;
     }
 
-    public User login(loginDto loginDto) {
-        User user = userRepository.findByMailAddress("514469@student.fontys.nl");
+    public User login(loginDto loginDto) throws Exception {
+        User user = userRepository.findByMailAddress(loginDto.getMailAddress());
         if (verifyPassword(loginDto.getPassword(), user.getPassword())){
+            user.setPassword("Test");
             return userRepository.findByMailAddress(loginDto.getMailAddress());
         }
         throw new NotFoundException("User not found");
@@ -165,19 +166,14 @@ public class UserService {
         jwtTokenCookie.setPath("/");
 
         return jwtTokenCookie;
-//        UserConverter userConverter = new UserConverter();
-//        Token token = new Token();
-//        token.setUser(user);
-//        token.setCreationTime(LocalDateTime.now());
-//        token.setLinkHash(jwtService.createJWT(userConverter.userToUserDto(user)));
-//        return token;
     }
 
     public Token createVerifyToken(User user){
         Token token = new Token();
-        token.setUser(user);
+        token.setUserid(user.getUserID());
         token.setCreationTime(LocalDateTime.now());
         token.setNumericCode(randomCode(6));
+        saveToken(token);
         return token;
     }
 
@@ -212,16 +208,15 @@ public class UserService {
     }
 
     public void saveToken(Token token){
-        if (tokenRepository.existsByUser(token.getUser())) {
-            token.setUser(token.getUser());
-        }
-        token.setId(token.getUser().getUserID());
+        List<Token> tokensToRemove = tokenRepository.findAllByUserid(token.getUserid());
+        tokenRepository.deleteAll(tokensToRemove);
+        token.setId(token.getUserid());
         tokenRepository.save(token);
     }
 
     public boolean verifyToken(String linkHash, String email) {
         User user = userRepository.findByMailAddress(email);
-        Token officialToken = tokenRepository.findByUser(user);
+        Token officialToken = tokenRepository.findByUserid(user.getUserID());
         if (officialToken != null){
             if (officialToken.getNumericCode().equals(linkHash)) {
                 if (officialToken.getCreationTime().isBefore(LocalDateTime.now().plusMinutes(5))) {
@@ -236,7 +231,7 @@ public class UserService {
 
     public boolean verifyToken(String linkHash, String oldEmail, String newEmail) { //for changing to new email address
         User user = userRepository.findByMailAddress(oldEmail);
-        Token officialToken = tokenRepository.findByUser(user);
+        Token officialToken = tokenRepository.findByUserid(user.getUserID());
         if (officialToken != null){
             if (officialToken.getNumericCode().equals(linkHash) && encoder.matches(newEmail + user.getUserID(), officialToken.getNumericCode())) {
                 if (officialToken.getCreationTime().isBefore(LocalDateTime.now().plusMinutes(5))) {
@@ -252,13 +247,13 @@ public class UserService {
 
     public String createLink(Token token){
         String domain = "http://localhost:3000/";
-        String test = domain + "verify" + "?linkHash=" + token.getNumericCode() + "&email=" + token.getUser().getMailAddress();
+        String test = domain + "verify" + "?linkHash=" + token.getNumericCode() + "&email=" + token.getUserid();
         return (test);
     }
 
     public String createLink(Token token, String newEmail){ //for changing to new email address
         String domain = "http://localhost:8082/";
-        return (domain + "api/User/verify" + "?linkHash=" + token.getNumericCode() + "&oldEmail=" + token.getUser().getMailAddress() + "&newEmail=" + newEmail);
+        return (domain + "api/User/verify" + "?linkHash=" + token.getNumericCode() + "&oldEmail=" + token.getUserid() + "&newEmail=" + newEmail);
     }
 
     private String HashPassword(String password)

@@ -40,7 +40,6 @@ public class AuthController {
         User user = userService.createNewUser(registerDto);
         if (user != null){
             Token token = userService.createVerifyToken(user);
-            userService.saveToken(token);
             emailSenderService.sendLoginMail(user.getMailAddress(), user.getFirstName(), user.getLastName(), token.getNumericCode());
             return ResponseEntity.status(HttpStatus.CREATED).body(null);
         }
@@ -49,16 +48,19 @@ public class AuthController {
 
     // login user
     @PostMapping("login")
-    public ResponseEntity<Void> loginUser(@RequestBody loginDto loginDto) throws Exception {
-        User user = userService.login(loginDto);
-        if (user != null) {
-
-            Token token = userService.createVerifyToken(user);
-            userService.saveToken(token);
-            emailSenderService.sendLoginMail(user.getMailAddress(), user.getFirstName(), user.getLastName(), token.getNumericCode());
-            return ResponseEntity.status(HttpStatus.OK).body(null);
+    public ResponseEntity<String> loginUser(@RequestBody loginDto loginDto) throws Exception {
+        try{
+            User user = userService.login(loginDto);
+            if (user != null) {
+                Token token = userService.createVerifyToken(user);
+                emailSenderService.sendLoginMail(user.getMailAddress(), user.getFirstName(), user.getLastName(), token.getNumericCode());
+                return ResponseEntity.status(HttpStatus.OK).body(null);
+            }
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+       catch (Exception error){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error.getMessage());
+       }
     }
 
     @PostMapping("verify")

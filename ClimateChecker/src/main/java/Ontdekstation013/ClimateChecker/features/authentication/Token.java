@@ -22,6 +22,6 @@ public class Token {
 
     @Id
     private Long id;
-    @OneToOne
-    private User user;
+
+    private long userid;
 }

@@ -4,10 +4,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import Ontdekstation013.ClimateChecker.features.user.User;
+import java.util.List;
 
 @Repository
 
 public interface TokenRepository extends JpaRepository<Token, Long> {
-    boolean existsByUser(User user);
-    Token findByUser(User user);
+    boolean existsByUserid(long userid);
+    Token findByUserid(long userid);
+    List<Token> findAllByUserid(long userid);
 }

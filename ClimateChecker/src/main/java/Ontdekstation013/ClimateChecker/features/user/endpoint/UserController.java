@@ -57,7 +57,7 @@ public class UserController {
         User user = userService.editUser(editUserDto);
         if (user != null) {
             Token token = null;//userService.createCookie(user);
-            token.setUser(user);
+            token.setUserid(user.getUserID());
             userService.saveToken(token);
             emailSenderService.sendEmailEditMail(editUserDto.getMailAddress(), user.getFirstName(), user.getLastName(), userService.createLink(token, editUserDto.getMailAddress()));
         }
