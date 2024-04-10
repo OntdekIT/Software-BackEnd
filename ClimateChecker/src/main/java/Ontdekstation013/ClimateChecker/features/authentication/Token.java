@@ -10,7 +10,6 @@ import javax.persistence.OneToOne;
 
 import Ontdekstation013.ClimateChecker.features.user.User;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -18,7 +17,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 public class Token {
-    private String linkHash;
+    private String numericCode;
     private LocalDateTime creationTime;
 
     @Id

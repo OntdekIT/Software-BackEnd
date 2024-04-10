@@ -27,7 +27,7 @@ public class EmailSenderService {
         System.out.printf("Mail Send");
     }
 
-    public void sendSignupMail(String toEmail, String firstName, String lastName, String link) throws MessagingException {
+    public void sendSignupMail(String toEmail, String firstName, String lastName, String code) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
@@ -38,7 +38,7 @@ public class EmailSenderService {
                 + "<br>"
                 + "<br>"
                 + "<br>"
-                + link
+                + code
                 + "<br>"
                 + "<br>"
                 + "Met vriendelijke groet,"
@@ -57,7 +57,7 @@ public class EmailSenderService {
         System.out.printf("Mail Sent");
     }
 
-    public void sendLoginMail(String toEmail, String firstName, String lastName, String link) throws MessagingException {
+    public void sendLoginMail(String toEmail, String firstName, String lastName, String code) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
@@ -67,7 +67,7 @@ public class EmailSenderService {
         String body = "Inlog link: ,"
                 + "<br>"
                 + "<br> [insert beautiful html button]"
-                + link
+                + code
                 + "<br>"
                 + "<br>"
                 + "Met vriendelijke groet,"
@@ -98,7 +98,7 @@ public class EmailSenderService {
         mailSender.send(message);
     }
 
-    public void sendEmailEditMail(String toEmail, String firstName, String lastName, String link) throws MessagingException {
+    public void sendEmailEditMail(String toEmail, String firstName, String lastName, String code) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
@@ -109,7 +109,7 @@ public class EmailSenderService {
                 + "<br>"
                 + "<br>"
                 + "<br>"
-                + link
+                + code
                 + "<br>"
                 + "<br>"
                 + "Met vriendelijke groet,"

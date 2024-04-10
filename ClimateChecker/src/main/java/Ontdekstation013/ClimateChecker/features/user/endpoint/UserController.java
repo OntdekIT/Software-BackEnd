@@ -56,7 +56,7 @@ public class UserController {
     public ResponseEntity<userDto> editUser(@RequestBody editUserDto editUserDto) throws Exception {
         User user = userService.editUser(editUserDto);
         if (user != null) {
-            Token token = userService.createToken(user);
+            Token token = null;//userService.createCookie(user);
             token.setUser(user);
             userService.saveToken(token);
             emailSenderService.sendEmailEditMail(editUserDto.getMailAddress(), user.getFirstName(), user.getLastName(), userService.createLink(token, editUserDto.getMailAddress()));
