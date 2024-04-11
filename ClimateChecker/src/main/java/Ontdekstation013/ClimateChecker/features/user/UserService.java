@@ -143,7 +143,6 @@ public class UserService {
     public User login(loginDto loginDto) throws Exception {
         User user = userRepository.findByMailAddress(loginDto.getMailAddress());
         if (verifyPassword(loginDto.getPassword(), user.getPassword())){
-            user.setPassword("Test");
             return userRepository.findByMailAddress(loginDto.getMailAddress());
         }
         throw new NotFoundException("User not found");
