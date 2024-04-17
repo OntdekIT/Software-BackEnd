@@ -12,11 +12,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 
 @RestController
 @RequestMapping("/api/User")
+@CrossOrigin(origins = {"http://localhost:3000"}, allowCredentials = "true")
 public class UserController {
 
     private final UserService userService;
@@ -81,6 +85,15 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
     }
 
-
-
+    @GetMapping("getID")
+    public ResponseEntity<String> getID(HttpServletResponse response, HttpServletRequest request){
+        Cookie[] cookies;
+        if (request.getCookies() != null) {
+            cookies = request.getCookies();
+            Long userID = Long.parseLong(cookies[0].getValue());
+            userDto user = userService.findUserById(userID);
+        return ResponseEntity.status(HttpStatus.OK).body(user.getFirstName());
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
 }

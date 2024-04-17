@@ -13,6 +13,8 @@ import Ontdekstation013.ClimateChecker.features.user.endpoint.userDto;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -155,20 +157,15 @@ public class UserService {
     }
 
 
-    public Cookie createCookie(User user) {
+    public ResponseCookie createCookie(User user) {
         Cookie jwtTokenCookie = new Cookie("user-id", user.getUserID().toString());
-        jwtTokenCookie.setMaxAge(6000);
-        jwtTokenCookie.setSecure(false);
-        jwtTokenCookie.setHttpOnly(true);
-        jwtTokenCookie.setPath("/");
+        ResponseCookie springCookie = ResponseCookie.from(jwtTokenCookie.getName(), jwtTokenCookie.getValue())
+                .httpOnly(true)
+                .sameSite("None")
+                .path("/")
+                .build();
 
-        return jwtTokenCookie;
-//        UserConverter userConverter = new UserConverter();
-//        Token token = new Token();
-//        token.setUser(user);
-//        token.setCreationTime(LocalDateTime.now());
-//        token.setLinkHash(jwtService.createJWT(userConverter.userToUserDto(user)));
-//        return token;
+        return springCookie;
     }
 
     public Token createVerifyToken(User user){
@@ -209,10 +206,7 @@ public class UserService {
         return string.toString();
     }
 
-    public void saveToken(Token token){
-        if (tokenRepository.existsByUser(token.getUser())) {
-            token.setUser(token.getUser());
-        }
+    public void saveToken(Token token) {
         token.setId(token.getUser().getUserID());
         tokenRepository.save(token);
     }
@@ -259,5 +253,7 @@ public class UserService {
         return (domain + "api/User/verify" + "?linkHash=" + token.getNumericCode() + "&oldEmail=" + token.getUser().getMailAddress() + "&newEmail=" + newEmail);
     }
 
-
+    public User getUserById(Long id){
+        return userRepository.findUserByUserID(id);
+    }
 }

@@ -5,18 +5,15 @@ import Ontdekstation013.ClimateChecker.features.authentication.JWTService;
 import Ontdekstation013.ClimateChecker.features.authentication.Token;
 import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.UserService;
-import Ontdekstation013.ClimateChecker.features.user.endpoint.userDto;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.Map;
+import javax.mail.MessagingException;
 
 @RestController
 @RequestMapping("/api/Authentication")
@@ -41,7 +38,7 @@ public class AuthController {
         if (user != null){
             Token token = userService.createVerifyToken(user);
             userService.saveToken(token);
-            emailSenderService.sendLoginMail(user.getMailAddress(), user.getFirstName(), user.getLastName(), token.getNumericCode());
+            sendVerificationEmail(user);
             return ResponseEntity.status(HttpStatus.CREATED).body(null);
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
@@ -55,18 +52,25 @@ public class AuthController {
 
             Token token = userService.createVerifyToken(user);
             userService.saveToken(token);
-            emailSenderService.sendLoginMail(user.getMailAddress(), user.getFirstName(), user.getLastName(), token.getNumericCode());
+            sendVerificationEmail(user);
             return ResponseEntity.status(HttpStatus.OK).body(null);
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
     }
 
+    private void sendVerificationEmail(User user) throws MessagingException {
+        Token token = userService.createVerifyToken(user);
+        userService.saveToken(token);
+        emailSenderService.sendLoginMail(user.getMailAddress(), user.getFirstName(), user.getLastName(), token.getNumericCode());
+    }
+    
     @PostMapping("verify")
-    public ResponseEntity<Void> verifyLink(@RequestBody verifyDto verifyDto, HttpServletResponse response, HttpServletRequest request) {
-        if (userService.verifyToken(verifyDto.getCode(), verifyDto.getMailAddress())){
-            Cookie cookie = userService.createCookie(new User(userService.getUserByMail(verifyDto.getMailAddress())));
+    public ResponseEntity<Void> verifyEmailCode(@RequestBody verifyDto verifyDto) {
+        String email = verifyDto.getMailAddress();
+        if (userService.verifyToken(verifyDto.getCode(), email)){
+            ResponseCookie cookie = userService.createCookie(new User(userService.getUserByMail(email)));
             HttpHeaders headers = new HttpHeaders();
-            headers.add("Set-Cookie", "token=" + cookie.toString() + "; HttpOnly; SameSite=none; Secure");
+            headers.add("Set-Cookie", cookie.toString() + "; HttpOnly; SameSite=none; Secure");
             return ResponseEntity.status(200).headers(headers).body(null);
         }
 
