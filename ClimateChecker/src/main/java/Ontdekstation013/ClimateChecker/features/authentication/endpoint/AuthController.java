@@ -10,12 +10,14 @@ import Ontdekstation013.ClimateChecker.features.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.mail.MessagingException;
 
 @RestController
 @RequestMapping("/api/Authentication")
@@ -73,14 +75,20 @@ public class AuthController {
        }
     }
 
+    private void sendVerificationEmail(User user) throws MessagingException {
+        Token token = userService.createVerifyToken(user);
+        userService.saveToken(token);
+        emailSenderService.sendLoginMail(user.getMailAddress(), user.getFirstName(), user.getLastName(), token.getNumericCode());
+    }
+    
     @PostMapping("verify")
-    public ResponseEntity<String> verifyLink(@RequestBody verifyDto verifyDto, HttpServletResponse response, HttpServletRequest request) {
-        if (userService.verifyToken(verifyDto.getCode(), verifyDto.getMailAddress())){
-            User user = new User(userService.getUserByMail(verifyDto.getMailAddress()));
-            Cookie cookie = userService.createCookie(user);
+    public ResponseEntity<Void> verifyEmailCode(@RequestBody verifyDto verifyDto) {
+        String email = verifyDto.getMailAddress();
+        if (userService.verifyToken(verifyDto.getCode(), email)){
+            ResponseCookie cookie = userService.createCookie(new User(userService.getUserByMail(email)));
             HttpHeaders headers = new HttpHeaders();
-            headers.add("Set-Cookie", "token=" + cookie.toString() + "; HttpOnly; SameSite=none; Secure");
-            return ResponseEntity.status(200).headers(headers).body(user.getFirstName());
+            headers.add("Set-Cookie", cookie.toString() + "; HttpOnly; SameSite=none; Secure");
+            return ResponseEntity.status(200).headers(headers).body(null);
         }
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);

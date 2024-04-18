@@ -16,6 +16,8 @@ import Ontdekstation013.ClimateChecker.features.user.endpoint.userDto;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -175,14 +177,15 @@ public class UserService {
     }
 
 
-    public Cookie createCookie(User user) {
+    public ResponseCookie createCookie(User user) {
         Cookie jwtTokenCookie = new Cookie("user-id", user.getUserID().toString());
-        jwtTokenCookie.setMaxAge(6000);
-        jwtTokenCookie.setSecure(false);
-        jwtTokenCookie.setHttpOnly(true);
-        jwtTokenCookie.setPath("/");
+        ResponseCookie springCookie = ResponseCookie.from(jwtTokenCookie.getName(), jwtTokenCookie.getValue())
+                .httpOnly(true)
+                .sameSite("None")
+                .path("/")
+                .build();
 
-        return jwtTokenCookie;
+        return springCookie;
     }
 
     public Token createVerifyToken(User user){
