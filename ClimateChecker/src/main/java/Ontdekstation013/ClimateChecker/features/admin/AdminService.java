@@ -1,8 +1,5 @@
 package Ontdekstation013.ClimateChecker.features.admin;
 
-import Ontdekstation013.ClimateChecker.features.authentication.Token;
-import Ontdekstation013.ClimateChecker.features.authentication.TokenRepository;
-import Ontdekstation013.ClimateChecker.features.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +10,6 @@ import java.util.Random;
 @Service
 public class AdminService {
 
-
     private final WorkshopCodeRepository workshopCodeRepository;
     @Autowired
     public AdminService(WorkshopCodeRepository workshopCodeRepository) {
@@ -23,20 +19,20 @@ public class AdminService {
     public WorkshopCode createWorkshopCode(Long minutes, Long length){
         WorkshopCode workshopCode = new WorkshopCode();
         workshopCode.setExpirationDate(LocalDateTime.now().plusMinutes(minutes));
-        workshopCode.setRandomCode(randomCode(length));
+        workshopCode.setCode(randomCode(length));
         workshopCodeRepository.save(workshopCode);
         return workshopCode;
     }
 
-    public boolean verifyWorkshopCode(String code) {
-        WorkshopCode officialCode = WorkshopCodeRepository.findByRandomCode(code);
+    public boolean verifyWorkshopCode(Long code) {
+        WorkshopCode officialCode = workshopCodeRepository.findByCode(code);
         if (officialCode != null){
-            if (officialCode.getRandomCode().equals(code)) {
+            if (officialCode.getCode().equals(code)) {
                 if (officialCode.getExpirationDate().isBefore(LocalDateTime.now())) {
                     return true;
                 }
                 else {
-                    WorkshopCodeRepository.delete(code);
+                    workshopCodeRepository.delete(officialCode);
                 }
             }
         }
@@ -44,7 +40,7 @@ public class AdminService {
     }
 
 
-    private String randomCode(float length){
+    private Long randomCode(float length){
         char[] CODE ="0123456789".toCharArray();
 
         StringBuilder string = new StringBuilder();
@@ -56,6 +52,6 @@ public class AdminService {
 
             string.append(CODE[index]);
         }
-        return string.toString();
+        return Long.parseLong(string.toString());
     }
 }

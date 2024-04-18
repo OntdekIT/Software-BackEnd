@@ -20,15 +20,15 @@ public class WorkshopCode {
 
 
     @Id
-    @Column(name = "workshopcode")
-    private String randomCode;
+    @Column(name = "code")
+    private Long code;
 
     @NotBlank
     @Column(name = "expiration_date")
     private LocalDateTime expirationDate;
 
-    public WorkshopCode (String code, LocalDateTime expirationDate) {
-        this.randomCode = code;
+    public WorkshopCode (Long code, LocalDateTime expirationDate) {
+        this.code = code;
         this.expirationDate = expirationDate;
     }
 }
