@@ -7,6 +7,7 @@ import Ontdekstation013.ClimateChecker.features.authentication.Token;
 import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.UserService;
 
+import Ontdekstation013.ClimateChecker.features.user.endpoint.userDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -94,13 +95,10 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
     }
 
-    @PostMapping("checkLogin")
+    @GetMapping("checkLogin")
     public ResponseEntity<Boolean> verifyLogin(HttpServletResponse response, HttpServletRequest request){
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null){
-            if (cookies.length > 0){
-                return ResponseEntity.status(HttpStatus.OK).body(true);
-            }
+        if (request.getCookies() != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(true);
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(false);
     }

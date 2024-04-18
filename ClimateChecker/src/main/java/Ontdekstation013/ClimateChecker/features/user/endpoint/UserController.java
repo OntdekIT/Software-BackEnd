@@ -77,7 +77,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
-    @GetMapping("getName")
+    @GetMapping("getID")
     public ResponseEntity<String> getName(HttpServletResponse response, HttpServletRequest request){
         Cookie[] cookies;
         if (request.getCookies() != null) {
