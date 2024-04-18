@@ -7,6 +7,8 @@ import Ontdekstation013.ClimateChecker.features.authentication.Token;
 import Ontdekstation013.ClimateChecker.features.authentication.TokenRepository;
 import Ontdekstation013.ClimateChecker.features.authentication.endpoint.loginDto;
 import Ontdekstation013.ClimateChecker.features.authentication.endpoint.registerDto;
+import Ontdekstation013.ClimateChecker.features.meetstation.Meetstation;
+import Ontdekstation013.ClimateChecker.features.meetstation.MeetstationRepository;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.editUserDto;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.userDataDto;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.userDto;
@@ -28,6 +30,7 @@ import java.util.Random;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final MeetstationRepository meetstationRepository;
     private final TokenRepository tokenRepository;
     private PasswordEncoder encoder = new BCryptPasswordEncoder();
     private final JWTService jwtService;
@@ -36,8 +39,9 @@ public class UserService {
     private final UserConverter userConverter;
 
     @Autowired
-    public UserService(UserRepository userRepository, TokenRepository tokenRepository, JWTService jwtService) {
+    public UserService(UserRepository userRepository, MeetstationRepository meetstationRepository, TokenRepository tokenRepository, JWTService jwtService) {
         this.userRepository = userRepository;
+        this.meetstationRepository = meetstationRepository;
         this.tokenRepository = tokenRepository;
         this.userConverter = new UserConverter();
         this.jwtService = jwtService;
@@ -111,34 +115,46 @@ public class UserService {
     }
 
     public User createNewUser(registerDto registerDto) throws Exception {
-        User user = new User();
-        if (registerDto.getFirstName().length() > 256) {
-            throw new InvalidArgumentException("First name can't be longer than 256 characters");
-        }
-        if (registerDto.getLastName().length() > 256) {
-            throw new InvalidArgumentException("Last name can't be longer than 256 characters");
-        }
-
-        if (registerDto.getPassword().length() > 256) {
-            throw new InvalidArgumentException("Password can't be longer than 256 characters");
-        }
-
-        registerDto.setMailAddress(registerDto.getMailAddress().toLowerCase());
-        if (registerDto.getMailAddress().contains("@")) {
-            if (!userRepository.existsUserByMailAddress(registerDto.getMailAddress())) {
-                user = new User(registerDto.getMailAddress(), registerDto.getFirstName(), registerDto.getLastName(), registerDto.getPassword());
-            } else {
-                throw new ExistingUniqueIdentifierException("Email already in use");
+        try
+        {
+            User user = new User();
+            if(user.ValidateInput(registerDto)) {
+                registerDto.setMailAddress(registerDto.getMailAddress().toLowerCase());
+                if (!userRepository.existsUserByMailAddress(registerDto.getMailAddress())) { //check if email is unique
+                    user = new User(registerDto.getMailAddress(), registerDto.getFirstName(), registerDto.getLastName(), registerDto.getPassword());
+                }
+                else {
+                    throw new ExistingUniqueIdentifierException("Email already in use");
+                }
             }
-        } else {
-            throw new InvalidArgumentException("invalid email address");
+            else {
+                throw new InvalidArgumentException("Invalid information");
+            }
+
+            user.setPassword(HashPassword(user.getPassword()));
+
+            Meetstation meetstation = meetstationRepository.getByRegistrationCode(registerDto.getMeetstationCode().longValue());
+            if(meetstation != null)
+            {
+                if(meetstation.getUserid() == null)
+                {
+                    user = userRepository.save(user);
+                    meetstation.setUserid(user.getUserID());
+                    return user;
+                }
+
+                throw new Exception("Meetstation is al in gebruik");
+            }
+
+            throw new Exception("Meetstation bestaat niet");
+
+
         }
 
+        catch (Exception ex) {
+            throw ex;
+        }
 
-        user.setPassword(HashPassword(user.getPassword()));
-
-        user = userRepository.save(user);
-        return user;
     }
 
     public User login(loginDto loginDto) throws Exception {
