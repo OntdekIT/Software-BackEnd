@@ -66,8 +66,9 @@ public class EmailSenderService {
 
         String body = "Inlog link: ,"
                 + "<br>"
-                + "<br> [insert beautiful html button]"
+                + "<h1>"
                 + code
+                + "</h1>"
                 + "<br>"
                 + "<br>"
                 + "Met vriendelijke groet,"
