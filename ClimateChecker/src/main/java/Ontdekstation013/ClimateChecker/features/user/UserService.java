@@ -136,6 +136,7 @@ public class UserService {
 
 
         user.setPassword(HashPassword(user.getPassword()));
+
         user = userRepository.save(user);
         return user;
     }
@@ -147,6 +148,7 @@ public class UserService {
         }
         throw new NotFoundException("User not found");
     }
+
     public userDto getUserByMail(String mail) {
         ModelMapper mapper = new ModelMapper();
         userDto dto = new userDto();
@@ -174,21 +176,6 @@ public class UserService {
         token.setNumericCode(randomCode(6));
         saveToken(token);
         return token;
-    }
-
-    private String randomString(int length) {
-        char[] ALPHANUMERIC ="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toCharArray();
-
-        StringBuilder string = new StringBuilder();
-
-        Random random = new Random();
-
-        for(int i = 0; i < length; i++) {
-            int index = random.nextInt(ALPHANUMERIC.length);
-
-            string.append(ALPHANUMERIC[index]);
-        }
-        return string.toString();
     }
 
     private String randomCode(float length){
@@ -227,34 +214,6 @@ public class UserService {
         return false;
     }
 
-
-    public boolean verifyToken(String linkHash, String oldEmail, String newEmail) { //for changing to new email address
-        User user = userRepository.findByMailAddress(oldEmail);
-        Token officialToken = tokenRepository.findByUserid(user.getUserID());
-        if (officialToken != null){
-            if (officialToken.getNumericCode().equals(linkHash) && encoder.matches(newEmail + user.getUserID(), officialToken.getNumericCode())) {
-                if (officialToken.getCreationTime().isBefore(LocalDateTime.now().plusMinutes(5))) {
-                    user.setMailAddress(newEmail);
-                    userRepository.save(user);
-                    tokenRepository.delete(officialToken);
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public String createLink(Token token){
-        String domain = "http://localhost:3000/";
-        String test = domain + "verify" + "?linkHash=" + token.getNumericCode() + "&email=" + token.getUserid();
-        return (test);
-    }
-
-    public String createLink(Token token, String newEmail){ //for changing to new email address
-        String domain = "http://localhost:8082/";
-        return (domain + "api/User/verify" + "?linkHash=" + token.getNumericCode() + "&oldEmail=" + token.getUserid() + "&newEmail=" + newEmail);
-    }
-
     private String HashPassword(String password)
     {
         int saltLength = 16;
@@ -272,4 +231,5 @@ public class UserService {
         Argon2PasswordEncoder encoder = new Argon2PasswordEncoder();
         return encoder.matches(rawPassword, hashedPassword);
     }
+
 }

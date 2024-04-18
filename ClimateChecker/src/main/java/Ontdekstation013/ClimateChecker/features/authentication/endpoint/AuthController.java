@@ -64,14 +64,26 @@ public class AuthController {
     }
 
     @PostMapping("verify")
-    public ResponseEntity<Void> verifyLink(@RequestBody verifyDto verifyDto, HttpServletResponse response, HttpServletRequest request) {
+    public ResponseEntity<String> verifyLink(@RequestBody verifyDto verifyDto, HttpServletResponse response, HttpServletRequest request) {
         if (userService.verifyToken(verifyDto.getCode(), verifyDto.getMailAddress())){
-            Cookie cookie = userService.createCookie(new User(userService.getUserByMail(verifyDto.getMailAddress())));
+            User user = new User(userService.getUserByMail(verifyDto.getMailAddress()));
+            Cookie cookie = userService.createCookie(user);
             HttpHeaders headers = new HttpHeaders();
             headers.add("Set-Cookie", "token=" + cookie.toString() + "; HttpOnly; SameSite=none; Secure");
-            return ResponseEntity.status(200).headers(headers).body(null);
+            return ResponseEntity.status(200).headers(headers).body(user.getFirstName());
         }
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+    }
+
+    @PostMapping("checkLogin")
+    public ResponseEntity<Boolean> verifyLogin(HttpServletResponse response, HttpServletRequest request){
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null){
+            if (cookies.length > 0){
+                return ResponseEntity.status(HttpStatus.OK).body(true);
+            }
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(false);
     }
 }

@@ -52,18 +52,18 @@ public class UserController {
     }
 
     // edit user
-    @PutMapping
-    public ResponseEntity<userDto> editUser(@RequestBody editUserDto editUserDto) throws Exception {
-        User user = userService.editUser(editUserDto);
-        if (user != null) {
-            Token token = null;//userService.createCookie(user);
-            token.setUserid(user.getUserID());
-            userService.saveToken(token);
-            emailSenderService.sendEmailEditMail(editUserDto.getMailAddress(), user.getFirstName(), user.getLastName(), userService.createLink(token, editUserDto.getMailAddress()));
-        }
-
-        return ResponseEntity.status(HttpStatus.OK).body(userConverter.userToUserDto(user));
-    }
+//    @PutMapping
+//    public ResponseEntity<userDto> editUser(@RequestBody editUserDto editUserDto) throws Exception {
+//        User user = userService.editUser(editUserDto);
+//        if (user != null) {
+//            Token token = null;//userService.createCookie(user);
+//            token.setUserid(user.getUserID());
+//            userService.saveToken(token);
+//            emailSenderService.sendEmailEditMail(editUserDto.getMailAddress(), user.getFirstName(), user.getLastName(), userService.createLink(token, editUserDto.getMailAddress()));
+//        }
+//
+//        return ResponseEntity.status(HttpStatus.OK).body(userConverter.userToUserDto(user));
+//    }
 
     // delete user
     @DeleteMapping("{userId}")
@@ -72,15 +72,4 @@ public class UserController {
         emailSenderService.deleteUserMail(user.getMailAddress(), user.getFirstName(), user.getLastName());
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
-
-    @GetMapping("verify")
-    public ResponseEntity<userDto> fetchLink(@RequestParam String linkHash, @RequestParam String oldEmail, @RequestParam String newEmail){
-        if (userService.verifyToken(linkHash, oldEmail, newEmail)){
-            return ResponseEntity.status(HttpStatus.OK).body(null);
-        }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-    }
-
-
-
 }

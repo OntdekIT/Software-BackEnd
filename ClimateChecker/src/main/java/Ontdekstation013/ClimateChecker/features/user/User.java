@@ -31,10 +31,7 @@ public class User {
 
     private boolean Admin;
 
-    @NotBlank
     private String password;
-
-    private boolean verified = false;
 
     public User(Long id, String firstName, String lastName, String mailAddress, boolean Admin, String password) {
         this.userID = id;
@@ -60,9 +57,6 @@ public class User {
         this.password = password;
     }
 
-    public User(String token, String email){
-
-    }
 
     public User(userDto dto){
         this.userID = dto.getId();
