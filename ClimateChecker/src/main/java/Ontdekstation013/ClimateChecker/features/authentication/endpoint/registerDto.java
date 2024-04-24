@@ -14,4 +14,5 @@ public class registerDto extends Dto{
     String password;
     String confirmPassword;
     Long meetstationCode;
+    Long workshopCode;
 }
