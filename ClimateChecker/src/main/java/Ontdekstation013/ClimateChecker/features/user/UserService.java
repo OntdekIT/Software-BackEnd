@@ -2,6 +2,8 @@ package Ontdekstation013.ClimateChecker.features.user;
 import Ontdekstation013.ClimateChecker.exception.ExistingUniqueIdentifierException;
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.exception.NotFoundException;
+import Ontdekstation013.ClimateChecker.features.admin.AdminService;
+import Ontdekstation013.ClimateChecker.features.admin.WorkshopCodeRepository;
 import Ontdekstation013.ClimateChecker.features.authentication.JWTService;
 import Ontdekstation013.ClimateChecker.features.authentication.Token;
 import Ontdekstation013.ClimateChecker.features.authentication.TokenRepository;
@@ -34,6 +36,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final MeetstationRepository meetstationRepository;
     private final TokenRepository tokenRepository;
+    private final AdminService adminService;
     private PasswordEncoder encoder = new BCryptPasswordEncoder();
     private final JWTService jwtService;
 
@@ -41,10 +44,11 @@ public class UserService {
     private final UserConverter userConverter;
 
     @Autowired
-    public UserService(UserRepository userRepository, MeetstationRepository meetstationRepository, TokenRepository tokenRepository, JWTService jwtService) {
+    public UserService(UserRepository userRepository, MeetstationRepository meetstationRepository, TokenRepository tokenRepository, AdminService adminService, JWTService jwtService) {
         this.userRepository = userRepository;
         this.meetstationRepository = meetstationRepository;
         this.tokenRepository = tokenRepository;
+        this.adminService = adminService;
         this.userConverter = new UserConverter();
         this.jwtService = jwtService;
     }
@@ -140,9 +144,14 @@ public class UserService {
             {
                 if(meetstation.getUserid() == null)
                 {
-                    user = userRepository.save(user);
-                    meetstation.setUserid(user.getUserID());
-                    return user;
+
+                    if(adminService.VerifyWorkshopCode(registerDto.getWorkshopCode().longValue())) {
+                        user = userRepository.save(user);
+                        meetstation.setUserid(user.getUserID());
+                        return user;
+                    }
+
+                    throw new Exception("Workshopcode is niet geldig");
                 }
 
                 throw new Exception("Meetstation is al in gebruik");
