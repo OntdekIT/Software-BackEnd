@@ -64,7 +64,7 @@ public class EmailSenderService {
 //        File file = new File(".\\ClimateChecker\\src\\main\\resources\\images\\ontdekstation013-logo.png");
 //        helper.addAttachment("logo.png", file);
 
-        String body = "Inlog link: ,"
+        String body = "Gebruik deze code bij het inloggen op MB Ontdekt: "
                 + "<br>"
                 + "<h1>"
                 + code

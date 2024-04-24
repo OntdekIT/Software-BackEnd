@@ -102,4 +102,19 @@ public class AuthController {
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(false);
     }
+
+    @DeleteMapping("logout")
+    public ResponseEntity<String> clearCookies(HttpServletResponse response, HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                cookie.setMaxAge(0);
+                cookie.setPath("/");
+                response.addCookie(cookie);
+            }
+        }
+
+        return ResponseEntity.ok().body(null);
+    }
 }

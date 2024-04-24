@@ -28,7 +28,7 @@ public class AdminController {
         WorkshopCode workshopCode = adminService.createWorkshopCode(request.getDuration(), request.getLength());
         if (workshopCode != null) {
             Long code = workshopCode.getCode();
-            if (adminService.verifyWorkshopCode(code)) {
+            if (adminService.VerifyWorkshopCode(code)) {
                 return ResponseEntity.status(200).body(code.toString());
             }
             else {

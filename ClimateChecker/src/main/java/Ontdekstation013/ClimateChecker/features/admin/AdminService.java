@@ -18,13 +18,28 @@ public class AdminService {
 
     public WorkshopCode createWorkshopCode(Long minutes, Long length){
         WorkshopCode workshopCode = new WorkshopCode();
+        Long code = null;
+        boolean isUnique = false;
+        while (!isUnique){
+            code = randomCode(length);
+            WorkshopCode existingWorkshopCode = workshopCodeRepository.findByCode(code);
+            if (existingWorkshopCode == null){
+                isUnique = true;
+            }
+            else{
+                if (!VerifyWorkshopCode(existingWorkshopCode.getCode())){
+                    isUnique = true;
+                }
+            }
+        }
+
         workshopCode.setExpirationDate(LocalDateTime.now().plusMinutes(minutes));
-        workshopCode.setCode(randomCode(length));
+        workshopCode.setCode(code);
         workshopCodeRepository.save(workshopCode);
         return workshopCode;
     }
 
-    public boolean verifyWorkshopCode(Long code) {
+    public boolean VerifyWorkshopCode(Long code) {
         WorkshopCode officialCode = workshopCodeRepository.findByCode(code);
         if (officialCode != null){
             if (officialCode.getCode().equals(code)) {
