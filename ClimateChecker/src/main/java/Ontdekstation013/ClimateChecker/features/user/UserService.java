@@ -188,6 +188,11 @@ public class UserService {
         return springCookie;
     }
 
+    public Long grantUserAdmin(userDto dto) {
+        User updatedUser = new User(dto);
+        return userRepository.save(updatedUser).getUserID();
+    }
+
     public Token createVerifyToken(User user){
         Token token = new Token();
         token.setUserid(user.getUserID());

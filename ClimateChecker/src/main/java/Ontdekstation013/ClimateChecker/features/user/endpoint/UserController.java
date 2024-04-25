@@ -7,6 +7,7 @@ import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.UserConverter;
 import Ontdekstation013.ClimateChecker.features.user.UserService;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -77,7 +78,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
-    @GetMapping("getID")
+    @GetMapping("getName")
     public ResponseEntity<String> getName(HttpServletResponse response, HttpServletRequest request){
         Cookie[] cookies;
         if (request.getCookies() != null) {
@@ -85,6 +86,29 @@ public class UserController {
             Long userID = Long.parseLong(cookies[0].getValue());
             userDto user = userService.findUserById(userID);
         return ResponseEntity.status(HttpStatus.OK).body(user.getFirstName());
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    @GetMapping("getID")
+    public ResponseEntity<String> getId(HttpServletResponse response, HttpServletRequest request){
+        Cookie[] cookies;
+        if (request.getCookies() != null) {
+            cookies = request.getCookies();
+            Long userID = Long.parseLong(cookies[0].getValue());
+            return ResponseEntity.status(HttpStatus.OK).body(userID.toString());
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    @GetMapping("checkAdmin")
+    public ResponseEntity<Boolean> checkAdmin(HttpServletResponse response, HttpServletRequest request){
+        Cookie[] cookies;
+        if (request.getCookies() != null) {
+            cookies = request.getCookies();
+            Long userID = Long.parseLong(cookies[0].getValue());
+            userDto user = userService.findUserById(userID);
+            return ResponseEntity.status(HttpStatus.OK).body(user.getAdmin());
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
