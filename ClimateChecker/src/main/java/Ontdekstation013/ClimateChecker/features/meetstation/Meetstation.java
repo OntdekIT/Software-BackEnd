@@ -1,5 +1,8 @@
 package Ontdekstation013.ClimateChecker.features.meetstation;
 
+import Ontdekstation013.ClimateChecker.features.meetstation.endpoint.MeetstationDto;
+import Ontdekstation013.ClimateChecker.features.user.User;
+import Ontdekstation013.ClimateChecker.features.user.endpoint.userDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -29,6 +32,10 @@ public class Meetstation {
     @Column(name = "userid")
     private Long userid;
 
+    @ManyToOne
+    @JoinColumn(name = "userid", nullable = false, insertable = false, updatable = false)
+    private User user;
+
 
     public Meetstation(String name, String database_tag, Boolean is_public, Long registrationCode, Long location_locationid, Long userid) {
         this.name = name;
@@ -42,5 +49,9 @@ public class Meetstation {
     public Meetstation(Boolean is_public, Long registrationCode) {
         this.is_public = is_public;
         this.registrationCode = registrationCode;
+    }
+
+    public MeetstationDto toDto(){
+        return new MeetstationDto(stationid, name, database_tag, is_public, registrationCode, location_locationid, userid);
     }
 }

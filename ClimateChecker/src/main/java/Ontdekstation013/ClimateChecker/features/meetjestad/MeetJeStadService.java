@@ -30,6 +30,15 @@ public class MeetJeStadService {
     public List<Measurement> getMeasurements(MeetJeStadParameters params) {
         StringBuilder url = new StringBuilder(baseUrl);
 
+        // Do we want a specific set of stations or all stations
+        if (!params.StationIds.isEmpty()) {
+            url.append("&ids=");
+
+            for (int stationId : params.StationIds) {
+                url.append(stationId).append(",");
+            }
+        }
+
         // Get measurements from this date
         if (params.StartDate != null) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd,HH:mm").withZone(ZoneOffset.UTC);
@@ -48,14 +57,7 @@ public class MeetJeStadService {
         if (params.Limit != 0)
             url.append("&limit=").append(params.Limit);
 
-        // Do we want a specific set of stations or all stations
-        if (!params.StationIds.isEmpty()) {
-            url.append("&ids=");
 
-            for (int stationId : params.StationIds) {
-                url.append(stationId).append(",");
-            }
-        }
 
         // Execute call and convert to json
         RestTemplate restTemplate = new RestTemplate();
