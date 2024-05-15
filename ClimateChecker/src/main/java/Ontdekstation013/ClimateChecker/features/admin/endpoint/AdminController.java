@@ -59,7 +59,7 @@ public class AdminController {
             }
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("User could not be found");
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please fill in every field");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please fill out all fields");
     }
 
 }
