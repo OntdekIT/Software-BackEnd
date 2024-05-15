@@ -91,6 +91,18 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
+    @GetMapping("getUser")
+    public ResponseEntity<userDto> getUser(HttpServletResponse response, HttpServletRequest request){
+        Cookie[] cookies;
+        if (request.getCookies() != null) {
+            cookies = request.getCookies();
+            Long userID = Long.parseLong(cookies[0].getValue());
+            userDto user = userService.findUserById(userID);
+            return ResponseEntity.ok(user);
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
     @GetMapping("getID")
     public ResponseEntity<String> getId(HttpServletResponse response, HttpServletRequest request){
         Cookie[] cookies;
