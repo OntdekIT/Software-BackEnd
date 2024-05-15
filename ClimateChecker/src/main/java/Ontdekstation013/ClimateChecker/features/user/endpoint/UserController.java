@@ -86,7 +86,7 @@ public class UserController {
             cookies = request.getCookies();
             Long userID = Long.parseLong(cookies[0].getValue());
             userDto user = userService.findUserById(userID);
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(user.getFirstName());
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
