@@ -13,7 +13,7 @@ public class userDto extends Dto{
     private String userName;
     private String mailAddress;
     private String jwsString;
-    private boolean admin;
+    private Boolean admin;
 
     private String password;
 

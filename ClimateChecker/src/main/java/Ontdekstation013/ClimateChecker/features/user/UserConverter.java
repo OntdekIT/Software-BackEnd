@@ -24,6 +24,7 @@ public class UserConverter {
         newdto.setLastName(user.getLastName());
         newdto.setFirstName(user.getFirstName());
         newdto.setPassword(user.getPassword());
+        newdto.setAdmin(user.getAdmin());
         return newdto;
     };
 }

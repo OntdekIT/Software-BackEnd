@@ -34,7 +34,7 @@ public class User {
     @Email
     private String mailAddress;
 
-    private boolean Admin;
+    private Boolean Admin;
 
     private String password;
 
@@ -67,6 +67,9 @@ public class User {
         this.userID = dto.getId();
         this.firstName = dto.getFirstName();
         this.lastName = dto.getLastName();
+        this.mailAddress = dto.getMailAddress();
+        this.Admin = dto.getAdmin();
+        this.password = dto.getPassword();
     }
 
     public boolean ValidateInput(registerDto registerDto) throws Exception {
