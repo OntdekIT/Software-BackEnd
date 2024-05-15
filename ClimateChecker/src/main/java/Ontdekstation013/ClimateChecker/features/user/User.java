@@ -3,6 +3,8 @@ package Ontdekstation013.ClimateChecker.features.user;
 import Ontdekstation013.ClimateChecker.exception.ExistingUniqueIdentifierException;
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.features.authentication.endpoint.registerDto;
+import Ontdekstation013.ClimateChecker.features.meetstation.Meetstation;
+import Ontdekstation013.ClimateChecker.features.meetstation.endpoint.MeetstationDto;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.userDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,7 +13,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Pattern;
 
 @Entity
@@ -37,6 +39,9 @@ public class User {
     private Boolean Admin;
 
     private String password;
+
+    @OneToMany(mappedBy = "user")
+    private Set<Meetstation> meetstations;
 
     public User(Long id, String firstName, String lastName, String mailAddress, boolean Admin, String password) {
         this.userID = id;
@@ -147,5 +152,13 @@ public class User {
                         + "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$")
                 .matcher(mailAddress)
                 .matches();
+    }
+
+    public userDto toDto(){
+        Set<MeetstationDto> meetstationDtos = new HashSet<MeetstationDto>();
+        for(Meetstation meetstation : meetstations){
+            meetstationDtos.add(meetstation.toDto());
+        }
+        return new userDto(userID, firstName, lastName, mailAddress, Admin, meetstationDtos);
     }
 }

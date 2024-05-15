@@ -55,8 +55,7 @@ public class UserService {
 
     public userDto findUserById(long id) {
         User user = userRepository.findById(id).get();
-        userDto newdto = userConverter.userToUserDto(user);
-        return newdto;
+        return user.toDto();
     }
 
 

@@ -3,6 +3,7 @@ package Ontdekstation013.ClimateChecker.features.user.endpoint;
 
 import Ontdekstation013.ClimateChecker.features.authentication.EmailSenderService;
 import Ontdekstation013.ClimateChecker.features.authentication.Token;
+import Ontdekstation013.ClimateChecker.features.meetstation.endpoint.MeetstationDto;
 import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.UserConverter;
 import Ontdekstation013.ClimateChecker.features.user.UserService;
@@ -85,7 +86,7 @@ public class UserController {
             cookies = request.getCookies();
             Long userID = Long.parseLong(cookies[0].getValue());
             userDto user = userService.findUserById(userID);
-        return ResponseEntity.status(HttpStatus.OK).body(user.getFirstName());
+        return ResponseEntity.ok(user);
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
