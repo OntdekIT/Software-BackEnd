@@ -186,7 +186,7 @@ public class UserService {
 
 
     public ResponseCookie createCookie(User user) {
-        Cookie jwtTokenCookie = new Cookie("user-id", user.getUserID().toString());
+        Cookie jwtTokenCookie = new Cookie("token", jwtService.createJWT(user.toDto()));
         ResponseCookie springCookie = ResponseCookie.from(jwtTokenCookie.getName(), jwtTokenCookie.getValue())
                 .httpOnly(true)
                 .sameSite("None")
@@ -208,6 +208,10 @@ public class UserService {
         token.setNumericCode(randomCode(6));
         saveToken(token);
         return token;
+    }
+
+    public boolean checkAdmin(Long id){
+        return userRepository.existsUserByUserIDAndAdminTrue(id);
     }
 
     private String randomCode(float length){

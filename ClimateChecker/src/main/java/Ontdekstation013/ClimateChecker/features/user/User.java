@@ -36,7 +36,7 @@ public class User {
     @Email
     private String mailAddress;
 
-    private Boolean Admin;
+    private Boolean admin;
 
     private String password;
 
@@ -48,7 +48,7 @@ public class User {
         this.firstName = firstName;
         this.lastName = lastName;
         this.mailAddress = mailAddress;
-        this.Admin = Admin;
+        this.admin = Admin;
         this.password = password;
     }
 
@@ -73,7 +73,7 @@ public class User {
         this.firstName = dto.getFirstName();
         this.lastName = dto.getLastName();
         this.mailAddress = dto.getMailAddress();
-        this.Admin = dto.getAdmin();
+        this.admin = dto.getAdmin();
         this.password = dto.getPassword();
     }
 
@@ -155,10 +155,12 @@ public class User {
     }
 
     public userDto toDto(){
-        Set<MeetstationDto> meetstationDtos = new HashSet<MeetstationDto>();
-        for(Meetstation meetstation : meetstations){
-            meetstationDtos.add(meetstation.toDto());
+        Set<MeetstationDto> meetstationDtos = new HashSet<>();
+        if (meetstations != null) {
+            for (Meetstation meetstation : meetstations) {
+                meetstationDtos.add(meetstation.toDto());
+            }
         }
-        return new userDto(userID, firstName, lastName, mailAddress, Admin, meetstationDtos);
+        return new userDto(userID, firstName, lastName, mailAddress, admin, meetstationDtos);
     }
 }

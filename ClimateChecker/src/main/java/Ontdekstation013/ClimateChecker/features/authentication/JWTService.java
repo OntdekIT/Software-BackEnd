@@ -36,10 +36,9 @@ public class JWTService {
                 .withIssuer("ontdekstation013")
                 .withClaim("id", dto.getId())
                 .withIssuedAt(new Date())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 5000L))
+                .withExpiresAt(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24)) //24 uur
                 .withJWTId(UUID.randomUUID()
                         .toString())
-                .withNotBefore(new Date(System.currentTimeMillis() + 1000L))
                 .sign(algorithm);
     }
 
@@ -53,9 +52,15 @@ public class JWTService {
         return false;
     }
 
-    public Integer getIdFromJWT(String token){
-        DecodedJWT decodedJWT = verifier.verify(token);
-        return decodedJWT.getClaim("id").asInt();
+    public Long getIdFromJWT(String token){
+        Long id = 0L;
+        try {
+            DecodedJWT decodedJWT = verifier.verify(token);
+            id = decodedJWT.getClaim("id").asLong();
+        } catch (JWTVerificationException e) {
+            System.out.println(e.getMessage());
+        }
+        return id;
     }
 
     Calendar calendar;
