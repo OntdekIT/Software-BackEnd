@@ -16,4 +16,7 @@ public class MeetstationService {
         return meetstation.toDto();
     }
 
+    public void UpdateMeetstation(Meetstation meetstation){
+        meetstationRepository.save(meetstation);
+    }
 }

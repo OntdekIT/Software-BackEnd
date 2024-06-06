@@ -54,4 +54,14 @@ public class Meetstation {
     public MeetstationDto toDto(){
         return new MeetstationDto(stationid, name, database_tag, is_public, registrationCode, location_locationid, userid);
     }
+
+    public Meetstation (MeetstationDto meetstationDto){
+        this.stationid = meetstationDto.stationid;
+        this.name = meetstationDto.name;
+        this.database_tag = meetstationDto.database_tag;
+        this.is_public = meetstationDto.is_public;
+        this.registrationCode = meetstationDto.registrationCode;
+        this.location_locationid = meetstationDto.location_locationid;
+        this.userid = meetstationDto.userid;
+    }
 }

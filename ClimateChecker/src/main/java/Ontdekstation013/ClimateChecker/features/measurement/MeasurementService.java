@@ -41,7 +41,7 @@ public class MeasurementService {
         params.StartDate = startDate;
         params.EndDate = endDate;
         params.StationIds.add(id);
-        params.includeFaultyMeasurements = true;
+        params.includeFaultyMeasurements = false;
         List<Measurement> measurements = meetJeStadService.getMeasurements(params);
 
         return MeasurementLogic.splitIntoDayMeasurements(measurements);

@@ -1,5 +1,6 @@
 package Ontdekstation013.ClimateChecker.features.meetstation.endpoint;
 
+import Ontdekstation013.ClimateChecker.features.meetstation.Meetstation;
 import Ontdekstation013.ClimateChecker.features.meetstation.MeetstationService;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.userDto;
 import org.springframework.http.HttpStatus;
@@ -32,5 +33,16 @@ public class MeetstationController {
 
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+    }
+
+    @PutMapping("")
+    public ResponseEntity<String> updateMeetstation(@RequestBody MeetstationDto meetstationDto) throws Exception {
+        try{
+            meetstationService.UpdateMeetstation(new Meetstation((meetstationDto)));
+            return ResponseEntity.status(HttpStatus.OK).body(null);
+        }
+        catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
     }
 }
