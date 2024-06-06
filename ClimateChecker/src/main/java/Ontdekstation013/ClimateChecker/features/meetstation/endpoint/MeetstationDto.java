@@ -4,19 +4,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class MeetstationDto {
     @JsonProperty("stationid")
-    private Long stationid;
+    public Long stationid;
     @JsonProperty("name")
-    private String name;
+    public String name;
     @JsonProperty("database_tag")
-    private String database_tag;
+    public String database_tag;
     @JsonProperty("is_public")
-    private Boolean is_public;
+    public Boolean is_public;
     @JsonProperty("registrationCode")
-    private Long registrationCode;
+    public Long registrationCode;
     @JsonProperty("location_locationid")
-    private Long location_locationid;
+    public Long location_locationid;
     @JsonProperty("userid")
-    private Long userid;
+    public Long userid;
 
 
     public MeetstationDto(Long stationid, String name, String database_tag, Boolean is_public, Long registrationCode, Long location_locationid, Long userid) {

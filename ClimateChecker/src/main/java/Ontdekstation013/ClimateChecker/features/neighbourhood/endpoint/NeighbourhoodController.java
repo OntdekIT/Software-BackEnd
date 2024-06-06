@@ -47,15 +47,21 @@ public class NeighbourhoodController {
      */
     @GetMapping("/history/average/{id}")
     public List<DayMeasurementResponse> getNeighbourhoodData(@PathVariable Long id, @RequestParam String startDate, @RequestParam String endDate) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy, HH:mm");
+        try{
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
 
-        LocalDateTime localDateTimeStart = LocalDateTime.parse(startDate, formatter);
-        Instant startInstant = localDateTimeStart.atZone(ZoneId.systemDefault()).toInstant();
+            LocalDateTime localDateTimeStart = LocalDateTime.parse(startDate, formatter);
+            Instant startInstant = localDateTimeStart.atZone(ZoneId.systemDefault()).toInstant();
 
-        LocalDateTime localDateTimeEnd = LocalDateTime.parse(endDate, formatter);
-        Instant endInstant = localDateTimeEnd.atZone(ZoneId.systemDefault()).toInstant();
+            LocalDateTime localDateTimeEnd = LocalDateTime.parse(endDate, formatter);
+            Instant endInstant = localDateTimeEnd.atZone(ZoneId.systemDefault()).toInstant();
 
-        return neighbourhoodService.getHistoricalNeighbourhoodData(id, startInstant, endInstant);
+            return neighbourhoodService.getHistoricalNeighbourhoodData(id, startInstant, endInstant);
+        }
+        catch (Exception ex){
+            throw ex;
+        }
+
     }
 
 }

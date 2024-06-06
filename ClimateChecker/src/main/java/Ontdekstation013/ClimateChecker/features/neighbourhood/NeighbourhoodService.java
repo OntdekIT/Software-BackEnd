@@ -93,7 +93,7 @@ public class NeighbourhoodService {
         MeetJeStadParameters params = new MeetJeStadParameters();
         params.StartDate = endDate.minusSeconds(60 * 60);
         params.EndDate = endDate;
-        params.includeFaultyMeasurements = true;
+        params.includeFaultyMeasurements = false;
         List<Measurement> measurements = meetJeStadService.getMeasurements(params);
         //      Then get all station id's within this neighbourhood
         float[][] neighbourhoodCoords = convertToFloatArray(neighbourhood.coordinates);

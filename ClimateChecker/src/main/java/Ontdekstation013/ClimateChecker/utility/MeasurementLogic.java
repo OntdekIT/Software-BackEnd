@@ -60,6 +60,21 @@ public class MeasurementLogic {
                     .map(Measurement::getTemperature)
                     .max(Float::compare)
                     .orElse(Float.NaN));
+            response.setAvgHum((float) entry.getValue()
+                    .stream()
+                    .mapToDouble(Measurement::getHumidity)
+                    .average()
+                    .orElse(Double.NaN));
+            response.setMinHum(entry.getValue()
+                    .stream()
+                    .map(Measurement::getHumidity)
+                    .min(Float::compare)
+                    .orElse(Float.NaN));
+            response.setMaxHum(entry.getValue()
+                    .stream()
+                    .map(Measurement::getHumidity)
+                    .max(Float::compare)
+                    .orElse(Float.NaN));
 
             responseList.add(response);
         }

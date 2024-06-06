@@ -36,7 +36,7 @@ public class User {
     @Email
     private String mailAddress;
 
-    private Boolean Admin;
+    private Boolean Admin = false;
 
     private String password;
 

@@ -143,7 +143,6 @@ public class UserService {
             {
                 if(meetstation.getUserid() == null)
                 {
-
                     if(adminService.VerifyWorkshopCode(registerDto.getWorkshopCode().longValue())) {
                         user = userRepository.save(user);
                         meetstation.setUserid(user.getUserID());
