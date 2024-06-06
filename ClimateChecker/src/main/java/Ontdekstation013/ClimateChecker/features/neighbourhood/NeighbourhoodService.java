@@ -112,7 +112,7 @@ public class NeighbourhoodService {
         params.StartDate = startDate;
         params.EndDate = endDate;
         params.StationIds = stations;
-        params.includeFaultyMeasurements = false;
+        params.includeFaultyMeasurements = true;
         measurements = meetJeStadService.getMeasurements(params);
 
         return MeasurementLogic.splitIntoDayMeasurements(measurements);

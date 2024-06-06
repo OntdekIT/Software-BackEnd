@@ -105,43 +105,40 @@ public class MeetJeStadService {
             return IncorrectValueFilter(measurements);
     }
 
-    public static List<Measurement> IncorrectValueFilter(List<Measurement> measurements) {
-        List<Measurement> filteredMeasurements = new ArrayList<>();
+    public List<Measurement> IncorrectValueFilter(List<Measurement> measurements) {
+        int differenceFromAverageDivider = 2;
+        int minimumDistanceAllowed = 3;
+        float total = 0;
+        float min = Integer.MAX_VALUE;
 
-        // Sort measurements by time
-        Collections.sort(measurements, Comparator.comparingLong(m -> m.getTimestamp().toEpochMilli()));
-
-        for (int i = 0; i < measurements.size(); i++) {
-            Measurement current = measurements.get(i);
-
-            // Check the first 2 measurements before and after the current measurement
-            int start = Math.max(0, i - 2);
-            int end = Math.min(measurements.size() - 1, i + 2);
-
-            double valueThreshold = current.getTemperature() * 0.20; // 10% threshold for value
-            double humidityThreshold = current.getHumidity() * 0.20; // 20% threshold for humidity
-
-            int countOverThreshold = 0;
-
-            for (int j = start; j <= end; j++) {
-                if (j != i) {
-                    Measurement other = measurements.get(j);
-                    if (Math.abs(current.getTemperature() - other.getTemperature()) > valueThreshold ||
-                            Math.abs(current.getHumidity() - other.getHumidity()) > humidityThreshold) {
-                        countOverThreshold++;
-                        if (countOverThreshold >= 2) {
-                            break; // If 2 or more are over threshold, no need to check further
-                        }
-                    }
+        for(Measurement measurement:measurements) {
+            if (measurement.getTemperature()!= null){
+                total += measurement.getTemperature();
+                if (measurement.getTemperature()<min){
+                    min = measurement.getTemperature();
                 }
             }
+        }
+        float adjustmentValue = Math.abs(min);
+        float adjustedTotal = total + measurements.size()*adjustmentValue;
+        float adjustedAverage = adjustedTotal/measurements.size();
+        float allowedSpread = adjustedAverage/differenceFromAverageDivider;
+        if (allowedSpread < minimumDistanceAllowed){
+            allowedSpread = minimumDistanceAllowed;
+        }
+        float average = total/measurements.size();
 
-            // If at least 2 comparisons are over the threshold, don't add the measurement
-            if (countOverThreshold < 3) {
-                filteredMeasurements.add(current);
+        for (Measurement measurement:measurements) {
+            if (measurement.getHumidity()!= null && (measurement.getHumidity()<0 || measurement.getHumidity()>100)){
+                measurement.setHumidity(null);
+            }
+            if (measurement.getTemperature() != null){
+                float absoluteDifferenceFromAverage = Math.abs(measurement.getTemperature()-average);
+                if (absoluteDifferenceFromAverage > allowedSpread){
+                    measurement.setTemperature(null);
+                }
             }
         }
-
-        return filteredMeasurements;
+        return measurements;
     }
     }
