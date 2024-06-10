@@ -54,24 +54,21 @@ public class MeasurementController {
     @GetMapping("/history/average/{id}")
     public List<DayMeasurementResponse> getMeasurementsAverage(@PathVariable int id, @RequestParam String startDate, @RequestParam String endDate) {
 
-try{
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
-    LocalDateTime localDateTimeStart = LocalDateTime.parse(startDate, formatter);
-    Instant startInstant = localDateTimeStart.atZone(ZoneId.systemDefault()).toInstant();
+    try{
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+        LocalDateTime localDateTimeStart = LocalDateTime.parse(startDate, formatter);
+        Instant startInstant = localDateTimeStart.atZone(ZoneId.systemDefault()).toInstant();
 
-    LocalDateTime localDateTimeEnd = LocalDateTime.parse(endDate, formatter);
-    Instant endInstant = localDateTimeEnd.atZone(ZoneId.systemDefault()).toInstant();
+        LocalDateTime localDateTimeEnd = LocalDateTime.parse(endDate, formatter);
+        Instant endInstant = localDateTimeEnd.atZone(ZoneId.systemDefault()).toInstant();
 
-    if (startInstant.isAfter(endInstant)){
-        throw new InvalidArgumentException("Start date is after end date");
-    }
-    return measurementService.getHistoricalMeasurements(id, startInstant, endInstant);
-}
-catch (Exception ex){
-    throw ex;
-}
-
-
-
+        if (startInstant.isAfter(endInstant)){
+            throw new InvalidArgumentException("Start date is after end date");
+        }
+        return measurementService.getHistoricalMeasurements(id, startInstant, endInstant);
+        }
+        catch (Exception ex){
+            throw ex;
+        }
     }
 }
