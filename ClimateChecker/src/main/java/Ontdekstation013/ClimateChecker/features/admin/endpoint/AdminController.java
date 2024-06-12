@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -42,6 +43,12 @@ public class AdminController {
             }
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to create workshop code");
+    }
+
+    @GetMapping("getworkshopcodes")
+    public ResponseEntity<List<WorkshopCode>> getWorkshopCode() {
+        List<WorkshopCode> workshopCodeList = adminService.getWorkshopCodes();
+        return ResponseEntity.status(200).body(workshopCodeList);
     }
 
     @PostMapping("grantuseradmin")

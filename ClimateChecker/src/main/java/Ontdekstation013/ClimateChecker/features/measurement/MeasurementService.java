@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class MeasurementService {
+public class  MeasurementService {
     private final MeetJeStadService meetJeStadService;
 
     public List<MeasurementDTO> getMeasurementsAtTime(Instant dateTime) {
