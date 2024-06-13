@@ -28,4 +28,8 @@ public class MeetstationDto {
         this.location_locationid = location_locationid;
         this.userid = userid;
     }
+
+    public MeetstationDto() {
+
+    }
 }

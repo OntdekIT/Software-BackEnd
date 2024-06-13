@@ -5,10 +5,15 @@ import java.time.format.*;
 import java.util.List;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
+import Ontdekstation013.ClimateChecker.features.measurement.Measurement;
 import Ontdekstation013.ClimateChecker.features.measurement.MeasurementService;
 import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadService;
+import Ontdekstation013.ClimateChecker.features.meetstation.Meetstation;
+import Ontdekstation013.ClimateChecker.features.meetstation.MeetstationService;
+import Ontdekstation013.ClimateChecker.features.meetstation.endpoint.MeetstationDto;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 public class MeasurementController {
 
     private final MeasurementService measurementService;
+    private final MeetstationService meetstationService;
 
     /**
      * Gets the closest measurement to a given timestamp for each station.
@@ -39,7 +45,18 @@ public class MeasurementController {
             @RequestParam(value = "timestamp") String timestamp) {
         try {
             Instant utcDateTime = Instant.parse(timestamp);
-            return measurementService.getMeasurementsAtTime(utcDateTime);
+            List<MeasurementDTO> measurementList = measurementService.getMeasurementsAtTime(utcDateTime);
+            for (MeasurementDTO measurementDTO : measurementList)
+            {
+                MeetstationDto meetstation = meetstationService.ReadById((long)measurementDTO.getId());
+                if (meetstation != null) {
+                    measurementDTO.setIs_public(meetstation.is_public);
+                    measurementDTO.setUserId(meetstation.userid);
+                } else {
+                    measurementDTO.setIs_public(true); // or any default value you prefer
+                }
+            }
+            return measurementList;
         } catch (DateTimeParseException e) {
             throw new InvalidArgumentException("Timestamp must be in ISO 8601 format");
         }

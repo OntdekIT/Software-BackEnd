@@ -25,4 +25,6 @@ public class MeasurementDTO {
     private Float temperature;
     @JsonProperty("humidity")
     private Float humidity;
+    private Boolean is_public = false;
+    private Long userId;
 }

@@ -2,6 +2,7 @@ package Ontdekstation013.ClimateChecker.features.meetjestad;
 
 import Ontdekstation013.ClimateChecker.features.measurement.Measurement;
 import Ontdekstation013.ClimateChecker.features.measurement.endpoint.MeasurementDTO;
+import Ontdekstation013.ClimateChecker.features.meetstation.MeetstationRepository;
 import Ontdekstation013.ClimateChecker.utility.GpsTriangulation;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
