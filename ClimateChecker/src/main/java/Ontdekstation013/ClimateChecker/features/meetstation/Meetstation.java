@@ -32,8 +32,8 @@ public class Meetstation {
     @Column(name = "userid")
     private Long userid;
 
-    @ManyToOne
-    @JoinColumn(name = "userid", nullable = false, insertable = false, updatable = false)
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "userid", nullable = true, insertable = false, updatable = false)
     private User user;
 
 

@@ -1,27 +1,21 @@
 package Ontdekstation013.ClimateChecker.features.meetstation.endpoint;
 
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
-import Ontdekstation013.ClimateChecker.features.measurement.Measurement;
 import Ontdekstation013.ClimateChecker.features.measurement.MeasurementService;
 import Ontdekstation013.ClimateChecker.features.meetstation.Meetstation;
 import Ontdekstation013.ClimateChecker.features.meetstation.MeetstationService;
-import Ontdekstation013.ClimateChecker.features.user.endpoint.userDto;
-import Ontdekstation013.ClimateChecker.utility.DayMeasurementResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 
 @RestController
 @RequestMapping("/api/Meetstation")
@@ -83,6 +77,48 @@ public class MeetstationController {
         }
         catch (Exception ex){
             throw ex;
+        }
+    }
+//    @PutMapping("{stationId}")
+//    public ResponseEntity<String> claimMeetstation(@PathVariable Long stationId, HttpServletRequest request) throws Exception {
+//        try{
+//            Cookie[] cookies;
+//            if (request.getCookies() != null) {
+//                cookies = request.getCookies();
+//                Long userID = Long.parseLong(cookies[0].getValue());
+//                meetstationService.ClaimMeetstation(stationId, userID);
+//            }
+//            return ResponseEntity.status(HttpStatus.OK).body(null);
+//        }
+//        catch (Exception ex){
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+//        }
+//    }
+
+    @GetMapping("/Availibility/{stationId}")
+    public ResponseEntity<Boolean> IsAvailable(@PathVariable Long stationId){
+        try{
+            return ResponseEntity.status(HttpStatus.OK).body(meetstationService.IsAvailable(stationId));
+        }
+        catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+
+    @PutMapping("/Claim")
+    public ResponseEntity<String> ClaimStation(@RequestBody MeetstationDto meetstationDto, HttpServletRequest request){
+        try{
+            Cookie[] cookies;
+            if (request.getCookies() != null) {
+                cookies = request.getCookies();
+                Long userID = Long.parseLong(cookies[0].getValue());
+                meetstationDto.userid = userID;
+                meetstationService.ClaimMeetstation(new Meetstation(meetstationDto));
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(null);
+        }
+        catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
     }
 }
