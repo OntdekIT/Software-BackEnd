@@ -1,6 +1,7 @@
 package Ontdekstation013.ClimateChecker.features.meetstation.endpoint;
 
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
+import Ontdekstation013.ClimateChecker.features.admin.AdminService;
 import Ontdekstation013.ClimateChecker.features.measurement.MeasurementService;
 import Ontdekstation013.ClimateChecker.features.meetstation.Meetstation;
 import Ontdekstation013.ClimateChecker.features.meetstation.MeetstationService;
@@ -23,10 +24,12 @@ import org.springframework.http.MediaType;
 public class MeetstationController {
     private final MeetstationService meetstationService;
     private final MeasurementService measurementService;
+    private final AdminService adminService;
 
-    public MeetstationController (MeetstationService meetstationService, MeasurementService measurementService){
+    public MeetstationController (MeetstationService meetstationService, MeasurementService measurementService, AdminService adminService){
         this.meetstationService = meetstationService;
         this.measurementService = measurementService;
+        this.adminService = adminService;
     }
 
     @GetMapping("{id}")
@@ -95,10 +98,16 @@ public class MeetstationController {
 //        }
 //    }
 
-    @GetMapping("/Availibility/{stationId}")
-    public ResponseEntity<Boolean> IsAvailable(@PathVariable Long stationId){
+    @GetMapping("/Availibility/{stationId}/{workshopCode}")
+    public ResponseEntity<Integer> IsAvailable(@PathVariable Long stationId, @PathVariable Long workshopCode){
         try{
-            return ResponseEntity.status(HttpStatus.OK).body(meetstationService.IsAvailable(stationId));
+            if (!meetstationService.IsAvailable(stationId)){
+                return ResponseEntity.status(HttpStatus.OK).body(402);
+            }
+            else if (!adminService.VerifyWorkshopCode(workshopCode)){
+                return ResponseEntity.status(HttpStatus.OK).body(403);
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(200);
         }
         catch (Exception ex){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
