@@ -174,7 +174,7 @@ public class UserService {
         throw new NotFoundException("User not found");
     }
 
-    public userDto getUserByMail(String mail) {s
+    public userDto getUserByMail(String mail) {
         ModelMapper mapper = new ModelMapper();
         userDto dto = new userDto();
         UserConverter converter = new UserConverter();
