@@ -104,7 +104,7 @@ public class MeetstationController {
             if (!meetstationService.IsAvailable(stationId)){
                 return ResponseEntity.status(HttpStatus.OK).body(402);
             }
-            else if (!adminService.VerifyWorkshopCode(wosrkshopCode)){
+            else if (!adminService.VerifyWorkshopCode(workshopCode)){
                 return ResponseEntity.status(HttpStatus.OK).body(403);
             }
             return ResponseEntity.status(HttpStatus.OK).body(200);
