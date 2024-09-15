@@ -33,7 +33,7 @@ build/
 .vscode/
 
 ### H2 Database ###
-*.sql
 */Database/
 
 ClimateChecker/Database/climateCheckerDB.mv.db
+ClimateChecker/src/main/resources/secrets.properties

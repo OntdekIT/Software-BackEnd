@@ -1,8 +1,10 @@
-name: Java CI with Maven
+name: Build and Test
 
 on:
   push:
-    branches: [ "s3vj23" ]
+    branches: ["s3nj23_dev"]
+  pull_request:
+    branches: ["s3nj23_dev"]
 
 jobs:
   build:
