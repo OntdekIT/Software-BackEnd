@@ -130,4 +130,31 @@ public class MeetstationController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
     }
+
+    // Create station endpoint salvaged from removed DatabasePollingController
+    // TODO: Refactor this endpoint to use the current architecture
+//    @PostMapping("/createStation")
+//    public ResponseEntity<String> createStationByRegistrationCode(@RequestParam("databaseTag") String databaseTag, @RequestParam("registrationCode") long registrationCode){
+//
+//        stationDto station = stationService.findStationByRegistrationCode(registrationCode, databaseTag);
+//
+//        if (station == null){
+//            MeetJeStadDto MJSDto = databasePollingService.GetStationToRegister(registrationCode);
+//            MJSDto = MJSvalidationService.ValidateRegisterDTO(MJSDto);
+//
+//            createLocationDto createLocationDto = new createLocationDto();
+//            createLocationDto.setLongitude(MJSDto.longitude);
+//            createLocationDto.setLatitude(MJSDto.latitude);
+//            long locationId = locationService.createLocation(createLocationDto);
+//
+//            createStationDto createStationDto = new createStationDto();
+//            createStationDto.setLocationId(locationId);
+//            createStationDto.setRegistrationCode(registrationCode);
+//            createStationDto.setDatabaseTag(databaseTag);
+//            stationService.createStation(createStationDto);
+//
+//            return new ResponseEntity<>("Station has been added to the database", HttpStatus.ACCEPTED);
+//        }
+//        return new ResponseEntity<>("Unable to add station to the database", HttpStatus.NOT_ACCEPTABLE);
+//    }
 }
