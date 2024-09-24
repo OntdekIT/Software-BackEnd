@@ -11,8 +11,11 @@ import javax.mail.internet.MimeMessage;
 
 @Service
 public class EmailSenderService {
-    @Autowired
-    private JavaMailSender mailSender;
+    private final JavaMailSender mailSender;
+
+    public EmailSenderService(JavaMailSender mailSender) {
+        this.mailSender = mailSender;
+    }
 
     public void sendEmail(String toEmail, String firstName, String lastName, String body){
         SimpleMailMessage message = new SimpleMailMessage();

@@ -29,10 +29,10 @@ public class NeighbourhoodController {
      * @param timestamp - ISO 8601 format
      */
     @GetMapping("/history")
-    public List<NeighbourhoodDTO> getNeighbourhoodsAtTime(@RequestParam(value = "timestamp") String timestamp) {
+    public List<NeighbourhoodDto> getNeighbourhoodsAtTime(@RequestParam(value = "timestamp") String timestamp) {
         try {
             Instant utcDateTime = Instant.parse(timestamp);
-            List<NeighbourhoodDTO> neighbourhoods = neighbourhoodService.getNeighbourhoodsAtTime(utcDateTime);
+            List<NeighbourhoodDto> neighbourhoods = neighbourhoodService.getNeighbourhoodsAtTime(utcDateTime);
             return neighbourhoods;
         } catch (DateTimeParseException e) {
             throw new InvalidArgumentException("Timestamp must be in ISO 8601 format");

@@ -32,14 +32,3 @@ public class WorkshopCode {
         this.expirationDate = expirationDate;
     }
 }
-
-
-
-//public User(Long id, String firstName, String lastName, String mailAddress, boolean Admin, String password) {
-//    this.userID = id;
-//    this.firstName = firstName;
-//    this.lastName = lastName;
-//    this.mailAddress = mailAddress;
-//    this.Admin = Admin;
-//    this.password = password;
-//}

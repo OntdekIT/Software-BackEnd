@@ -3,10 +3,10 @@ package Ontdekstation013.ClimateChecker.features.admin.endpoint;
 import Ontdekstation013.ClimateChecker.features.admin.AdminService;
 import Ontdekstation013.ClimateChecker.features.admin.WorkshopCode;
 
-import Ontdekstation013.ClimateChecker.features.admin.wsCodeRequest;
+import Ontdekstation013.ClimateChecker.features.admin.WorkshopCodeRequest;
 
 import Ontdekstation013.ClimateChecker.features.user.UserService;
-import Ontdekstation013.ClimateChecker.features.user.endpoint.userDto;
+import Ontdekstation013.ClimateChecker.features.user.endpoint.UserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.http.HttpStatus;
@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/Admin")
@@ -30,8 +29,8 @@ public class AdminController {
         this.userService = userService;
     }
 
-    @PostMapping("createworkshopcode")
-    public ResponseEntity<String> createNewWorkshopCode(@RequestBody wsCodeRequest request) {
+    @PostMapping("createWorkshopCode")
+    public ResponseEntity<String> createNewWorkshopCode(@RequestBody WorkshopCodeRequest request) {
         WorkshopCode workshopCode = adminService.createWorkshopCode(request.getDuration(), request.getLength());
         if (workshopCode != null) {
             Long code = workshopCode.getCode();
@@ -52,11 +51,11 @@ public class AdminController {
     }
 
     @PostMapping("grantuseradmin")
-    public ResponseEntity<String> grantUserAdmin(@RequestBody GrantUserAdminRequestDto request) {
+    public ResponseEntity<String> grantUserAdmin(@RequestBody GrantUserAdminRequest request) {
         if (request.getUserId() != null & request.getAdminRights() != null) {
             Long userId = Long.parseLong(request.getUserId());
             Boolean adminRights = request.getAdminRights();
-            userDto dto = userService.findUserById(userId);
+            UserDto dto = userService.findUserById(userId);
 
             if(dto != null)
             {

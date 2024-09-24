@@ -1,10 +1,10 @@
-package Ontdekstation013.ClimateChecker.features.meetstation.endpoint;
+package Ontdekstation013.ClimateChecker.features.station.endpoint;
 
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.features.admin.AdminService;
 import Ontdekstation013.ClimateChecker.features.measurement.MeasurementService;
-import Ontdekstation013.ClimateChecker.features.meetstation.Meetstation;
-import Ontdekstation013.ClimateChecker.features.meetstation.MeetstationService;
+import Ontdekstation013.ClimateChecker.features.station.Station;
+import Ontdekstation013.ClimateChecker.features.station.StationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,23 +21,23 @@ import org.springframework.http.MediaType;
 @RestController
 @RequestMapping("/api/Meetstation")
 @CrossOrigin(origins = {"http://localhost:3000"}, allowCredentials = "true")
-public class MeetstationController {
-    private final MeetstationService meetstationService;
+public class StationController {
+    private final StationService stationService;
     private final MeasurementService measurementService;
     private final AdminService adminService;
 
-    public MeetstationController (MeetstationService meetstationService, MeasurementService measurementService, AdminService adminService){
-        this.meetstationService = meetstationService;
+    public StationController(StationService stationService, MeasurementService measurementService, AdminService adminService){
+        this.stationService = stationService;
         this.measurementService = measurementService;
         this.adminService = adminService;
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<MeetstationDto> getMeetstation(@PathVariable Long id) throws Exception {
+    public ResponseEntity<StationDto> getMeetstation(@PathVariable Long id) throws Exception {
         try{
             if (id != 0){
-                MeetstationDto meetstationDto = meetstationService.ReadById(id);
-                return ResponseEntity.status(HttpStatus.OK).body(meetstationDto);
+                StationDto stationDto = stationService.ReadById(id);
+                return ResponseEntity.status(HttpStatus.OK).body(stationDto);
             }
         }
         catch (Exception error){
@@ -47,9 +47,9 @@ public class MeetstationController {
     }
 
     @PutMapping("")
-    public ResponseEntity<String> updateMeetstation(@RequestBody MeetstationDto meetstationDto) throws Exception {
+    public ResponseEntity<String> updateMeetstation(@RequestBody StationDto stationDto) throws Exception {
         try{
-            meetstationService.UpdateMeetstation(new Meetstation((meetstationDto)));
+            stationService.UpdateMeetstation(new Station((stationDto)));
             return ResponseEntity.status(HttpStatus.OK).body(null);
         }
         catch (Exception ex){
@@ -101,7 +101,7 @@ public class MeetstationController {
     @GetMapping("/Availibility/{stationId}/{workshopCode}")
     public ResponseEntity<Integer> IsAvailable(@PathVariable Long stationId, @PathVariable Long workshopCode){
         try{
-            if (!meetstationService.IsAvailable(stationId)){
+            if (!stationService.IsAvailable(stationId)){
                 return ResponseEntity.status(HttpStatus.OK).body(402);
             }
             else if (!adminService.VerifyWorkshopCode(workshopCode)){
@@ -115,14 +115,14 @@ public class MeetstationController {
     }
 
     @PutMapping("/Claim")
-    public ResponseEntity<String> ClaimStation(@RequestBody MeetstationDto meetstationDto, HttpServletRequest request){
+    public ResponseEntity<String> ClaimStation(@RequestBody StationDto stationDto, HttpServletRequest request){
         try{
             Cookie[] cookies;
             if (request.getCookies() != null) {
                 cookies = request.getCookies();
                 Long userID = Long.parseLong(cookies[0].getValue());
-                meetstationDto.userid = userID;
-                meetstationService.ClaimMeetstation(new Meetstation(meetstationDto));
+                stationDto.userid = userID;
+                stationService.ClaimMeetstation(new Station(stationDto));
             }
             return ResponseEntity.status(HttpStatus.OK).body(null);
         }

@@ -1,7 +1,7 @@
 package Ontdekstation013.ClimateChecker.features.user.endpoint;
 
 import Ontdekstation013.ClimateChecker.features.Dto;
-import Ontdekstation013.ClimateChecker.features.meetstation.endpoint.MeetstationDto;
+import Ontdekstation013.ClimateChecker.features.station.endpoint.StationDto;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,7 +9,7 @@ import java.util.*;
 
 @Getter
 @Setter
-public class userDto extends Dto{
+public class UserDto extends Dto{
 
     Long id;
     private String firstName;
@@ -20,14 +20,14 @@ public class userDto extends Dto{
 
     private String password;
 
-    private Set<MeetstationDto> meetstations = Collections.<MeetstationDto>emptySet();
+    private Set<StationDto> meetstations = Collections.<StationDto>emptySet();
 
-    public userDto (){}
-    public userDto (String email){
+    public UserDto(){}
+    public UserDto(String email){
         mailAddress = email;
     }
 
-    public userDto(Long id, String firstName, String lastName, String mailAddress, boolean admin, Set<MeetstationDto> meetstations) {
+    public UserDto(Long id, String firstName, String lastName, String mailAddress, boolean admin, Set<StationDto> meetstations) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;

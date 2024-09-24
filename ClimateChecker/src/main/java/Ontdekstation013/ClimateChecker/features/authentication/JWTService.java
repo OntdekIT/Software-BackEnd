@@ -1,8 +1,7 @@
 package Ontdekstation013.ClimateChecker.features.authentication;
 
-import Ontdekstation013.ClimateChecker.features.authentication.endpoint.JwsDTO;
-import Ontdekstation013.ClimateChecker.features.user.User;
-import Ontdekstation013.ClimateChecker.features.user.endpoint.userDto;
+import Ontdekstation013.ClimateChecker.features.authentication.endpoint.JwsDto;
+import Ontdekstation013.ClimateChecker.features.user.endpoint.UserDto;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -31,7 +30,7 @@ public class JWTService {
             .withIssuer("ontdekstation013")
             .build();
 
-    public String createJWT(userDto dto){
+    public String createJWT(UserDto dto){
         return JWT.create()
                 .withIssuer("ontdekstation013")
                 .withClaim("id", dto.getId())
@@ -64,7 +63,7 @@ public class JWTService {
      *
      * @implNote Front end can decrypt the data without any key, however if they change data. This key can verify its intergrity.
      * At the current state, {@code secretKey} will be (re)generated each time the program is restarted.
-     * @see #generateJWS(userDto)
+     * @see #generateJWS(UserDto)
      * @see <a href="https://github.com/jwtk/jjwt#jws-key-create-secret">Creating an secret key</a>
      */
     SecretKey secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
@@ -80,7 +79,7 @@ public class JWTService {
      * @see #secretKey
      * @see <a href="https://github.com/jwtk/jjwt#jws-create-key">Signing an JWS</a>
      */
-    public userDto generateJWS(@NotNull userDto user) {
+    public UserDto generateJWS(@NotNull UserDto user) {
         calendar = Calendar.getInstance();
         claims.setIssuer(ISSUER);
         claims.setSubject(String.valueOf(user.getId()));
@@ -105,7 +104,7 @@ public class JWTService {
      * @see <a href="https://github.com/jwtk/jjwt#jws-read">Reading the JWS</a>
      * @see #fillJWS(Jws)
      */
-    public JwsData verifyJWS(JwsDTO jwsDTO) throws JwtException {
+    public JwsData verifyJWS(JwsDto jwsDTO) throws JwtException {
         Jws<Claims> claims;
         claims = Jwts.parserBuilder()
                 .setSigningKey(secretKey)

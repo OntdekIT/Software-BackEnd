@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class registerDto extends Dto{
+public class RegisterDto extends Dto{
 
     String firstName;
     String lastName;

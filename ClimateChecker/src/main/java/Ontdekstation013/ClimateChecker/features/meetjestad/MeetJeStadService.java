@@ -1,8 +1,7 @@
 package Ontdekstation013.ClimateChecker.features.meetjestad;
 
 import Ontdekstation013.ClimateChecker.features.measurement.Measurement;
-import Ontdekstation013.ClimateChecker.features.measurement.endpoint.MeasurementDTO;
-import Ontdekstation013.ClimateChecker.features.meetstation.MeetstationRepository;
+import Ontdekstation013.ClimateChecker.features.measurement.endpoint.MeasurementDto;
 import Ontdekstation013.ClimateChecker.utility.GpsTriangulation;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -66,10 +65,10 @@ public class MeetJeStadService {
         String responseBody = response.getBody();
 
         // Convert json to list object
-        TypeToken<List<MeasurementDTO>> typeToken = new TypeToken<>() {};
+        TypeToken<List<MeasurementDto>> typeToken = new TypeToken<>() {};
 
         Gson gson = new Gson();
-        List<MeasurementDTO> measurementsDto = gson.fromJson(responseBody, typeToken);
+        List<MeasurementDto> measurementsDto = gson.fromJson(responseBody, typeToken);
         // Set as empty array if null
         if (measurementsDto == null)
             measurementsDto = new ArrayList<>();
@@ -81,7 +80,7 @@ public class MeetJeStadService {
 
         List<Measurement> measurements = new ArrayList<>();
         // Convert MeasurementDTO to Measurement
-        for (MeasurementDTO dto : measurementsDto) {
+        for (MeasurementDto dto : measurementsDto) {
             // Filter out measurements which are outside city bounds
             float[] point = {dto.getLatitude(), dto.getLongitude()};
             if (!GpsTriangulation.pointInPolygon(cityLimits, point))

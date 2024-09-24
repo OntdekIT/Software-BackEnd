@@ -1,8 +1,7 @@
-package Ontdekstation013.ClimateChecker.features.meetstation;
+package Ontdekstation013.ClimateChecker.features.station;
 
-import Ontdekstation013.ClimateChecker.features.meetstation.endpoint.MeetstationDto;
+import Ontdekstation013.ClimateChecker.features.station.endpoint.StationDto;
 import Ontdekstation013.ClimateChecker.features.user.User;
-import Ontdekstation013.ClimateChecker.features.user.endpoint.userDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,7 +13,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Meetstation {
+public class Station {
     @Id
     @Column(name = "stationid")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,7 +36,7 @@ public class Meetstation {
     private User user;
 
 
-    public Meetstation(String name, String database_tag, Boolean is_public, Long registrationCode, Long location_locationid, Long userid) {
+    public Station(String name, String database_tag, Boolean is_public, Long registrationCode, Long location_locationid, Long userid) {
         this.name = name;
         this.database_tag = database_tag;
         this.is_public = is_public;
@@ -46,22 +45,22 @@ public class Meetstation {
         this.userid = userid;
     }
 
-    public Meetstation(Boolean is_public, Long registrationCode) {
+    public Station(Boolean is_public, Long registrationCode) {
         this.is_public = is_public;
         this.registrationCode = registrationCode;
     }
 
-    public MeetstationDto toDto(){
-        return new MeetstationDto(stationid, name, database_tag, is_public, registrationCode, location_locationid, userid);
+    public StationDto toDto(){
+        return new StationDto(stationid, name, database_tag, is_public, registrationCode, location_locationid, userid);
     }
 
-    public Meetstation (MeetstationDto meetstationDto){
-        this.stationid = meetstationDto.stationid;
-        this.name = meetstationDto.name;
-        this.database_tag = meetstationDto.database_tag;
-        this.is_public = meetstationDto.is_public;
-        this.registrationCode = meetstationDto.registrationCode;
-        this.location_locationid = meetstationDto.location_locationid;
-        this.userid = meetstationDto.userid;
+    public Station(StationDto stationDto){
+        this.stationid = stationDto.stationid;
+        this.name = stationDto.name;
+        this.database_tag = stationDto.database_tag;
+        this.is_public = stationDto.is_public;
+        this.registrationCode = stationDto.registrationCode;
+        this.location_locationid = stationDto.location_locationid;
+        this.userid = stationDto.userid;
     }
 }

@@ -8,6 +8,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class JwsDTO extends Dto {
+public class JwsDto extends Dto {
     String jwsString;
 }

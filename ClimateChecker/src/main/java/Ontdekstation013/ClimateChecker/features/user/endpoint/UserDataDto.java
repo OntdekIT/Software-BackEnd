@@ -4,11 +4,9 @@ import Ontdekstation013.ClimateChecker.features.Dto;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.swing.*;
-
 @Getter
 @Setter
-public class userDataDto extends Dto{
+public class UserDataDto extends Dto{
 
     Long id;
     String firstName;

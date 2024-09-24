@@ -1,13 +1,11 @@
 package Ontdekstation013.ClimateChecker.features.authentication.endpoint;
 
-import Ontdekstation013.ClimateChecker.exception.OntdekstationException;
 import Ontdekstation013.ClimateChecker.features.authentication.EmailSenderService;
 import Ontdekstation013.ClimateChecker.features.authentication.JWTService;
 import Ontdekstation013.ClimateChecker.features.authentication.Token;
 import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.UserService;
 
-import Ontdekstation013.ClimateChecker.features.user.endpoint.userDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -38,7 +36,7 @@ public class AuthController {
 
     // create new user
     @PostMapping("register")
-    public ResponseEntity<String> createNewUser(@RequestBody registerDto registerDto) throws Exception {
+    public ResponseEntity<String> createNewUser(@RequestBody RegisterDto registerDto) throws Exception {
         try {
             User user = userService.createNewUser(registerDto);
 
@@ -61,7 +59,7 @@ public class AuthController {
 
     // login user
     @PostMapping("login")
-    public ResponseEntity<String> loginUser(@RequestBody loginDto loginDto) throws Exception {
+    public ResponseEntity<String> loginUser(@RequestBody LoginDto loginDto) throws Exception {
         try{
             User user = userService.login(loginDto);
             if (user != null) {
@@ -83,7 +81,7 @@ public class AuthController {
     }
     
     @PostMapping("verify")
-    public ResponseEntity<Void> verifyEmailCode(@RequestBody verifyDto verifyDto) {
+    public ResponseEntity<Void> verifyEmailCode(@RequestBody VerifyDto verifyDto) {
         String email = verifyDto.getMailAddress();
         if (userService.verifyToken(verifyDto.getCode(), email)){
             ResponseCookie cookie = userService.createCookie(new User(userService.getUserByMail(email)));

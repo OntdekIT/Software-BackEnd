@@ -8,7 +8,7 @@ import java.util.List;
 
 @Repository
 
-public interface WorkshopCodeRepository extends JpaRepository<WorkshopCode, Long> {
+public interface IWorkshopCodeRepository extends JpaRepository<WorkshopCode, Long> {
     WorkshopCode findByCode(Long code);
     List<WorkshopCode> findAllByExpirationDateBefore(LocalDateTime date);
 

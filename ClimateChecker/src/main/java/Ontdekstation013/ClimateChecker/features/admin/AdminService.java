@@ -1,7 +1,5 @@
 package Ontdekstation013.ClimateChecker.features.admin;
 
-import org.apache.tomcat.jni.Local;
-import org.hibernate.jdbc.Work;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,9 +12,9 @@ import java.util.Random;
 @Service
 public class AdminService {
 
-    private final WorkshopCodeRepository workshopCodeRepository;
+    private final IWorkshopCodeRepository workshopCodeRepository;
     @Autowired
-    public AdminService(WorkshopCodeRepository workshopCodeRepository) {
+    public AdminService(IWorkshopCodeRepository workshopCodeRepository) {
         this.workshopCodeRepository = workshopCodeRepository;
     }
 

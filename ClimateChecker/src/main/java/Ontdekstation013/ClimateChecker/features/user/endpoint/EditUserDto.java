@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class editUserDto extends Dto{
+public class EditUserDto extends Dto{
     Long id;
     String firstName;
     String lastName;

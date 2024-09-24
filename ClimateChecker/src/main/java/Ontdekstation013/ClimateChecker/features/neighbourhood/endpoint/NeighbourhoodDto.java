@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class NeighbourhoodDTO {
+public class NeighbourhoodDto {
     @JsonProperty("id")
     private long id;
     @JsonProperty("name")

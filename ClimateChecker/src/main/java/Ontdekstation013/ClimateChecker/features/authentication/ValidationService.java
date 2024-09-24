@@ -1,4 +1,4 @@
-package Ontdekstation013.ClimateChecker.services;
+package Ontdekstation013.ClimateChecker.features.authentication;
 
 import org.modelmapper.ValidationException;
 import org.springframework.stereotype.Service;

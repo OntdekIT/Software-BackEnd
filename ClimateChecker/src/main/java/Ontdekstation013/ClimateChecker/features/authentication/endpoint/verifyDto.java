@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class verifyDto extends Dto{
+public class VerifyDto extends Dto{
     String mailAddress;
     String code;
 }

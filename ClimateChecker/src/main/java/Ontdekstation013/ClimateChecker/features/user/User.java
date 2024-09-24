@@ -1,11 +1,9 @@
 package Ontdekstation013.ClimateChecker.features.user;
 
-import Ontdekstation013.ClimateChecker.exception.ExistingUniqueIdentifierException;
-import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
-import Ontdekstation013.ClimateChecker.features.authentication.endpoint.registerDto;
-import Ontdekstation013.ClimateChecker.features.meetstation.Meetstation;
-import Ontdekstation013.ClimateChecker.features.meetstation.endpoint.MeetstationDto;
-import Ontdekstation013.ClimateChecker.features.user.endpoint.userDto;
+import Ontdekstation013.ClimateChecker.features.authentication.endpoint.RegisterDto;
+import Ontdekstation013.ClimateChecker.features.station.Station;
+import Ontdekstation013.ClimateChecker.features.station.endpoint.StationDto;
+import Ontdekstation013.ClimateChecker.features.user.endpoint.UserDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -41,7 +39,7 @@ public class User {
     private String password;
 
     @OneToMany(mappedBy = "user")
-    private Set<Meetstation> meetstations;
+    private Set<Station> stations;
 
     public User(Long id, String firstName, String lastName, String mailAddress, boolean Admin, String password) {
         this.userID = id;
@@ -68,7 +66,7 @@ public class User {
     }
 
 
-    public User(userDto dto){
+    public User(UserDto dto){
         this.userID = dto.getId();
         this.firstName = dto.getFirstName();
         this.lastName = dto.getLastName();
@@ -77,7 +75,7 @@ public class User {
         this.password = dto.getPassword();
     }
 
-    public boolean ValidateInput(registerDto registerDto) throws Exception {
+    public boolean ValidateInput(RegisterDto registerDto) throws Exception {
         if(registerDto.getFirstName().isEmpty() || registerDto.getLastName().isEmpty() || registerDto.getMailAddress().isEmpty() || registerDto.getPassword().isEmpty() || registerDto.getConfirmPassword().isEmpty() || registerDto.getMeetstationCode() == null)
         {
             throw new Exception("Please fill out all fields");
@@ -154,11 +152,11 @@ public class User {
                 .matches();
     }
 
-    public userDto toDto(){
-        Set<MeetstationDto> meetstationDtos = new HashSet<MeetstationDto>();
-        for(Meetstation meetstation : meetstations){
-            meetstationDtos.add(meetstation.toDto());
+    public UserDto toDto(){
+        Set<StationDto> stationDtos = new HashSet<StationDto>();
+        for(Station station : stations){
+            stationDtos.add(station.toDto());
         }
-        return new userDto(userID, firstName, lastName, mailAddress, Admin, meetstationDtos);
+        return new UserDto(userID, firstName, lastName, mailAddress, Admin, stationDtos);
     }
 }

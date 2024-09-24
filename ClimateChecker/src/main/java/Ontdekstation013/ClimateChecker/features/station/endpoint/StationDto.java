@@ -1,8 +1,8 @@
-package Ontdekstation013.ClimateChecker.features.meetstation.endpoint;
+package Ontdekstation013.ClimateChecker.features.station.endpoint;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class MeetstationDto {
+public class StationDto {
     @JsonProperty("stationid")
     public Long stationid;
     @JsonProperty("name")
@@ -19,7 +19,7 @@ public class MeetstationDto {
     public Long userid;
 
 
-    public MeetstationDto(Long stationid, String name, String database_tag, Boolean is_public, Long registrationCode, Long location_locationid, Long userid) {
+    public StationDto(Long stationid, String name, String database_tag, Boolean is_public, Long registrationCode, Long location_locationid, Long userid) {
         this.stationid = stationid;
         this.name = name;
         this.database_tag = database_tag;
@@ -29,7 +29,7 @@ public class MeetstationDto {
         this.userid = userid;
     }
 
-    public MeetstationDto() {
+    public StationDto() {
 
     }
 }

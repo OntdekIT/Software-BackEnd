@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 
-public class mailDto extends Dto {
+public class MailDto extends Dto {
     Long id;
     String header;
     String body;
