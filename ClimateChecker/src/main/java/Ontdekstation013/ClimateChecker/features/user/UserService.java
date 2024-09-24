@@ -3,7 +3,6 @@ import Ontdekstation013.ClimateChecker.exception.ExistingUniqueIdentifierExcepti
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.exception.NotFoundException;
 import Ontdekstation013.ClimateChecker.features.admin.AdminService;
-import Ontdekstation013.ClimateChecker.features.admin.WorkshopCodeRepository;
 import Ontdekstation013.ClimateChecker.features.authentication.JWTService;
 import Ontdekstation013.ClimateChecker.features.authentication.Token;
 import Ontdekstation013.ClimateChecker.features.authentication.TokenRepository;
@@ -19,7 +18,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -33,7 +31,7 @@ import java.util.Random;
 @Service
 public class UserService {
 
-    private final UserRepository userRepository;
+    private final IUserRepository userRepository;
     private final MeetstationRepository meetstationRepository;
     private final TokenRepository tokenRepository;
     private final AdminService adminService;
@@ -44,7 +42,7 @@ public class UserService {
     private final UserConverter userConverter;
 
     @Autowired
-    public UserService(UserRepository userRepository, MeetstationRepository meetstationRepository, TokenRepository tokenRepository, AdminService adminService, JWTService jwtService) {
+    public UserService(IUserRepository userRepository, MeetstationRepository meetstationRepository, TokenRepository tokenRepository, AdminService adminService, JWTService jwtService) {
         this.userRepository = userRepository;
         this.meetstationRepository = meetstationRepository;
         this.tokenRepository = tokenRepository;

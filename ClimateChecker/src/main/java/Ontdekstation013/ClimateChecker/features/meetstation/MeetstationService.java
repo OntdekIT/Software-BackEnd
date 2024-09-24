@@ -1,8 +1,6 @@
 package Ontdekstation013.ClimateChecker.features.meetstation;
 
 import Ontdekstation013.ClimateChecker.features.meetstation.endpoint.MeetstationDto;
-import Ontdekstation013.ClimateChecker.features.user.User;
-import Ontdekstation013.ClimateChecker.features.user.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
