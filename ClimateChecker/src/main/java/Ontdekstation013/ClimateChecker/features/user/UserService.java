@@ -1,23 +1,23 @@
 package Ontdekstation013.ClimateChecker.features.user;
+
 import Ontdekstation013.ClimateChecker.exception.ExistingUniqueIdentifierException;
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.exception.NotFoundException;
 import Ontdekstation013.ClimateChecker.features.admin.AdminService;
+import Ontdekstation013.ClimateChecker.features.authentication.ITokenRepository;
 import Ontdekstation013.ClimateChecker.features.authentication.JWTService;
 import Ontdekstation013.ClimateChecker.features.authentication.Token;
-import Ontdekstation013.ClimateChecker.features.authentication.ITokenRepository;
 import Ontdekstation013.ClimateChecker.features.authentication.endpoint.LoginDto;
 import Ontdekstation013.ClimateChecker.features.authentication.endpoint.RegisterDto;
+import Ontdekstation013.ClimateChecker.features.station.IStationRepository;
 import Ontdekstation013.ClimateChecker.features.station.Station;
-import Ontdekstation013.ClimateChecker.features.station.StationRepository;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.EditUserDto;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.UserDataDto;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.UserDto;
-
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.http.ResponseCookie;
+import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,17 +32,17 @@ import java.util.Random;
 public class UserService {
 
     private final IUserRepository userRepository;
-    private final StationRepository stationRepository;
+    private final IStationRepository stationRepository;
     private final ITokenRepository ITokenRepository;
     private final AdminService adminService;
-    private PasswordEncoder encoder = new BCryptPasswordEncoder();
+    private final PasswordEncoder encoder = new BCryptPasswordEncoder();
     private final JWTService jwtService;
 
 
     private final UserConverter userConverter;
 
     @Autowired
-    public UserService(IUserRepository userRepository, StationRepository stationRepository, ITokenRepository ITokenRepository, AdminService adminService, JWTService jwtService) {
+    public UserService(IUserRepository userRepository, IStationRepository stationRepository, ITokenRepository ITokenRepository, AdminService adminService, JWTService jwtService) {
         this.userRepository = userRepository;
         this.stationRepository = stationRepository;
         this.ITokenRepository = ITokenRepository;

@@ -5,7 +5,9 @@ import Ontdekstation013.ClimateChecker.features.admin.AdminService;
 import Ontdekstation013.ClimateChecker.features.measurement.MeasurementService;
 import Ontdekstation013.ClimateChecker.features.station.Station;
 import Ontdekstation013.ClimateChecker.features.station.StationService;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,8 +17,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 
 @RestController
 @RequestMapping("/api/Meetstation")
@@ -82,21 +82,6 @@ public class StationController {
             throw ex;
         }
     }
-//    @PutMapping("{stationId}")
-//    public ResponseEntity<String> claimMeetstation(@PathVariable Long stationId, HttpServletRequest request) throws Exception {
-//        try{
-//            Cookie[] cookies;
-//            if (request.getCookies() != null) {
-//                cookies = request.getCookies();
-//                Long userID = Long.parseLong(cookies[0].getValue());
-//                meetstationService.ClaimMeetstation(stationId, userID);
-//            }
-//            return ResponseEntity.status(HttpStatus.OK).body(null);
-//        }
-//        catch (Exception ex){
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-//        }
-//    }
 
     @GetMapping("/Availibility/{stationId}/{workshopCode}")
     public ResponseEntity<Integer> IsAvailable(@PathVariable Long stationId, @PathVariable Long workshopCode){

@@ -5,7 +5,6 @@ import Ontdekstation013.ClimateChecker.features.authentication.JWTService;
 import Ontdekstation013.ClimateChecker.features.authentication.Token;
 import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.UserService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.mail.MessagingException;
 
 @RestController
 @RequestMapping("/api/Authentication")
@@ -52,12 +50,9 @@ public class AuthController {
         catch (Exception ex)
         {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-            //OntdekstationException exception = new OntdekstationException(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
-            //return new ResponseEntity<OntdekstationException>(exception, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    // login user
     @PostMapping("login")
     public ResponseEntity<String> loginUser(@RequestBody LoginDto loginDto) throws Exception {
         try{
@@ -74,12 +69,6 @@ public class AuthController {
        }
     }
 
-    private void sendVerificationEmail(User user) throws MessagingException {
-        Token token = userService.createVerifyToken(user);
-        userService.saveToken(token);
-        emailSenderService.sendLoginMail(user.getMailAddress(), user.getFirstName(), user.getLastName(), token.getNumericCode());
-    }
-    
     @PostMapping("verify")
     public ResponseEntity<Void> verifyEmailCode(@RequestBody VerifyDto verifyDto) {
         String email = verifyDto.getMailAddress();
@@ -89,7 +78,6 @@ public class AuthController {
             headers.add("Set-Cookie", cookie.toString() + "; HttpOnly; SameSite=none; Secure");
             return ResponseEntity.status(200).headers(headers).body(null);
         }
-
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
     }
 
@@ -112,7 +100,6 @@ public class AuthController {
                 response.addCookie(cookie);
             }
         }
-
         return ResponseEntity.ok().body(null);
     }
 }

@@ -1,6 +1,5 @@
 package Ontdekstation013.ClimateChecker.features.authentication;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -27,15 +26,12 @@ public class EmailSenderService {
 
         mailSender.send(message);
 
-        System.out.printf("Mail Send");
+        System.out.print("Mail Send");
     }
 
     public void sendSignupMail(String toEmail, String firstName, String lastName, String code) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
-
-//        File file = new File(".\\ClimateChecker\\src\\main\\resources\\images\\ontdekstation013-logo.png");
-//        helper.addAttachment("logo.png", file);
 
         String body = "Je hebt net je account aangemaakt bij Ontdekstation 013,"
                 + "<br>"
@@ -57,15 +53,12 @@ public class EmailSenderService {
 
         mailSender.send(message);
 
-        System.out.printf("Mail Sent");
+        System.out.print("Mail Sent");
     }
 
     public void sendLoginMail(String toEmail, String firstName, String lastName, String code) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
-
-//        File file = new File(".\\ClimateChecker\\src\\main\\resources\\images\\ontdekstation013-logo.png");
-//        helper.addAttachment("logo.png", file);
 
         String body = "Gebruik deze code bij het inloggen op MB Ontdekt: "
                 + "<br>"
@@ -87,7 +80,7 @@ public class EmailSenderService {
 
         mailSender.send(message);
 
-        System.out.printf("Mail Sent");
+        System.out.print("Mail Sent");
     }
 
     public void deleteUserMail(String toEmail, String firstName, String lastName) {
@@ -105,9 +98,6 @@ public class EmailSenderService {
     public void sendEmailEditMail(String toEmail, String firstName, String lastName, String code) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
-
-//        File file = new File(".\\ClimateChecker\\src\\main\\resources\\images\\ontdekstation013-logo.png");
-//        helper.addAttachment("logo.png", file);
 
         String body = "Je hebt net je email changed 013,"
                 + "<br>"
@@ -129,7 +119,6 @@ public class EmailSenderService {
 
         mailSender.send(message);
 
-        System.out.printf("Mail Sent");
+        System.out.print("Mail Sent");
     }
-
 }

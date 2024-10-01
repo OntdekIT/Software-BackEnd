@@ -7,8 +7,8 @@ import java.util.Optional;
 
 @Service
 public class StationService {
-    private final StationRepository stationRepository;
-    public StationService(StationRepository stationRepository){
+    private final IStationRepository stationRepository;
+    public StationService(IStationRepository stationRepository){
         this.stationRepository = stationRepository;
     }
 
@@ -18,7 +18,6 @@ public class StationService {
         {
             return meetstation.get().toDto();
         }
-
         return null;
     }
 
@@ -40,9 +39,7 @@ public class StationService {
         Optional<Station> optionalMeetstation = stationRepository.findById(stationId);
         if (optionalMeetstation.isPresent()) {
             Station station = optionalMeetstation.get();
-            if (station.getUserid() == null) {
-                return true;
-            }
+            return station.getUserid() == null;
         }
         return false;
     }

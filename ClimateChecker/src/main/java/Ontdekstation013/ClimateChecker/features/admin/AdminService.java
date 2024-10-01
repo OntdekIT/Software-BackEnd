@@ -3,7 +3,6 @@ package Ontdekstation013.ClimateChecker.features.admin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -68,7 +67,6 @@ public class AdminService {
         }
         return false;
     }
-
 
     private Long randomCode(float length){
         char[] CODE ="0123456789".toCharArray();

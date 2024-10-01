@@ -2,8 +2,8 @@ package Ontdekstation013.ClimateChecker.features.neighbourhood.endpoint;
 
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadService;
-import Ontdekstation013.ClimateChecker.utility.DayMeasurementResponse;
 import Ontdekstation013.ClimateChecker.features.neighbourhood.NeighbourhoodService;
+import Ontdekstation013.ClimateChecker.utility.DayMeasurementResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -61,7 +61,5 @@ public class NeighbourhoodController {
         catch (Exception ex){
             throw ex;
         }
-
     }
-
 }

@@ -1,10 +1,10 @@
 package Ontdekstation013.ClimateChecker.features.neighbourhood;
 
 import Ontdekstation013.ClimateChecker.features.measurement.Measurement;
-import Ontdekstation013.ClimateChecker.utility.DayMeasurementResponse;
 import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadParameters;
 import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadService;
 import Ontdekstation013.ClimateChecker.features.neighbourhood.endpoint.NeighbourhoodDto;
+import Ontdekstation013.ClimateChecker.utility.DayMeasurementResponse;
 import Ontdekstation013.ClimateChecker.utility.GpsTriangulation;
 import Ontdekstation013.ClimateChecker.utility.MeasurementLogic;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +25,6 @@ public class NeighbourhoodService {
     private final MeetJeStadService meetJeStadService;
     private final INeighbourhoodRepository neighbourhoodRepository;
 
-    // Process measurements into neighbourhoods
     private List<NeighbourhoodDto> getNeighbourhoodsAverageTemp(List<Neighbourhood> neighbourhoods, List<Measurement> measurements){
         List<NeighbourhoodDto> neighbourhoodDtos = new ArrayList<>();
 
@@ -34,7 +35,6 @@ public class NeighbourhoodService {
             dto.setName(neighbourhood.getName());
             dto.setCoordinates(convertToFloatArray(neighbourhood.coordinates));
 
-            // Get all measurements within this neighbourhood
             List<Measurement> tempMeasurements = new ArrayList<>();
             for (Measurement measurement : measurements) {
                 float[] point = { measurement.getLatitude(), measurement.getLongitude() };
@@ -43,7 +43,6 @@ public class NeighbourhoodService {
                 }
             }
 
-            // Calculate average temperature of the measurements in this neighbourhood
             float totalTemp = 0.0f;
             int measurementCount = tempMeasurements.size();
             for (Measurement measurement : tempMeasurements) {
@@ -84,15 +83,12 @@ public class NeighbourhoodService {
         else
             return new ArrayList<>();
 
-        // This code is a patch to get the data from all stations in a neighbourhood, it can be improved with data caching
-        //      First get all measurements from a 1-hour period to get "all" operational stationIds,
-        //      the longer timespan you query, the more stations will be included, but the longer it will take
         MeetJeStadParameters params = new MeetJeStadParameters();
         params.StartDate = endDate.minusSeconds(60 * 60);
         params.EndDate = endDate;
         params.includeFaultyMeasurements = false;
         List<Measurement> measurements = meetJeStadService.getMeasurements(params);
-        //      Then get all station id's within this neighbourhood
+
         float[][] neighbourhoodCoords = convertToFloatArray(neighbourhood.coordinates);
         List<Integer> stations = new ArrayList<>();
         for (Measurement measurement : measurements) {
@@ -100,11 +96,10 @@ public class NeighbourhoodService {
             if (GpsTriangulation.pointInPolygon(neighbourhoodCoords, point) && !stations.contains(measurement.getId()))
                 stations.add(measurement.getId());
         }
-        //      If no stations in neighbourhood, no query has to be done
-        //      Removing this code causes MeetJeStadService to get the data of ALL stations (+/- 350.000 for 1 month)
+
         if (stations.isEmpty())
             return new ArrayList<DayMeasurementResponse>();
-        //      Lastly, get all measurements within timeframe from these stations
+
         params = new MeetJeStadParameters();
         params.StartDate = startDate;
         params.EndDate = endDate;

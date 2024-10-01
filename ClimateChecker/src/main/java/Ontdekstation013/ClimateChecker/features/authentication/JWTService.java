@@ -86,14 +86,6 @@ public class JWTService {
         calendar.set(Calendar.DAY_OF_MONTH, calendar.get(Calendar.DAY_OF_MONTH) + 7);
         Date date = calendar.getTime();
         claims.setExpiration(date);
-//        user.setJwsString(Jwts.builder()
-//                .setHeaderParam("typ", "JWT")
-//                .setHeaderParam("alg", "HS256")
-//                .setClaims(claims)
-//                .claim("firstName", user.getFirstName())
-//                .claim("lastName", user.getLastName())
-//                .signWith(secretKey)
-//                .compact());
         return user;
     }
 
@@ -117,10 +109,10 @@ public class JWTService {
 
     private JwsData fillJWS(Jws<Claims> claims) {
         JwsData jwsData = new JwsData();
-        jwsData.setExp(claims.getBody().getExpiration());
+        jwsData.setExpiration(claims.getBody().getExpiration());
         jwsData.setFirstName(claims.getBody().get("firstName", String.class));
         jwsData.setLastName(claims.getBody().get("lastName", String.class));
-        jwsData.setIss(claims.getBody().getIssuer());
+        jwsData.setIssuer(claims.getBody().getIssuer());
         jwsData.setId(claims.getBody().getSubject());
 
         return jwsData;

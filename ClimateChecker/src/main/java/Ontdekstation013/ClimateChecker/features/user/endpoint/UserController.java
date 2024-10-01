@@ -4,7 +4,6 @@ package Ontdekstation013.ClimateChecker.features.user.endpoint;
 import Ontdekstation013.ClimateChecker.features.authentication.EmailSenderService;
 import Ontdekstation013.ClimateChecker.features.user.UserConverter;
 import Ontdekstation013.ClimateChecker.features.user.UserService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -53,21 +52,6 @@ public class UserController {
         return ResponseEntity.ok(newDtoList);
     }
 
-    // edit user
-//    @PutMapping
-//    public ResponseEntity<userDto> editUser(@RequestBody editUserDto editUserDto) throws Exception {
-//        User user = userService.editUser(editUserDto);
-//        if (user != null) {
-//            Token token = null;//userService.createCookie(user);
-//            token.setUserid(user.getUserID());
-//            userService.saveToken(token);
-//            emailSenderService.sendEmailEditMail(editUserDto.getMailAddress(), user.getFirstName(), user.getLastName(), userService.createLink(token, editUserDto.getMailAddress()));
-//        }
-//
-//        return ResponseEntity.status(HttpStatus.OK).body(userConverter.userToUserDto(user));
-//    }
-
-    // delete user
     @DeleteMapping("{userId}")
     public ResponseEntity<UserDto> deleteUser(@PathVariable long userId){
         UserDto user = userService.deleteUser(userId);

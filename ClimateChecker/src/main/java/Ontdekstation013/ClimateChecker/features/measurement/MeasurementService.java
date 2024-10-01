@@ -1,23 +1,23 @@
 package Ontdekstation013.ClimateChecker.features.measurement;
 
-import java.time.*;
-import java.time.format.DateTimeFormatter;
+import Ontdekstation013.ClimateChecker.features.measurement.endpoint.MeasurementDto;
+import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadParameters;
+import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadService;
+import Ontdekstation013.ClimateChecker.utility.DayMeasurementResponse;
+import Ontdekstation013.ClimateChecker.utility.MeasurementLogic;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
-
-import java.io.ByteArrayOutputStream;
-import java.time.Instant;
-import java.util.List;
-
-import Ontdekstation013.ClimateChecker.features.measurement.endpoint.MeasurementDto;
-import Ontdekstation013.ClimateChecker.utility.DayMeasurementResponse;
-import Ontdekstation013.ClimateChecker.utility.MeasurementLogic;
-import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadParameters;
-import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.io.ByteArrayOutputStream;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +25,6 @@ public class  MeasurementService {
     private final MeetJeStadService meetJeStadService;
 
     public List<MeasurementDto> getMeasurementsAtTime(Instant dateTime) {
-        // get measurements within a certain range of the dateTime
         int minuteMargin = meetJeStadService.getMinuteLimit();
         MeetJeStadParameters params = new MeetJeStadParameters();
         params.StartDate = dateTime.minus(Duration.ofMinutes(minuteMargin));

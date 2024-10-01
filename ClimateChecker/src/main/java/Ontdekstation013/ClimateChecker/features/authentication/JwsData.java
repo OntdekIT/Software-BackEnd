@@ -11,10 +11,10 @@ import java.util.Date;
 @NoArgsConstructor
 public class JwsData {
 
-    private String iss; // ISSUER
+    private String issuer;
     private String mailAddress;
     private String id;
     private String firstName;
     private String lastName;
-    private Date exp; // EXPIRATION
+    private Date expiration;
 }
