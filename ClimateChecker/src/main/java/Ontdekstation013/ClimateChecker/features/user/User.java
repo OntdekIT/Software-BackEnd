@@ -1,6 +1,6 @@
 package Ontdekstation013.ClimateChecker.features.user;
 
-import Ontdekstation013.ClimateChecker.features.authentication.endpoint.RegisterDto;
+import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.RegisterDto;
 import Ontdekstation013.ClimateChecker.features.station.Station;
 import Ontdekstation013.ClimateChecker.features.station.endpoint.StationDto;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.UserDto;

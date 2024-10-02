@@ -1,8 +1,8 @@
-package Ontdekstation013.ClimateChecker.features.authentication.endpoint;
+package Ontdekstation013.ClimateChecker.features.user.authentication.endpoint;
 
-import Ontdekstation013.ClimateChecker.features.authentication.EmailSenderService;
-import Ontdekstation013.ClimateChecker.features.authentication.JWTService;
-import Ontdekstation013.ClimateChecker.features.authentication.Token;
+import Ontdekstation013.ClimateChecker.features.user.authentication.EmailSenderService;
+import Ontdekstation013.ClimateChecker.features.user.authentication.JWTService;
+import Ontdekstation013.ClimateChecker.features.user.authentication.Token;
 import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

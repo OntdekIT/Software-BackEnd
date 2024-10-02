@@ -1,4 +1,4 @@
-package Ontdekstation013.ClimateChecker.features.authentication;
+package Ontdekstation013.ClimateChecker.features.user.authentication;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

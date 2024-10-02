@@ -1,7 +1,7 @@
 package Ontdekstation013.ClimateChecker.features.user.endpoint;
 
 
-import Ontdekstation013.ClimateChecker.features.authentication.EmailSenderService;
+import Ontdekstation013.ClimateChecker.features.user.authentication.EmailSenderService;
 import Ontdekstation013.ClimateChecker.features.user.UserConverter;
 import Ontdekstation013.ClimateChecker.features.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

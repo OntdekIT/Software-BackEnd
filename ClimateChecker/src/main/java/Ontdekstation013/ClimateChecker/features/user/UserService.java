@@ -4,11 +4,11 @@ import Ontdekstation013.ClimateChecker.exception.ExistingUniqueIdentifierExcepti
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.exception.NotFoundException;
 import Ontdekstation013.ClimateChecker.features.workshopCode.WorkshopCodeService;
-import Ontdekstation013.ClimateChecker.features.authentication.ITokenRepository;
-import Ontdekstation013.ClimateChecker.features.authentication.JWTService;
-import Ontdekstation013.ClimateChecker.features.authentication.Token;
-import Ontdekstation013.ClimateChecker.features.authentication.endpoint.LoginDto;
-import Ontdekstation013.ClimateChecker.features.authentication.endpoint.RegisterDto;
+import Ontdekstation013.ClimateChecker.features.user.authentication.ITokenRepository;
+import Ontdekstation013.ClimateChecker.features.user.authentication.JWTService;
+import Ontdekstation013.ClimateChecker.features.user.authentication.Token;
+import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.LoginDto;
+import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.RegisterDto;
 import Ontdekstation013.ClimateChecker.features.station.IStationRepository;
 import Ontdekstation013.ClimateChecker.features.station.Station;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.EditUserDto;

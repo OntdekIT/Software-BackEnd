@@ -1,4 +1,4 @@
-package Ontdekstation013.ClimateChecker.features.authentication.endpoint;
+package Ontdekstation013.ClimateChecker.features.user.authentication.endpoint;
 
 import Ontdekstation013.ClimateChecker.features.Dto;
 import lombok.Getter;

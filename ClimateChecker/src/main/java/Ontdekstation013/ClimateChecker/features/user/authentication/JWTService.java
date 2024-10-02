@@ -1,6 +1,6 @@
-package Ontdekstation013.ClimateChecker.features.authentication;
+package Ontdekstation013.ClimateChecker.features.user.authentication;
 
-import Ontdekstation013.ClimateChecker.features.authentication.endpoint.JwsDto;
+import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.JwsDto;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.UserDto;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;

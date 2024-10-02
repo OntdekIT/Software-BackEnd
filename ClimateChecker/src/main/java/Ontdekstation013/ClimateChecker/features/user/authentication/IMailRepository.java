@@ -1,4 +1,4 @@
-package Ontdekstation013.ClimateChecker.features.authentication;
+package Ontdekstation013.ClimateChecker.features.user.authentication;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

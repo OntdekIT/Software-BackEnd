@@ -1,4 +1,4 @@
-package Ontdekstation013.ClimateChecker.features.authentication;
+package Ontdekstation013.ClimateChecker.features.user.authentication;
 
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
