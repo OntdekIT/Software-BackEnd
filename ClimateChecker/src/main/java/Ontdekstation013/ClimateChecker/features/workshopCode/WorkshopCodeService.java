@@ -1,4 +1,4 @@
-package Ontdekstation013.ClimateChecker.features.admin;
+package Ontdekstation013.ClimateChecker.features.workshopCode;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,11 +9,11 @@ import java.util.List;
 import java.util.Random;
 
 @Service
-public class AdminService {
+public class WorkshopCodeService {
 
     private final IWorkshopCodeRepository workshopCodeRepository;
     @Autowired
-    public AdminService(IWorkshopCodeRepository workshopCodeRepository) {
+    public WorkshopCodeService(IWorkshopCodeRepository workshopCodeRepository) {
         this.workshopCodeRepository = workshopCodeRepository;
     }
 

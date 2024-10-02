@@ -1,4 +1,4 @@
-package Ontdekstation013.ClimateChecker.features.admin.endpoint;
+package Ontdekstation013.ClimateChecker.features.user.endpoint;
 
 import lombok.Getter;
 import lombok.Setter;

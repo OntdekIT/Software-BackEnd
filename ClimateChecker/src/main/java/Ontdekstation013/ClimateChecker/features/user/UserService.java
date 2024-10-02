@@ -3,7 +3,7 @@ package Ontdekstation013.ClimateChecker.features.user;
 import Ontdekstation013.ClimateChecker.exception.ExistingUniqueIdentifierException;
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.exception.NotFoundException;
-import Ontdekstation013.ClimateChecker.features.admin.AdminService;
+import Ontdekstation013.ClimateChecker.features.workshopCode.WorkshopCodeService;
 import Ontdekstation013.ClimateChecker.features.authentication.ITokenRepository;
 import Ontdekstation013.ClimateChecker.features.authentication.JWTService;
 import Ontdekstation013.ClimateChecker.features.authentication.Token;
@@ -34,7 +34,7 @@ public class UserService {
     private final IUserRepository userRepository;
     private final IStationRepository stationRepository;
     private final ITokenRepository ITokenRepository;
-    private final AdminService adminService;
+    private final WorkshopCodeService adminService;
     private final PasswordEncoder encoder = new BCryptPasswordEncoder();
     private final JWTService jwtService;
 
@@ -42,7 +42,7 @@ public class UserService {
     private final UserConverter userConverter;
 
     @Autowired
-    public UserService(IUserRepository userRepository, IStationRepository stationRepository, ITokenRepository ITokenRepository, AdminService adminService, JWTService jwtService) {
+    public UserService(IUserRepository userRepository, IStationRepository stationRepository, ITokenRepository ITokenRepository, WorkshopCodeService adminService, JWTService jwtService) {
         this.userRepository = userRepository;
         this.stationRepository = stationRepository;
         this.ITokenRepository = ITokenRepository;

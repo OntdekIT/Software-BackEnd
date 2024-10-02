@@ -1,12 +1,11 @@
-package Ontdekstation013.ClimateChecker.features.admin.endpoint;
+package Ontdekstation013.ClimateChecker.features.workshopCode.endpoint;
 
-import Ontdekstation013.ClimateChecker.features.admin.AdminService;
-import Ontdekstation013.ClimateChecker.features.admin.WorkshopCode;
+import Ontdekstation013.ClimateChecker.features.workshopCode.WorkshopCodeService;
+import Ontdekstation013.ClimateChecker.features.workshopCode.WorkshopCode;
 
-import Ontdekstation013.ClimateChecker.features.admin.WorkshopCodeRequest;
+import Ontdekstation013.ClimateChecker.features.workshopCode.WorkshopCodeRequest;
 
 import Ontdekstation013.ClimateChecker.features.user.UserService;
-import Ontdekstation013.ClimateChecker.features.user.endpoint.UserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.http.HttpStatus;
@@ -18,12 +17,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/Admin")
 @CrossOrigin(origins = {"http://localhost:3000"}, allowCredentials = "true")
-public class AdminController {
-    private final AdminService adminService;
+public class WorkshopCodeController {
+    private final WorkshopCodeService adminService;
     private final UserService userService;
 
     @Autowired
-    public AdminController(AdminService adminService, UserService userService)
+    public WorkshopCodeController(WorkshopCodeService adminService, UserService userService)
     {
         this.adminService = adminService;
         this.userService = userService;
@@ -50,22 +49,6 @@ public class AdminController {
         return ResponseEntity.status(200).body(workshopCodeList);
     }
 
-    @PostMapping("grantuseradmin")
-    public ResponseEntity<String> grantUserAdmin(@RequestBody GrantUserAdminRequest request) {
-        if (request.getUserId() != null & request.getAdminRights() != null) {
-            Long userId = Long.parseLong(request.getUserId());
-            Boolean adminRights = request.getAdminRights();
-            UserDto dto = userService.findUserById(userId);
 
-            if(dto != null)
-            {
-                dto.setAdmin(adminRights);
-                Long returnedUserId = userService.grantUserAdmin(dto);
-                return ResponseEntity.status(200).body(returnedUserId.toString());
-            }
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("User could not be found");
-        }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please fill out all fields");
-    }
 
 }

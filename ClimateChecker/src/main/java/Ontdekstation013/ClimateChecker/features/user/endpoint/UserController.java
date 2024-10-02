@@ -105,4 +105,22 @@ public class UserController {
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
+
+    @PostMapping("grantuseradmin")
+    public ResponseEntity<String> grantUserAdmin(@RequestBody GrantUserAdminRequest request) {
+        if (request.getUserId() != null & request.getAdminRights() != null) {
+            Long userId = Long.parseLong(request.getUserId());
+            Boolean adminRights = request.getAdminRights();
+            UserDto dto = userService.findUserById(userId);
+
+            if(dto != null)
+            {
+                dto.setAdmin(adminRights);
+                Long returnedUserId = userService.grantUserAdmin(dto);
+                return ResponseEntity.status(200).body(returnedUserId.toString());
+            }
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("User could not be found");
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please fill out all fields");
+    }
 }

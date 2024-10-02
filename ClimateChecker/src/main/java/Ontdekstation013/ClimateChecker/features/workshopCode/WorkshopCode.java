@@ -1,4 +1,4 @@
-package Ontdekstation013.ClimateChecker.features.admin;
+package Ontdekstation013.ClimateChecker.features.workshopCode;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -6,8 +6,6 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-
-import Ontdekstation013.ClimateChecker.features.user.User;
 
 import java.time.LocalDateTime;
 
