@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Ontdekstation013.ClimateChecker.features.measurement.Measurement;
-import Ontdekstation013.ClimateChecker.features.measurement.endpoint.MeasurementDTO;
+import Ontdekstation013.ClimateChecker.features.measurement.endpoint.MeasurementDto;
 import Ontdekstation013.ClimateChecker.utility.DayMeasurementResponse;
 import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadParameters;
 import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadService;
@@ -54,7 +54,7 @@ public class MeasurementUnitTests {
         Instant datetime = Instant.parse("2000-01-01T12:16:00.00Z");
 
         // Act
-        List<MeasurementDTO> dtos = measurementService.getMeasurementsAtTime(datetime);
+        List<MeasurementDto> dtos = measurementService.getMeasurementsAtTime(datetime);
 
         // Assert
         assertEquals(2, dtos.size());
@@ -67,11 +67,11 @@ public class MeasurementUnitTests {
                 .ofPattern("dd-MM-yyyy HH:mm:ss")
                 .withZone(ZoneId.of("Europe/Amsterdam"));
         {
-            MeasurementDTO dto = dtos.stream().filter(obj -> obj.getId() == 1).toList().get(0);
+            MeasurementDto dto = dtos.stream().filter(obj -> obj.getId() == 1).toList().get(0);
             assertEquals(formatter.format(Instant.parse("2000-01-01T12:12:00.00Z")) , dto.getTimestamp());
         }
         {
-            MeasurementDTO dto = dtos.stream().filter(obj -> obj.getId() == 2).toList().get(0);
+            MeasurementDto dto = dtos.stream().filter(obj -> obj.getId() == 2).toList().get(0);
             assertEquals(formatter.format(Instant.parse("2000-01-01T12:16:00.00Z")), dto.getTimestamp());
         }
     }

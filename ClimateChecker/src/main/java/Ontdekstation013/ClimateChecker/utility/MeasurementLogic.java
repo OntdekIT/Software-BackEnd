@@ -1,19 +1,13 @@
 package Ontdekstation013.ClimateChecker.utility;
 
+import Ontdekstation013.ClimateChecker.features.measurement.Measurement;
+
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.*;
-import java.time.Duration;
-import java.time.Instant;
-
-import Ontdekstation013.ClimateChecker.features.measurement.Measurement;
 
 /**
  * We use this class for measurement-related logic that is used in both MeasurementService and NeighbourhoodService
@@ -21,7 +15,6 @@ import Ontdekstation013.ClimateChecker.features.measurement.Measurement;
 public class MeasurementLogic {
 
     public static List<DayMeasurementResponse> splitIntoDayMeasurements(Collection<Measurement> measurements) {
-        // split measurements into days
         LinkedHashMap<LocalDate, Set<Measurement>> dayMeasurements = new LinkedHashMap<>();
         for (Measurement measurement : measurements) {
             if (measurement.getTemperature() != null) {

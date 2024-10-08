@@ -1,25 +1,23 @@
 package Ontdekstation013.ClimateChecker.features.user;
+
 import Ontdekstation013.ClimateChecker.exception.ExistingUniqueIdentifierException;
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.exception.NotFoundException;
-import Ontdekstation013.ClimateChecker.features.admin.AdminService;
-import Ontdekstation013.ClimateChecker.features.admin.WorkshopCodeRepository;
-import Ontdekstation013.ClimateChecker.features.authentication.JWTService;
-import Ontdekstation013.ClimateChecker.features.authentication.Token;
-import Ontdekstation013.ClimateChecker.features.authentication.TokenRepository;
-import Ontdekstation013.ClimateChecker.features.authentication.endpoint.loginDto;
-import Ontdekstation013.ClimateChecker.features.authentication.endpoint.registerDto;
-import Ontdekstation013.ClimateChecker.features.meetstation.Meetstation;
-import Ontdekstation013.ClimateChecker.features.meetstation.MeetstationRepository;
-import Ontdekstation013.ClimateChecker.features.user.endpoint.editUserDto;
-import Ontdekstation013.ClimateChecker.features.user.endpoint.userDataDto;
-import Ontdekstation013.ClimateChecker.features.user.endpoint.userDto;
-
+import Ontdekstation013.ClimateChecker.features.workshopCode.WorkshopCodeService;
+import Ontdekstation013.ClimateChecker.features.user.authentication.ITokenRepository;
+import Ontdekstation013.ClimateChecker.features.user.authentication.JWTService;
+import Ontdekstation013.ClimateChecker.features.user.authentication.Token;
+import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.LoginDto;
+import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.RegisterDto;
+import Ontdekstation013.ClimateChecker.features.station.IStationRepository;
+import Ontdekstation013.ClimateChecker.features.station.Station;
+import Ontdekstation013.ClimateChecker.features.user.endpoint.EditUserDto;
+import Ontdekstation013.ClimateChecker.features.user.endpoint.UserDataDto;
+import Ontdekstation013.ClimateChecker.features.user.endpoint.UserDto;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,40 +27,41 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
 
-    private final UserRepository userRepository;
-    private final MeetstationRepository meetstationRepository;
-    private final TokenRepository tokenRepository;
-    private final AdminService adminService;
-    private PasswordEncoder encoder = new BCryptPasswordEncoder();
+    private final IUserRepository userRepository;
+    private final IStationRepository stationRepository;
+    private final ITokenRepository ITokenRepository;
+    private final WorkshopCodeService adminService;
+    private final PasswordEncoder encoder = new BCryptPasswordEncoder();
     private final JWTService jwtService;
 
 
     private final UserConverter userConverter;
 
     @Autowired
-    public UserService(UserRepository userRepository, MeetstationRepository meetstationRepository, TokenRepository tokenRepository, AdminService adminService, JWTService jwtService) {
+    public UserService(IUserRepository userRepository, IStationRepository stationRepository, ITokenRepository ITokenRepository, WorkshopCodeService adminService, JWTService jwtService) {
         this.userRepository = userRepository;
-        this.meetstationRepository = meetstationRepository;
-        this.tokenRepository = tokenRepository;
+        this.stationRepository = stationRepository;
+        this.ITokenRepository = ITokenRepository;
         this.adminService = adminService;
         this.userConverter = new UserConverter();
         this.jwtService = jwtService;
     }
 
-    public userDto findUserById(long id) {
+    public UserDto findUserById(long id) {
         User user = userRepository.findById(id).get();
         return user.toDto();
     }
 
 
     // not yet functional
-    public List<userDataDto> getAllUsers() {
+    public List<UserDataDto> getAllUsers() {
         List<User> userList = userRepository.findAll();
-        List<userDataDto> newDtoList = new ArrayList<>();
+        List<UserDataDto> newDtoList = new ArrayList<>();
 
         for (User user: userList) {
             newDtoList.add(userConverter.userToUserDataDto(user));
@@ -73,13 +72,13 @@ public class UserService {
 
     // not yet functional
     // why?
-    public List<userDataDto> getAllByPageId(long pageId) {
-        List<userDataDto> newDtoList = new ArrayList<userDataDto>();
+    public List<UserDataDto> getAllByPageId(long pageId) {
+        List<UserDataDto> newDtoList = new ArrayList<UserDataDto>();
 
         return newDtoList;
     }
 
-    public User editUser(editUserDto editUserDto) throws Exception {
+    public User editUser(EditUserDto editUserDto) throws Exception {
         User user = userRepository.findById(editUserDto.getId()).orElseThrow();
 
         if (editUserDto.getFirstName().length() < 256)
@@ -113,13 +112,13 @@ public class UserService {
         return user;
     }
 
-    public userDto deleteUser(Long id) {
+    public UserDto deleteUser(Long id) {
         User user = userRepository.getById(id);
         userRepository.deleteById(id);
         return (userConverter.userToUserDto(user));
     }
 
-    public User createNewUser(registerDto registerDto) throws Exception {
+    public User createNewUser(RegisterDto registerDto) throws Exception {
         try
         {
             User user = new User();
@@ -138,14 +137,14 @@ public class UserService {
 
             user.setPassword(HashPassword(user.getPassword()));
 
-            Meetstation meetstation = meetstationRepository.getByRegistrationCode(registerDto.getMeetstationCode().longValue());
-            if(meetstation != null)
+            Station station = stationRepository.getByRegistrationCode(registerDto.getMeetstationCode().longValue());
+            if(station != null)
             {
-                if(meetstation.getUserid() == null)
+                if(station.getUserid() == null)
                 {
                     if(adminService.VerifyWorkshopCode(registerDto.getWorkshopCode().longValue())) {
                         user = userRepository.save(user);
-                        meetstation.setUserid(user.getUserID());
+                        station.setUserid(user.getUserID());
                         return user;
                     }
 
@@ -166,7 +165,7 @@ public class UserService {
 
     }
 
-    public User login(loginDto loginDto) throws Exception {
+    public User login(LoginDto loginDto) throws Exception {
         User user = userRepository.findByMailAddress(loginDto.getMailAddress());
         if (verifyPassword(loginDto.getPassword(), user.getPassword())){
             return userRepository.findByMailAddress(loginDto.getMailAddress());
@@ -174,9 +173,9 @@ public class UserService {
         throw new NotFoundException("User not found");
     }
 
-    public userDto getUserByMail(String mail) {
+    public UserDto getUserByMail(String mail) {
         ModelMapper mapper = new ModelMapper();
-        userDto dto = new userDto();
+        UserDto dto = new UserDto();
         UserConverter converter = new UserConverter();
         dto = converter.userToUserDto(userRepository.findByMailAddress(mail));
         //dto = new userDto(mail);
@@ -195,7 +194,7 @@ public class UserService {
         return springCookie;
     }
 
-    public Long grantUserAdmin(userDto dto) {
+    public Long grantUserAdmin(UserDto dto) {
         User updatedUser = new User(dto);
         return userRepository.save(updatedUser).getUserID();
     }
@@ -225,19 +224,19 @@ public class UserService {
     }
 
     public void saveToken(Token token){
-        List<Token> tokensToRemove = tokenRepository.findAllByUserid(token.getUserid());
-        tokenRepository.deleteAll(tokensToRemove);
+        List<Token> tokensToRemove = ITokenRepository.findAllByUserid(token.getUserid());
+        ITokenRepository.deleteAll(tokensToRemove);
         token.setId(token.getUserid());
-        tokenRepository.save(token);
+        ITokenRepository.save(token);
     }
 
     public boolean verifyToken(String linkHash, String email) {
         User user = userRepository.findByMailAddress(email);
-        Token officialToken = tokenRepository.findByUserid(user.getUserID());
+        Token officialToken = ITokenRepository.findByUserid(user.getUserID());
         if (officialToken != null){
             if (officialToken.getNumericCode().equals(linkHash)) {
                 if (officialToken.getCreationTime().isBefore(LocalDateTime.now().plusMinutes(5))) {
-                    tokenRepository.delete(officialToken);
+                    ITokenRepository.delete(officialToken);
                     return true;
                 }
             }
@@ -263,4 +262,10 @@ public class UserService {
         return encoder.matches(rawPassword, hashedPassword);
     }
 
+    public List<UserDataDto> filterUsersByMail(String mail) {
+        List<User> users = userRepository.findByMailAddressContaining(mail);
+        return users.stream()
+                .map(user -> userConverter.userToUserDataDto(user))
+                .collect(Collectors.toList());
+    }
 }

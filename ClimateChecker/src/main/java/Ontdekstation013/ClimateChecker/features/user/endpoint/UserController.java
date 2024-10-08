@@ -1,14 +1,9 @@
 package Ontdekstation013.ClimateChecker.features.user.endpoint;
 
 
-import Ontdekstation013.ClimateChecker.features.authentication.EmailSenderService;
-import Ontdekstation013.ClimateChecker.features.authentication.Token;
-import Ontdekstation013.ClimateChecker.features.meetstation.endpoint.MeetstationDto;
-import Ontdekstation013.ClimateChecker.features.user.User;
+import Ontdekstation013.ClimateChecker.features.user.authentication.EmailSenderService;
 import Ontdekstation013.ClimateChecker.features.user.UserConverter;
 import Ontdekstation013.ClimateChecker.features.user.UserService;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,43 +33,28 @@ public class UserController {
 
     // get user by id
     @GetMapping("{userId}")
-    public ResponseEntity<userDto> getUserById(@PathVariable long userId){
-        userDto dto = userService.findUserById(userId);
+    public ResponseEntity<UserDto> getUserById(@PathVariable long userId){
+        UserDto dto = userService.findUserById(userId);
         return ResponseEntity.ok(dto);
     }
 
     // get all users
     @GetMapping
-    public ResponseEntity<List<userDataDto>> getAllUsers(){
-        List<userDataDto> newDtoList = userService.getAllUsers();
+    public ResponseEntity<List<UserDataDto>> getAllUsers(){
+        List<UserDataDto> newDtoList = userService.getAllUsers();
         return ResponseEntity.ok(newDtoList);
     }
 
     // get users by page number
     @GetMapping("page/{pageNumber}")
-    public ResponseEntity<List<userDataDto>> getAllUsersByPage(@PathVariable long pageId){
-        List<userDataDto> newDtoList = userService.getAllByPageId(pageId);
+    public ResponseEntity<List<UserDataDto>> getAllUsersByPage(@PathVariable long pageId){
+        List<UserDataDto> newDtoList = userService.getAllByPageId(pageId);
         return ResponseEntity.ok(newDtoList);
     }
 
-    // edit user
-//    @PutMapping
-//    public ResponseEntity<userDto> editUser(@RequestBody editUserDto editUserDto) throws Exception {
-//        User user = userService.editUser(editUserDto);
-//        if (user != null) {
-//            Token token = null;//userService.createCookie(user);
-//            token.setUserid(user.getUserID());
-//            userService.saveToken(token);
-//            emailSenderService.sendEmailEditMail(editUserDto.getMailAddress(), user.getFirstName(), user.getLastName(), userService.createLink(token, editUserDto.getMailAddress()));
-//        }
-//
-//        return ResponseEntity.status(HttpStatus.OK).body(userConverter.userToUserDto(user));
-//    }
-
-    // delete user
     @DeleteMapping("{userId}")
-    public ResponseEntity<userDto> deleteUser(@PathVariable long userId){
-        userDto user = userService.deleteUser(userId);
+    public ResponseEntity<UserDto> deleteUser(@PathVariable long userId){
+        UserDto user = userService.deleteUser(userId);
         emailSenderService.deleteUserMail(user.getMailAddress(), user.getFirstName(), user.getLastName());
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
@@ -85,19 +65,19 @@ public class UserController {
         if (request.getCookies() != null) {
             cookies = request.getCookies();
             Long userID = Long.parseLong(cookies[0].getValue());
-            userDto user = userService.findUserById(userID);
+            UserDto user = userService.findUserById(userID);
         return ResponseEntity.ok(user.getFirstName());
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     @GetMapping("getUser")
-    public ResponseEntity<userDto> getUser(HttpServletResponse response, HttpServletRequest request){
+    public ResponseEntity<UserDto> getUser(HttpServletResponse response, HttpServletRequest request){
         Cookie[] cookies;
         if (request.getCookies() != null) {
             cookies = request.getCookies();
             Long userID = Long.parseLong(cookies[0].getValue());
-            userDto user = userService.findUserById(userID);
+            UserDto user = userService.findUserById(userID);
             return ResponseEntity.ok(user);
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -120,9 +100,33 @@ public class UserController {
         if (request.getCookies() != null) {
             cookies = request.getCookies();
             Long userID = Long.parseLong(cookies[0].getValue());
-            userDto user = userService.findUserById(userID);
+            UserDto user = userService.findUserById(userID);
             return ResponseEntity.status(HttpStatus.OK).body(user.getAdmin());
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    @PostMapping("grantuseradmin")
+    public ResponseEntity<String> grantUserAdmin(@RequestBody GrantUserAdminRequest request) {
+        if (request.getUserId() != null & request.getAdminRights() != null) {
+            Long userId = Long.parseLong(request.getUserId());
+            Boolean adminRights = request.getAdminRights();
+            UserDto dto = userService.findUserById(userId);
+
+            if(dto != null)
+            {
+                dto.setAdmin(adminRights);
+                Long returnedUserId = userService.grantUserAdmin(dto);
+                return ResponseEntity.status(200).body(returnedUserId.toString());
+            }
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("User could not be found");
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please fill out all fields");
+    }
+
+    @GetMapping("/filterByMail")
+    public ResponseEntity<List<UserDataDto>> filterUsersByMail(@RequestParam String mail) {
+        List<UserDataDto> filteredUsers = userService.filterUsersByMail(mail);
+        return ResponseEntity.ok(filteredUsers);
     }
 }
