@@ -1,85 +1,51 @@
 package Ontdekstation013.ClimateChecker.features.workshopCode;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 @Service
 public class WorkshopCodeService {
 
     private final IWorkshopCodeRepository workshopCodeRepository;
-    @Autowired
+
     public WorkshopCodeService(IWorkshopCodeRepository workshopCodeRepository) {
         this.workshopCodeRepository = workshopCodeRepository;
     }
 
-    public WorkshopCode createWorkshopCode(Long minutes, Long length){
-        WorkshopCode workshopCode = new WorkshopCode();
-        Long code = null;
-        boolean isUnique = false;
-        while (!isUnique){
-            code = randomCode(length);
-            WorkshopCode existingWorkshopCode = workshopCodeRepository.findByCode(code);
-            if (existingWorkshopCode == null){
-                isUnique = true;
-            }
-            else{
-                if (!VerifyWorkshopCode(existingWorkshopCode.getCode())){
-                    isUnique = true;
-                }
-            }
-        }
 
-        workshopCode.setExpirationDate(LocalDateTime.now().plusMinutes(minutes));
-        workshopCode.setCode(code);
-        workshopCodeRepository.save(workshopCode);
-        return workshopCode;
+    public WorkshopCode createWorkshopCode(LocalDateTime expirationDate) {
+        Long uniqueRandomCode = generateUniqueRandomCode();
+        WorkshopCode workshopCode = new WorkshopCode(uniqueRandomCode, expirationDate);
+        return workshopCodeRepository.save(workshopCode);
     }
 
-    public List<WorkshopCode> getWorkshopCodes() {
-        List<WorkshopCode> workshopCodeList = workshopCodeRepository.findAll();
-        List<WorkshopCode> returnWorkshopCodeList = new ArrayList<>();
-
-        for (WorkshopCode workshopCode : workshopCodeList) {
-            if (VerifyWorkshopCode(workshopCode.getCode())) {
-                returnWorkshopCodeList.add(workshopCode);
-            }
-        }
-
-        return returnWorkshopCodeList;
+    public List<WorkshopCode> getAllWorkshopCodes() {
+        LocalDateTime now = LocalDateTime.now();
+        return workshopCodeRepository.findAll()
+                .stream()
+                .filter(code -> code.getExpirationDate().isAfter(now))
+                .collect(Collectors.toList());
     }
 
-    public boolean VerifyWorkshopCode(Long code) {
-        WorkshopCode officialCode = workshopCodeRepository.findByCode(code);
-        if (officialCode != null){
-            if (officialCode.getCode().equals(code)) {
-                if (officialCode.getExpirationDate().isAfter(LocalDateTime.now())) {
-                    return true;
-                }
-                else {
-                    workshopCodeRepository.delete(officialCode);
-                }
-            }
-        }
-        return false;
+    @Scheduled(cron = "0 */5 * * * *")
+    public void deleteExpiredWorkshopCodes() {
+        LocalDateTime now = LocalDateTime.now();
+        List<WorkshopCode> expiredCodes = workshopCodeRepository.findByExpirationDateBefore(now);
+        workshopCodeRepository.deleteAll(expiredCodes);
+        System.out.println("Deleted workshop codes at " + now);
     }
 
-    private Long randomCode(float length){
-        char[] CODE ="0123456789".toCharArray();
-
-        StringBuilder string = new StringBuilder();
-
-        Random random = new Random();
-
-        for(int i = 0; i < length; i++) {
-            int index = random.nextInt(CODE.length);
-
-            string.append(CODE[index]);
+    private Long generateUniqueRandomCode() {
+        Long randomCode = ThreadLocalRandom.current().nextLong(100000, 999999);
+        if (workshopCodeRepository.existsById(randomCode)) {
+            return generateUniqueRandomCode();
+        } else {
+            return randomCode;
         }
-        return Long.parseLong(string.toString());
     }
 }
