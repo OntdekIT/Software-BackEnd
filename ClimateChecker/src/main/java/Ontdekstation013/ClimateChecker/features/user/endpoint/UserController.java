@@ -45,6 +45,12 @@ public class UserController {
         return ResponseEntity.ok(newDtoList);
     }
 
+    @GetMapping("/users")
+    public ResponseEntity<List<UserDataDto>> getAllUsersWithStationStatus() {
+        List<UserDataDto> userList = userService.getAllUsersWithStationStatus();
+        return ResponseEntity.ok(userList);
+    }
+
     // get users by page number
     @GetMapping("page/{pageNumber}")
     public ResponseEntity<List<UserDataDto>> getAllUsersByPage(@PathVariable long pageId){

@@ -27,6 +27,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -68,6 +69,29 @@ public class UserService {
 
         return newDtoList;
     }
+
+    public List<UserDataDto> getAllUsersWithStationStatus() {
+        List<User> userList = userRepository.findAll();
+        List<UserDataDto> newDtoList = new ArrayList<>();
+
+        for (User user : userList) {
+            UserDataDto dto = userConverter.userToUserDataDto(user);
+
+            // Haal alle stations op voor de gebruiker
+            List<Station> stations = stationRepository.findByUserid(user.getUserID());
+
+            // Als de gebruiker stations heeft, kijk dan of er een actief station is
+            boolean hasActiveStation = stations.stream().anyMatch(Station::getIsActive);
+            dto.setIsStationActive(hasActiveStation);
+
+            newDtoList.add(dto);
+        }
+
+        return newDtoList;
+    }
+
+
+
 
     // not yet functional
     // why?

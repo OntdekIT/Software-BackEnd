@@ -1,6 +1,7 @@
 package Ontdekstation013.ClimateChecker.features.user.endpoint;
 
 import Ontdekstation013.ClimateChecker.features.Dto;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,5 +16,12 @@ public class UserDataDto extends Dto{
     String mailAddress;
     boolean admin;
 
+    @JsonIgnore
     String password;
+
+
+
+
+    Boolean isStationActive;
+
 }
