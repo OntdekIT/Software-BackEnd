@@ -1,30 +1,30 @@
 package Ontdekstation013.ClimateChecker.features.user;
 
-import Ontdekstation013.ClimateChecker.features.user.endpoint.userDataDto;
-import Ontdekstation013.ClimateChecker.features.user.endpoint.userDto;
+import Ontdekstation013.ClimateChecker.features.user.endpoint.UserDataDto;
+import Ontdekstation013.ClimateChecker.features.user.endpoint.UserDto;
 
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserConverter {
-    public userDataDto userToUserDataDto (User user){
-        userDataDto newdto = new userDataDto();
-        newdto.setId(user.getUserID());
-        newdto.setMailAddress(user.getMailAddress());
-        newdto.setFirstName(user.getFirstName());
-        newdto.setLastName(user.getLastName());
-        newdto.setPassword(user.getPassword());
-        return newdto;
+    public UserDataDto userToUserDataDto (User user){
+        UserDataDto dto = new UserDataDto();
+        dto.setId(user.getUserID());
+        dto.setMailAddress(user.getMailAddress());
+        dto.setFirstName(user.getFirstName());
+        dto.setLastName(user.getLastName());
+        dto.setPassword(user.getPassword());
+        return dto;
     }
 
-    public userDto userToUserDto (User user) {
-        userDto newdto = new userDto();
-        newdto.setId(user.getUserID());
-        newdto.setMailAddress(user.getMailAddress());
-        newdto.setLastName(user.getLastName());
-        newdto.setFirstName(user.getFirstName());
-        newdto.setPassword(user.getPassword());
-        newdto.setAdmin(user.getAdmin());
-        return newdto;
+    public UserDto userToUserDto (User user) {
+        UserDto dto = new UserDto();
+        dto.setId(user.getUserID());
+        dto.setMailAddress(user.getMailAddress());
+        dto.setLastName(user.getLastName());
+        dto.setFirstName(user.getFirstName());
+        dto.setPassword(user.getPassword());
+        dto.setAdmin(user.getAdmin());
+        return dto;
     };
 }

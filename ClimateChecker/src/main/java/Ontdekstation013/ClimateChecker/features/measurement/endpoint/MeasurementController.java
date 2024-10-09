@@ -5,15 +5,12 @@ import java.time.format.*;
 import java.util.List;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.Optional;
 
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
-import Ontdekstation013.ClimateChecker.features.measurement.Measurement;
 import Ontdekstation013.ClimateChecker.features.measurement.MeasurementService;
 import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadService;
-import Ontdekstation013.ClimateChecker.features.meetstation.Meetstation;
-import Ontdekstation013.ClimateChecker.features.meetstation.MeetstationService;
-import Ontdekstation013.ClimateChecker.features.meetstation.endpoint.MeetstationDto;
+import Ontdekstation013.ClimateChecker.features.station.StationService;
+import Ontdekstation013.ClimateChecker.features.station.endpoint.StationDto;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 public class MeasurementController {
 
     private final MeasurementService measurementService;
-    private final MeetstationService meetstationService;
+    private final StationService stationService;
 
     /**
      * Gets the closest measurement to a given timestamp for each station.
@@ -41,14 +38,14 @@ public class MeasurementController {
      * @param timestamp - ISO 8601 format
      */
     @GetMapping("/history")
-    public List<MeasurementDTO> getMeasurementsAtTime(
+    public List<MeasurementDto> getMeasurementsAtTime(
             @RequestParam(value = "timestamp") String timestamp) {
         try {
             Instant utcDateTime = Instant.parse(timestamp);
-            List<MeasurementDTO> measurementList = measurementService.getMeasurementsAtTime(utcDateTime);
-            for (MeasurementDTO measurementDTO : measurementList)
+            List<MeasurementDto> measurementList = measurementService.getMeasurementsAtTime(utcDateTime);
+            for (MeasurementDto measurementDTO : measurementList)
             {
-                MeetstationDto meetstation = meetstationService.ReadById((long)measurementDTO.getId());
+                StationDto meetstation = stationService.ReadById((long)measurementDTO.getId());
                 if (meetstation != null) {
                     measurementDTO.setIs_public(meetstation.is_public);
                     measurementDTO.setUserId(meetstation.userid);

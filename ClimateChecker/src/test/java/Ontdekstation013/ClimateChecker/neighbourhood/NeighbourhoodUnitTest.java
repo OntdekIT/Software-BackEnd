@@ -33,7 +33,7 @@ public class NeighbourhoodUnitTest {
     private List<Measurement> measurementList;
 
     @Mock
-    private NeighbourhoodRepository neighbourhoodRepository;
+    private INeighbourhoodRepository INeighbourhoodRepository;
     private List<Neighbourhood> neighbourhoodList;
 
     @BeforeEach
@@ -104,7 +104,7 @@ public class NeighbourhoodUnitTest {
                 lastDayMeasurements.get(2)
         );
 
-        when(neighbourhoodRepository.findById(1L)).thenReturn(Optional.of(stijn));
+        when(INeighbourhoodRepository.findById(1L)).thenReturn(Optional.of(stijn));
 
         ArgumentCaptor<MeetJeStadParameters> paramCaptor = ArgumentCaptor.forClass(MeetJeStadParameters.class);
         when(meetJeStadService.getMeasurements(paramCaptor.capture()))
@@ -115,7 +115,7 @@ public class NeighbourhoodUnitTest {
 
         // Assert
         verify(meetJeStadService, times(2)).getMeasurements(any());
-        verify(neighbourhoodRepository).findById(1L);
+        verify(INeighbourhoodRepository).findById(1L);
 
         assertEquals(2, dayMeasurements.size());
 

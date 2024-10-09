@@ -1,6 +1,5 @@
 package Ontdekstation013.ClimateChecker.features.neighbourhood;
 
-import Ontdekstation013.ClimateChecker.features.neighbourhood.endpoint.NeighbourhoodDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
