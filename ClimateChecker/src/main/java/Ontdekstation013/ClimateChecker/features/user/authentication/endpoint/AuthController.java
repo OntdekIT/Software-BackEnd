@@ -1,10 +1,10 @@
 package Ontdekstation013.ClimateChecker.features.user.authentication.endpoint;
 
+import Ontdekstation013.ClimateChecker.features.user.User;
+import Ontdekstation013.ClimateChecker.features.user.UserService;
 import Ontdekstation013.ClimateChecker.features.user.authentication.EmailSenderService;
 import Ontdekstation013.ClimateChecker.features.user.authentication.JWTService;
 import Ontdekstation013.ClimateChecker.features.user.authentication.Token;
-import Ontdekstation013.ClimateChecker.features.user.User;
-import Ontdekstation013.ClimateChecker.features.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -25,8 +25,7 @@ public class AuthController {
     private final EmailSenderService emailSenderService;
 
     @Autowired
-    public AuthController(UserService userService, EmailSenderService emailSenderService, JWTService jwtService)
-    {
+    public AuthController(UserService userService, EmailSenderService emailSenderService, JWTService jwtService) {
         this.userService = userService;
         this.jwtService = jwtService;
         this.emailSenderService = emailSenderService;
@@ -38,41 +37,37 @@ public class AuthController {
         try {
             User user = userService.createNewUser(registerDto);
 
-            if (user != null){
+            if (user != null) {
 
                 Token token = userService.createVerifyToken(user);
-                emailSenderService.sendLoginMail(user.getMailAddress(), user.getFirstName(), user.getLastName(), token.getNumericCode());
+                emailSenderService.sendLoginMail(user.getEmail(), user.getFirstName(), user.getLastName(), token.getNumericCode());
                 return ResponseEntity.status(HttpStatus.CREATED).body(null);
             }
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
-
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
     }
 
     @PostMapping("login")
     public ResponseEntity<String> loginUser(@RequestBody LoginDto loginDto) throws Exception {
-        try{
+        try {
             User user = userService.login(loginDto);
             if (user != null) {
                 Token token = userService.createVerifyToken(user);
-                emailSenderService.sendLoginMail(user.getMailAddress(), user.getFirstName(), user.getLastName(), token.getNumericCode());
+                emailSenderService.sendLoginMail(user.getEmail(), user.getFirstName(), user.getLastName(), token.getNumericCode());
                 return ResponseEntity.status(HttpStatus.OK).body(null);
             }
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-       catch (Exception error){
+        } catch (Exception error) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error.getMessage());
-       }
+        }
     }
 
     @PostMapping("verify")
     public ResponseEntity<Void> verifyEmailCode(@RequestBody VerifyDto verifyDto) {
         String email = verifyDto.getMailAddress();
-        if (userService.verifyToken(verifyDto.getCode(), email)){
+        if (userService.verifyToken(verifyDto.getCode(), email)) {
             ResponseCookie cookie = userService.createCookie(new User(userService.getUserByMail(email)));
             HttpHeaders headers = new HttpHeaders();
             headers.add("Set-Cookie", cookie.toString() + "; HttpOnly; SameSite=none; Secure");
@@ -82,7 +77,7 @@ public class AuthController {
     }
 
     @GetMapping("checkLogin")
-    public ResponseEntity<Boolean> verifyLogin(HttpServletResponse response, HttpServletRequest request){
+    public ResponseEntity<Boolean> verifyLogin(HttpServletResponse response, HttpServletRequest request) {
         if (request.getCookies() != null) {
             return ResponseEntity.status(HttpStatus.OK).body(true);
         }

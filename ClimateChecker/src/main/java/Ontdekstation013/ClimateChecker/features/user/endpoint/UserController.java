@@ -1,7 +1,7 @@
 package Ontdekstation013.ClimateChecker.features.user.endpoint;
 
 
-import Ontdekstation013.ClimateChecker.features.user.UserConverter;
+import Ontdekstation013.ClimateChecker.features.user.UserMapper;
 import Ontdekstation013.ClimateChecker.features.user.UserService;
 import Ontdekstation013.ClimateChecker.features.user.authentication.EmailSenderService;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.GrantUserAdminRequest;
@@ -24,14 +24,14 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
-    private final UserConverter userConverter;
+    private final UserMapper userMapper;
 
     private final EmailSenderService emailSenderService;
 
     @Autowired
-    public UserController(UserService userService, UserConverter userConverter, EmailSenderService emailSEnderService) {
+    public UserController(UserService userService, UserMapper userMapper, EmailSenderService emailSEnderService) {
         this.userService = userService;
-        this.userConverter = userConverter;
+        this.userMapper = userMapper;
         this.emailSenderService = emailSEnderService;
     }
 

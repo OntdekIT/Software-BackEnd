@@ -32,7 +32,7 @@ public class User {
 
     @NotBlank
     @Email
-    private String mailAddress;
+    private String email;
 
     private boolean isAdmin = false;
 
@@ -41,26 +41,26 @@ public class User {
     @OneToMany(mappedBy = "user")
     private Set<Station> stations;
 
-    public User(Long id, String firstName, String lastName, String mailAddress, boolean isAdmin, String password) {
+    public User(Long id, String firstName, String lastName, String email, boolean isAdmin, String password) {
         this.userId = id;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.mailAddress = mailAddress;
+        this.email = email;
         this.isAdmin = isAdmin;
         this.password = password;
     }
 
-    public User(String mailAddress, String firstName, String lastName, String password) {
-        this.mailAddress = mailAddress;
+    public User(String email, String firstName, String lastName, String password) {
+        this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;
         this.password = password;
     }
 
 
-    public User(String mailAddress, Long id, String password) {
+    public User(String email, Long id, String password) {
         this.userId = id;
-        this.mailAddress = mailAddress;
+        this.email = email;
         this.password = password;
     }
 
@@ -69,7 +69,7 @@ public class User {
         this.userId = dto.getId();
         this.firstName = dto.getFirstName();
         this.lastName = dto.getLastName();
-        this.mailAddress = dto.getMailAddress();
+        this.email = dto.getEmail();
         this.isAdmin = dto.getAdmin();
         this.password = dto.getPassword();
     }

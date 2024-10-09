@@ -39,7 +39,7 @@ public class UserService {
     private final JWTService jwtService;
 
 
-    private final UserConverter userConverter;
+    private final UserMapper userMapper;
 
     @Autowired
     public UserService(IUserRepository userRepository, IStationRepository stationRepository, ITokenRepository ITokenRepository, WorkshopCodeService adminService, JWTService jwtService) {
@@ -47,7 +47,7 @@ public class UserService {
         this.stationRepository = stationRepository;
         this.ITokenRepository = ITokenRepository;
         this.adminService = adminService;
-        this.userConverter = new UserConverter();
+        this.userMapper = new UserMapper();
         this.jwtService = jwtService;
     }
 
@@ -63,7 +63,7 @@ public class UserService {
         List<UserDataDto> newDtoList = new ArrayList<>();
 
         for (User user : userList) {
-            newDtoList.add(UserConverter.userToUserDataDto(user));
+            newDtoList.add(UserMapper.userToUserDataDto(user));
         }
 
         return newDtoList;
@@ -92,14 +92,14 @@ public class UserService {
 
         //TODO Wachtwoord veranderen toevoegen
         editUserDto.setMailAddress(editUserDto.getMailAddress().toLowerCase());
-        if (!user.getMailAddress().equals(editUserDto.getMailAddress())) {
+        if (!user.getEmail().equals(editUserDto.getMailAddress())) {
             if (editUserDto.getMailAddress().contains("@")) {
                 if (!userRepository.existsUserByMailAddress(editUserDto.getMailAddress())) {
-                    String mail = user.getMailAddress();
-                    user.setMailAddress(editUserDto.getMailAddress());
+                    String mail = user.getEmail();
+                    user.setEmail(editUserDto.getMailAddress());
                     userRepository.save(user);
                     userRepository.save(user);
-                    user.setMailAddress(mail);
+                    user.setEmail(mail);
                 } else {
                     throw new ExistingUniqueIdentifierException("Email already in use");
                 }
@@ -114,7 +114,7 @@ public class UserService {
     public UserDto deleteUser(Long id) {
         User user = userRepository.getById(id);
         userRepository.deleteById(id);
-        return (UserConverter.userToUserDto(user));
+        return (UserMapper.userToUserDto(user));
     }
 
     public User createNewUser(RegisterDto registerDto) throws Exception {
@@ -168,8 +168,8 @@ public class UserService {
     public UserDto getUserByMail(String mail) {
         ModelMapper mapper = new ModelMapper();
         UserDto dto = new UserDto();
-        UserConverter converter = new UserConverter();
-        dto = UserConverter.userToUserDto(userRepository.findByMailAddress(mail));
+        UserMapper converter = new UserMapper();
+        dto = UserMapper.userToUserDto(userRepository.findByMailAddress(mail));
         //dto = new userDto(mail);
         return dto;
     }

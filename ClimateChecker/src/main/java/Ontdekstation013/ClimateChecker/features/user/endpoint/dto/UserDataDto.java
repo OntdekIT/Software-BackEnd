@@ -5,7 +5,7 @@ public record UserDataDto(Long id,
                           String firstName,
                           String lastName,
                           String userName,
-                          String mailAddress,
+                          String email,
                           boolean isAdmin,
                           String password) {
 }

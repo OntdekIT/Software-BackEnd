@@ -7,7 +7,7 @@ import java.util.Set;
 public record UserDto(Long id,
                       String firstName,
                       String lastName,
-                      String mailAddress,
+                      String email,
                       boolean isAdmin,
                       Set<StationDto> meetstations) {
 }

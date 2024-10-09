@@ -8,11 +8,11 @@ import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserDto;
 import java.util.HashSet;
 import java.util.Set;
 
-public class UserConverter {
+public class UserMapper {
     public static UserDataDto userToUserDataDto(User user) {
         UserDataDto dto = new UserDataDto();
         dto.setId(user.getUserId());
-        dto.setMailAddress(user.getMailAddress());
+        dto.setMailAddress(user.getEmail());
         dto.setFirstName(user.getFirstName());
         dto.setLastName(user.getLastName());
         dto.setPassword(user.getPassword());
@@ -22,7 +22,7 @@ public class UserConverter {
     public static UserDto userToUserDto(User user) {
         UserDto dto = new UserDto();
         dto.setId(user.getUserId());
-        dto.setMailAddress(user.getMailAddress());
+        dto.setMailAddress(user.getEmail());
         dto.setLastName(user.getLastName());
         dto.setFirstName(user.getFirstName());
         dto.setPassword(user.getPassword());
