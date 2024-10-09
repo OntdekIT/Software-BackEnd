@@ -1,4 +1,4 @@
-package Ontdekstation013.ClimateChecker.features.workshopCode;
+package Ontdekstation013.ClimateChecker.features.workshopcode;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;

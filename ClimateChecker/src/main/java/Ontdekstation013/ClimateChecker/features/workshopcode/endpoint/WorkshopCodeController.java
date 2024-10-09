@@ -1,8 +1,8 @@
-package Ontdekstation013.ClimateChecker.features.workshopCode.endpoint;
+package Ontdekstation013.ClimateChecker.features.workshopcode.endpoint;
 
-import Ontdekstation013.ClimateChecker.features.workshopCode.WorkshopCode;
-import Ontdekstation013.ClimateChecker.features.workshopCode.WorkshopCodeRequest;
-import Ontdekstation013.ClimateChecker.features.workshopCode.WorkshopCodeService;
+import Ontdekstation013.ClimateChecker.features.workshopcode.WorkshopCode;
+import Ontdekstation013.ClimateChecker.features.workshopcode.WorkshopCodeRequest;
+import Ontdekstation013.ClimateChecker.features.workshopcode.WorkshopCodeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +11,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/workshopcodes")
-@CrossOrigin(origins = {"http://localhost:3000"}, allowCredentials = "true")
 public class WorkshopCodeController {
     private final WorkshopCodeService workshopCodeService;
 

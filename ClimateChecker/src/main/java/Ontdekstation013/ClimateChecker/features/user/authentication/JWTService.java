@@ -1,7 +1,7 @@
 package Ontdekstation013.ClimateChecker.features.user.authentication;
 
 import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.JwsDto;
-import Ontdekstation013.ClimateChecker.features.user.endpoint.UserDto;
+import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserDto;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -30,7 +30,7 @@ public class JWTService {
             .withIssuer("ontdekstation013")
             .build();
 
-    public String createJWT(UserDto dto){
+    public String createJWT(UserDto dto) {
         return JWT.create()
                 .withIssuer("ontdekstation013")
                 .withClaim("id", dto.getId())
@@ -42,7 +42,7 @@ public class JWTService {
                 .sign(algorithm);
     }
 
-    public boolean verifyJWT(String token){
+    public boolean verifyJWT(String token) {
         try {
             DecodedJWT decodedJWT = verifier.verify(token);
             return true;
@@ -52,7 +52,7 @@ public class JWTService {
         return false;
     }
 
-    public Integer getIdFromJWT(String token){
+    public Integer getIdFromJWT(String token) {
         DecodedJWT decodedJWT = verifier.verify(token);
         return decodedJWT.getClaim("id").asInt();
     }

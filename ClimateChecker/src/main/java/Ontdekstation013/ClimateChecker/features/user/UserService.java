@@ -3,17 +3,17 @@ package Ontdekstation013.ClimateChecker.features.user;
 import Ontdekstation013.ClimateChecker.exception.ExistingUniqueIdentifierException;
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.exception.NotFoundException;
-import Ontdekstation013.ClimateChecker.features.workshopCode.WorkshopCodeService;
+import Ontdekstation013.ClimateChecker.features.station.IStationRepository;
+import Ontdekstation013.ClimateChecker.features.station.Station;
 import Ontdekstation013.ClimateChecker.features.user.authentication.ITokenRepository;
 import Ontdekstation013.ClimateChecker.features.user.authentication.JWTService;
 import Ontdekstation013.ClimateChecker.features.user.authentication.Token;
 import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.LoginDto;
 import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.RegisterDto;
-import Ontdekstation013.ClimateChecker.features.station.IStationRepository;
-import Ontdekstation013.ClimateChecker.features.station.Station;
-import Ontdekstation013.ClimateChecker.features.user.endpoint.EditUserDto;
-import Ontdekstation013.ClimateChecker.features.user.endpoint.UserDataDto;
-import Ontdekstation013.ClimateChecker.features.user.endpoint.UserDto;
+import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.EditUserDto;
+import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserDataDto;
+import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserDto;
+import Ontdekstation013.ClimateChecker.features.workshopcode.WorkshopCodeService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseCookie;
@@ -62,8 +62,8 @@ public class UserService {
         List<User> userList = userRepository.findAll();
         List<UserDataDto> newDtoList = new ArrayList<>();
 
-        for (User user: userList) {
-            newDtoList.add(userConverter.userToUserDataDto(user));
+        for (User user : userList) {
+            newDtoList.add(UserConverter.userToUserDataDto(user));
         }
 
         return newDtoList;
@@ -114,36 +114,31 @@ public class UserService {
     public UserDto deleteUser(Long id) {
         User user = userRepository.getById(id);
         userRepository.deleteById(id);
-        return (userConverter.userToUserDto(user));
+        return (UserConverter.userToUserDto(user));
     }
 
     public User createNewUser(RegisterDto registerDto) throws Exception {
-        try
-        {
+        try {
             User user = new User();
-            if(user.ValidateInput(registerDto)) {
+            if (user.ValidateInput(registerDto)) {
                 registerDto.setMailAddress(registerDto.getMailAddress().toLowerCase());
                 if (!userRepository.existsUserByMailAddress(registerDto.getMailAddress())) { //check if email is unique
                     user = new User(registerDto.getMailAddress(), registerDto.getFirstName(), registerDto.getLastName(), registerDto.getPassword());
-                }
-                else {
+                } else {
                     throw new ExistingUniqueIdentifierException("Email already in use");
                 }
-            }
-            else {
+            } else {
                 throw new InvalidArgumentException("Invalid information");
             }
 
             user.setPassword(HashPassword(user.getPassword()));
 
             Station station = stationRepository.getByRegistrationCode(registerDto.getMeetstationCode().longValue());
-            if(station != null)
-            {
-                if(station.getUserid() == null)
-                {
-                    if(adminService.VerifyWorkshopCode(registerDto.getWorkshopCode().longValue())) {
+            if (station != null) {
+                if (station.getUserid() == null) {
+                    if (adminService.VerifyWorkshopCode(registerDto.getWorkshopCode().longValue())) {
                         user = userRepository.save(user);
-                        station.setUserid(user.getUserID());
+                        station.setUserid(user.getUserId());
                         return user;
                     }
 
@@ -156,9 +151,7 @@ public class UserService {
             throw new Exception("Meetstation bestaat niet");
 
 
-        }
-
-        catch (Exception ex) {
+        } catch (Exception ex) {
             throw ex;
         }
 
@@ -166,7 +159,7 @@ public class UserService {
 
     public User login(LoginDto loginDto) throws Exception {
         User user = userRepository.findByMailAddress(loginDto.getMailAddress());
-        if (verifyPassword(loginDto.getPassword(), user.getPassword())){
+        if (verifyPassword(loginDto.getPassword(), user.getPassword())) {
             return userRepository.findByMailAddress(loginDto.getMailAddress());
         }
         throw new NotFoundException("User not found");
@@ -176,14 +169,14 @@ public class UserService {
         ModelMapper mapper = new ModelMapper();
         UserDto dto = new UserDto();
         UserConverter converter = new UserConverter();
-        dto = converter.userToUserDto(userRepository.findByMailAddress(mail));
+        dto = UserConverter.userToUserDto(userRepository.findByMailAddress(mail));
         //dto = new userDto(mail);
-         return dto;
+        return dto;
     }
 
 
     public ResponseCookie createCookie(User user) {
-        Cookie jwtTokenCookie = new Cookie("user-id", user.getUserID().toString());
+        Cookie jwtTokenCookie = new Cookie("user-id", user.getUserId().toString());
         ResponseCookie springCookie = ResponseCookie.from(jwtTokenCookie.getName(), jwtTokenCookie.getValue())
                 .httpOnly(true)
                 .sameSite("None")
@@ -195,26 +188,26 @@ public class UserService {
 
     public Long grantUserAdmin(UserDto dto) {
         User updatedUser = new User(dto);
-        return userRepository.save(updatedUser).getUserID();
+        return userRepository.save(updatedUser).getUserId();
     }
 
-    public Token createVerifyToken(User user){
+    public Token createVerifyToken(User user) {
         Token token = new Token();
-        token.setUserid(user.getUserID());
+        token.setUserid(user.getUserId());
         token.setCreationTime(LocalDateTime.now());
         token.setNumericCode(randomCode(6));
         saveToken(token);
         return token;
     }
 
-    private String randomCode(float length){
-        char[] NUMERIC ="0123456789".toCharArray();
+    private String randomCode(float length) {
+        char[] NUMERIC = "0123456789".toCharArray();
 
         StringBuilder string = new StringBuilder();
 
         Random random = new Random();
 
-        for(int i = 0; i < length; i++) {
+        for (int i = 0; i < length; i++) {
             int index = random.nextInt(NUMERIC.length);
 
             string.append(NUMERIC[index]);
@@ -222,7 +215,7 @@ public class UserService {
         return string.toString();
     }
 
-    public void saveToken(Token token){
+    public void saveToken(Token token) {
         List<Token> tokensToRemove = ITokenRepository.findAllByUserid(token.getUserid());
         ITokenRepository.deleteAll(tokensToRemove);
         token.setId(token.getUserid());
@@ -231,8 +224,8 @@ public class UserService {
 
     public boolean verifyToken(String linkHash, String email) {
         User user = userRepository.findByMailAddress(email);
-        Token officialToken = ITokenRepository.findByUserid(user.getUserID());
-        if (officialToken != null){
+        Token officialToken = ITokenRepository.findByUserid(user.getUserId());
+        if (officialToken != null) {
             if (officialToken.getNumericCode().equals(linkHash)) {
                 if (officialToken.getCreationTime().isBefore(LocalDateTime.now().plusMinutes(5))) {
                     ITokenRepository.delete(officialToken);
@@ -243,8 +236,7 @@ public class UserService {
         return false;
     }
 
-    private String HashPassword(String password)
-    {
+    private String HashPassword(String password) {
         int saltLength = 16;
         int hashLength = 32;
         int parallelism = 8;

@@ -1,4 +1,4 @@
-package Ontdekstation013.ClimateChecker.features.workshopCode;
+package Ontdekstation013.ClimateChecker.features.workshopcode;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
