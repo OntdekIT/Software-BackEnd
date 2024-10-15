@@ -15,12 +15,11 @@ public class CorsConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
                         // Replace "*" with the specific allowed origins
-                        .allowedOrigins("http://localhost:3000")
+                        .allowedOrigins("http://localhost:5173", "http://localhost:3000")
                         .allowedMethods("GET", "POST", "PUT", "DELETE")
                         .allowedHeaders("*")
                         .allowCredentials(true); // Enable sending of credentials
             }
         };
     }
-
 }
