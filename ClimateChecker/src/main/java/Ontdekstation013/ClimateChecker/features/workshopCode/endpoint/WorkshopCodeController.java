@@ -18,13 +18,13 @@ public class WorkshopCodeController {
         this.workshopCodeService = workshopCodeService;
     }
 
-    @PostMapping("/")
+    @PostMapping()
     public ResponseEntity<?> createNewWorkshopCode(@RequestBody WorkshopCodeRequest request) {
         WorkshopCode savedCode = workshopCodeService.createWorkshopCode(request.expirationDate());
         return new ResponseEntity<>(savedCode, HttpStatus.CREATED);
     }
 
-    @GetMapping("/")
+    @GetMapping()
     public ResponseEntity<List<WorkshopCode>> getAllWorkshopCodes() {
         List<WorkshopCode> workshopCodeList = workshopCodeService.getAllWorkshopCodes();
         return new ResponseEntity<>(workshopCodeList, HttpStatus.OK);
