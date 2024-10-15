@@ -1,33 +1,30 @@
 package Ontdekstation013.ClimateChecker.features.measurement;
 
-import java.time.*;
-import java.time.format.DateTimeFormatter;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Element;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.pdf.PdfWriter;
-
-import java.io.ByteArrayOutputStream;
-import java.time.Instant;
-import java.util.List;
-
-import Ontdekstation013.ClimateChecker.features.measurement.endpoint.MeasurementDTO;
-import Ontdekstation013.ClimateChecker.utility.DayMeasurementResponse;
-import Ontdekstation013.ClimateChecker.utility.MeasurementLogic;
+import Ontdekstation013.ClimateChecker.features.measurement.endpoint.MeasurementDto;
 import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadParameters;
 import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadService;
+import Ontdekstation013.ClimateChecker.utility.DayMeasurementResponse;
 import Ontdekstation013.ClimateChecker.utility.MeasurementLogic;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfWriter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.io.ByteArrayOutputStream;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class  MeasurementService {
     private final MeetJeStadService meetJeStadService;
 
-    public List<MeasurementDTO> getMeasurementsAtTime(Instant dateTime) {
-        // get measurements within a certain range of the dateTime
+    public List<MeasurementDto> getMeasurementsAtTime(Instant dateTime) {
         int minuteMargin = meetJeStadService.getMinuteLimit();
         MeetJeStadParameters params = new MeetJeStadParameters();
         params.StartDate = dateTime.minus(Duration.ofMinutes(minuteMargin));
@@ -94,8 +91,8 @@ public class  MeasurementService {
                 measurement.getHumidity() != null ? measurement.getHumidity() : 0, measurement.getLatitude(), measurement.getLongitude());
     }
 
-    private MeasurementDTO convertToDTO(Measurement entity) {
-        MeasurementDTO dto = new MeasurementDTO();
+    private MeasurementDto convertToDTO(Measurement entity) {
+        MeasurementDto dto = new MeasurementDto();
         dto.setId(entity.getId());
         dto.setLongitude(entity.getLongitude());
         dto.setLatitude(entity.getLatitude());
