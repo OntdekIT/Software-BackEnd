@@ -48,4 +48,19 @@ public class WorkshopCodeService {
             return randomCode;
         }
     }
+
+    public boolean VerifyWorkshopCode(Long code) {
+        WorkshopCode officialCode = workshopCodeRepository.findByCode(code);
+        if (officialCode != null){
+            if (officialCode.getCode().equals(code)) {
+                if (officialCode.getExpirationDate().isAfter(LocalDateTime.now())) {
+                    return true;
+                }
+                else {
+                    workshopCodeRepository.delete(officialCode);
+                }
+            }
+        }
+        return false;
+    }
 }
