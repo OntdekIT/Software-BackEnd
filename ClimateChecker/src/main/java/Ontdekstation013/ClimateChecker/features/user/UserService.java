@@ -3,17 +3,17 @@ package Ontdekstation013.ClimateChecker.features.user;
 import Ontdekstation013.ClimateChecker.exception.ExistingUniqueIdentifierException;
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.exception.NotFoundException;
-import Ontdekstation013.ClimateChecker.features.workshopCode.WorkshopCodeService;
+import Ontdekstation013.ClimateChecker.features.station.IStationRepository;
+import Ontdekstation013.ClimateChecker.features.station.Station;
 import Ontdekstation013.ClimateChecker.features.user.authentication.ITokenRepository;
 import Ontdekstation013.ClimateChecker.features.user.authentication.JWTService;
 import Ontdekstation013.ClimateChecker.features.user.authentication.Token;
 import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.LoginDto;
 import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.RegisterDto;
-import Ontdekstation013.ClimateChecker.features.station.IStationRepository;
-import Ontdekstation013.ClimateChecker.features.station.Station;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.EditUserDto;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.UserDataDto;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.UserDto;
+import Ontdekstation013.ClimateChecker.features.workshopCode.WorkshopCodeService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseCookie;
@@ -37,18 +37,36 @@ public class UserService {
     private final WorkshopCodeService adminService;
     private final PasswordEncoder encoder = new BCryptPasswordEncoder();
     private final JWTService jwtService;
+    private final WorkshopCodeService workshopCodeService;
 
 
     private final UserConverter userConverter;
 
     @Autowired
-    public UserService(IUserRepository userRepository, IStationRepository stationRepository, ITokenRepository ITokenRepository, WorkshopCodeService adminService, JWTService jwtService) {
+    public UserService(IUserRepository userRepository, IStationRepository stationRepository, ITokenRepository ITokenRepository, WorkshopCodeService adminService, JWTService jwtService, WorkshopCodeService workshopCodeService) {
         this.userRepository = userRepository;
         this.stationRepository = stationRepository;
         this.ITokenRepository = ITokenRepository;
         this.adminService = adminService;
+        this.workshopCodeService = workshopCodeService;
         this.userConverter = new UserConverter();
         this.jwtService = jwtService;
+    }
+
+    public User createNewUser(RegisterDto registerDto) throws Exception {
+        UserValidator userValidator = new UserValidator();
+        ValidationResult result = userValidator.validate(registerDto, userRepository, stationRepository, workshopCodeService);
+        if (!result.isValid()) {
+            throw new Exception(result.getErrorMessage());
+        }
+        User user = new User(registerDto.email(), registerDto.firstName(), registerDto.lastName(), registerDto.password());
+        user.setPassword(HashPassword(user.getPassword()));
+
+        userRepository.save(user);
+        Station station = stationRepository.getByRegistrationCode(registerDto.stationCode());
+        station.setUserid(user.getUserId());
+
+        return user;
     }
 
     public UserDto findUserById(long id) {
@@ -117,57 +135,10 @@ public class UserService {
         return (userConverter.userToUserDto(user));
     }
 
-    public User createNewUser(RegisterDto registerDto) throws Exception {
-        try
-        {
-            User user = new User();
-            if(user.ValidateInput(registerDto)) {
-                registerDto.setMailAddress(registerDto.getMailAddress().toLowerCase());
-                if (!userRepository.existsUserByMailAddress(registerDto.getMailAddress())) { //check if email is unique
-                    user = new User(registerDto.getMailAddress(), registerDto.getFirstName(), registerDto.getLastName(), registerDto.getPassword());
-                }
-                else {
-                    throw new ExistingUniqueIdentifierException("Email already in use");
-                }
-            }
-            else {
-                throw new InvalidArgumentException("Invalid information");
-            }
-
-            user.setPassword(HashPassword(user.getPassword()));
-
-            Station station = stationRepository.getByRegistrationCode(registerDto.getMeetstationCode().longValue());
-            if(station != null)
-            {
-                if(station.getUserid() == null)
-                {
-                    if(adminService.VerifyWorkshopCode(registerDto.getWorkshopCode().longValue())) {
-                        user = userRepository.save(user);
-                        station.setUserid(user.getUserID());
-                        return user;
-                    }
-
-                    throw new Exception("Workshopcode is niet geldig");
-                }
-
-                throw new Exception("Meetstation is al in gebruik");
-            }
-
-            throw new Exception("Meetstation bestaat niet");
-
-
-        }
-
-        catch (Exception ex) {
-            throw ex;
-        }
-
-    }
-
     public User login(LoginDto loginDto) throws Exception {
-        User user = userRepository.findByMailAddress(loginDto.getMailAddress());
-        if (verifyPassword(loginDto.getPassword(), user.getPassword())){
-            return userRepository.findByMailAddress(loginDto.getMailAddress());
+        User user = userRepository.findByEmail(loginDto.email());
+        if (verifyPassword(loginDto.password(), user.getPassword())){
+            return userRepository.findByEmail(loginDto.email());
         }
         throw new NotFoundException("User not found");
     }
@@ -176,14 +147,14 @@ public class UserService {
         ModelMapper mapper = new ModelMapper();
         UserDto dto = new UserDto();
         UserConverter converter = new UserConverter();
-        dto = converter.userToUserDto(userRepository.findByMailAddress(mail));
+        dto = converter.userToUserDto(userRepository.findByEmail(mail));
         //dto = new userDto(mail);
          return dto;
     }
 
 
     public ResponseCookie createCookie(User user) {
-        Cookie jwtTokenCookie = new Cookie("user-id", user.getUserID().toString());
+        Cookie jwtTokenCookie = new Cookie("user-id", user.getUserId().toString());
         ResponseCookie springCookie = ResponseCookie.from(jwtTokenCookie.getName(), jwtTokenCookie.getValue())
                 .httpOnly(true)
                 .sameSite("None")
@@ -195,12 +166,12 @@ public class UserService {
 
     public Long grantUserAdmin(UserDto dto) {
         User updatedUser = new User(dto);
-        return userRepository.save(updatedUser).getUserID();
+        return userRepository.save(updatedUser).getUserId();
     }
 
     public Token createVerifyToken(User user){
         Token token = new Token();
-        token.setUserid(user.getUserID());
+        token.setUserid(user.getUserId());
         token.setCreationTime(LocalDateTime.now());
         token.setNumericCode(randomCode(6));
         saveToken(token);
@@ -230,8 +201,8 @@ public class UserService {
     }
 
     public boolean verifyToken(String linkHash, String email) {
-        User user = userRepository.findByMailAddress(email);
-        Token officialToken = ITokenRepository.findByUserid(user.getUserID());
+        User user = userRepository.findByEmail(email);
+        Token officialToken = ITokenRepository.findByUserid(user.getUserId());
         if (officialToken != null){
             if (officialToken.getNumericCode().equals(linkHash)) {
                 if (officialToken.getCreationTime().isBefore(LocalDateTime.now().plusMinutes(5))) {
