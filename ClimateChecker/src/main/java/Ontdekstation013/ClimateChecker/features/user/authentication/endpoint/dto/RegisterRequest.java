@@ -1,6 +1,6 @@
-package Ontdekstation013.ClimateChecker.features.user.authentication.endpoint;
+package Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto;
 
-public record RegisterDto(
+public record RegisterRequest(
         String firstName,
         String lastName,
         String email,

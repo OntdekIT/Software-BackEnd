@@ -1,24 +1,24 @@
 package Ontdekstation013.ClimateChecker.features.user;
 
-import Ontdekstation013.ClimateChecker.features.station.Station;
-import Ontdekstation013.ClimateChecker.features.station.endpoint.StationDto;
-import Ontdekstation013.ClimateChecker.features.user.endpoint.UserDto;
-
-import java.util.HashSet;
-import java.util.Set;
+import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserRequest;
+import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserResponse;
 
 public class UserMapper {
-    public static UserDto toDto(User user) {
-        Set<StationDto> stationDtos = new HashSet<StationDto>();
-        for (Station station : user.getStations()) {
-            stationDtos.add(station.toDto());
-        }
-        return new UserDto(
+    public static UserResponse toUserResponse(User user) {
+        return new UserResponse(
                 user.getUserId(),
                 user.getFirstName(),
                 user.getLastName(),
                 user.getEmail(),
-                user.isAdmin(),
-                stationDtos);
+                user.isAdmin()
+        );
+    }
+
+    public static User toUser(UserRequest request) {
+        return new User(
+                request.firstName(),
+                request.lastName(),
+                request.email()
+        );
     }
 }

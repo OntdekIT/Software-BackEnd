@@ -1,4 +1,4 @@
-package Ontdekstation013.ClimateChecker.features.user.endpoint;
+package Ontdekstation013.ClimateChecker.features.user.endpoint.dto;
 
 public record UserDto(
         Long id,
