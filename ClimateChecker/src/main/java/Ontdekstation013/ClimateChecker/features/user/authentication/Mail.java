@@ -28,5 +28,4 @@ public class Mail {
         this.body = body;
         this.footer = footer;
     }
-
 }
