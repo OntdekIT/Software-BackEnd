@@ -1,9 +1,9 @@
 package Ontdekstation013.ClimateChecker.features.user.endpoint;
 
 
-import Ontdekstation013.ClimateChecker.features.user.authentication.EmailSenderService;
 import Ontdekstation013.ClimateChecker.features.user.UserConverter;
 import Ontdekstation013.ClimateChecker.features.user.UserService;
+import Ontdekstation013.ClimateChecker.features.user.authentication.EmailSenderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,8 +24,9 @@ public class UserController {
     private final UserConverter userConverter;
 
     private final EmailSenderService emailSenderService;
+
     @Autowired
-    public UserController(UserService userService, UserConverter userConverter , EmailSenderService emailSEnderService){
+    public UserController(UserService userService, UserConverter userConverter, EmailSenderService emailSEnderService) {
         this.userService = userService;
         this.userConverter = userConverter;
         this.emailSenderService = emailSEnderService;
@@ -33,46 +34,50 @@ public class UserController {
 
     // get user by id
     @GetMapping("{userId}")
-    public ResponseEntity<UserDto> getUserById(@PathVariable long userId){
+    public ResponseEntity<UserDto> getUserById(@PathVariable long userId) {
         UserDto dto = userService.findUserById(userId);
         return ResponseEntity.ok(dto);
     }
 
     // get all users
-    @GetMapping
-    public ResponseEntity<List<UserDataDto>> getAllUsers(){
-        List<UserDataDto> newDtoList = userService.getAllUsers();
-        return ResponseEntity.ok(newDtoList);
+    @GetMapping("/filter")
+    public ResponseEntity<List<UserDto>> filterUsers(
+            @RequestParam(required = false) String firstName,
+            @RequestParam(required = false) String lastName,
+            @RequestParam(required = false) String mailAddress) {
+
+        List<UserDto> filteredUsers = userService.getAllUsers(firstName, lastName, mailAddress);
+        return ResponseEntity.ok(filteredUsers);
     }
 
     // get users by page number
     @GetMapping("page/{pageNumber}")
-    public ResponseEntity<List<UserDataDto>> getAllUsersByPage(@PathVariable long pageId){
+    public ResponseEntity<List<UserDataDto>> getAllUsersByPage(@PathVariable long pageId) {
         List<UserDataDto> newDtoList = userService.getAllByPageId(pageId);
         return ResponseEntity.ok(newDtoList);
     }
 
     @DeleteMapping("{userId}")
-    public ResponseEntity<UserDto> deleteUser(@PathVariable long userId){
+    public ResponseEntity<UserDto> deleteUser(@PathVariable long userId) {
         UserDto user = userService.deleteUser(userId);
         emailSenderService.deleteUserMail(user.getMailAddress(), user.getFirstName(), user.getLastName());
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
     @GetMapping("getName")
-    public ResponseEntity<String> getName(HttpServletResponse response, HttpServletRequest request){
+    public ResponseEntity<String> getName(HttpServletResponse response, HttpServletRequest request) {
         Cookie[] cookies;
         if (request.getCookies() != null) {
             cookies = request.getCookies();
             Long userID = Long.parseLong(cookies[0].getValue());
             UserDto user = userService.findUserById(userID);
-        return ResponseEntity.ok(user.getFirstName());
+            return ResponseEntity.ok(user.getFirstName());
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     @GetMapping("getUser")
-    public ResponseEntity<UserDto> getUser(HttpServletResponse response, HttpServletRequest request){
+    public ResponseEntity<UserDto> getUser(HttpServletResponse response, HttpServletRequest request) {
         Cookie[] cookies;
         if (request.getCookies() != null) {
             cookies = request.getCookies();
@@ -84,7 +89,7 @@ public class UserController {
     }
 
     @GetMapping("getID")
-    public ResponseEntity<String> getId(HttpServletResponse response, HttpServletRequest request){
+    public ResponseEntity<String> getId(HttpServletResponse response, HttpServletRequest request) {
         Cookie[] cookies;
         if (request.getCookies() != null) {
             cookies = request.getCookies();
@@ -95,7 +100,7 @@ public class UserController {
     }
 
     @GetMapping("checkAdmin")
-    public ResponseEntity<Boolean> checkAdmin(HttpServletResponse response, HttpServletRequest request){
+    public ResponseEntity<Boolean> checkAdmin(HttpServletResponse response, HttpServletRequest request) {
         Cookie[] cookies;
         if (request.getCookies() != null) {
             cookies = request.getCookies();
@@ -113,8 +118,7 @@ public class UserController {
             Boolean adminRights = request.getAdminRights();
             UserDto dto = userService.findUserById(userId);
 
-            if(dto != null)
-            {
+            if (dto != null) {
                 dto.setAdmin(adminRights);
                 Long returnedUserId = userService.grantUserAdmin(dto);
                 return ResponseEntity.status(200).body(returnedUserId.toString());
@@ -124,9 +128,4 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please fill out all fields");
     }
 
-    @GetMapping("/filterByMail")
-    public ResponseEntity<List<UserDataDto>> filterUsersByMail(@RequestParam String mail) {
-        List<UserDataDto> filteredUsers = userService.filterUsersByMail(mail);
-        return ResponseEntity.ok(filteredUsers);
-    }
 }
