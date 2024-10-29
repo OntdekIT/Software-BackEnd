@@ -23,19 +23,29 @@ public class UserValidator {
     public ValidationResult validate(RegisterDto registerDto, IUserRepository userRepository, IStationRepository stationRepository, WorkshopCodeService workshopCodeService) {
         ValidationResult result = new ValidationResult(true, null);
 
-        if (registerDto.email().isEmpty() || registerDto.firstName().isEmpty() || registerDto.lastName().isEmpty() || registerDto.password().isEmpty()) {
-            result = new ValidationResult(false, "Invalid information");
-        } else if (userRepository.existsUserByEmail(registerDto.email())) {
-            result = new ValidationResult(false, "Email already in use");
-        } else {
+        try {
+            validateRequiredFields(registerDto);
+            validateFirstName(registerDto.firstName());
+            validateLastName(registerDto.lastName());
+            validateEmail(registerDto.email());
+            validatePassword(registerDto.password());
+            validateConfirmPassword(registerDto.password(), registerDto.confirmPassword());
+            validateStationCode(String.valueOf(registerDto.stationCode()));
+
+            if (userRepository.existsUserByEmail(registerDto.email())) {
+                return new ValidationResult(false, "Email already in use");
+            }
+
             Station station = stationRepository.getByRegistrationCode(registerDto.stationCode());
             if (station == null) {
-                result = new ValidationResult(false, "Meetstation bestaat niet");
+                result = new ValidationResult(false, "Station does not exist");
             } else if (station.getUserid() != null) {
-                result = new ValidationResult(false, "Meetstation is al in gebruik");
+                result = new ValidationResult(false, "Station is already in use");
             } else if (!workshopCodeService.VerifyWorkshopCode(registerDto.workshopCode())) {
-                result = new ValidationResult(false, "Workshopcode is niet geldig");
+                result = new ValidationResult(false, "Workshop code is not valid");
             }
+        } catch (Exception e) {
+            return new ValidationResult(false, e.getMessage());
         }
         return result;
     }
@@ -88,14 +98,14 @@ public class UserValidator {
         }
     }
 
-    private void validateMeetstationCode(String meetstationCode) throws Exception {
-        if (meetstationCode.length() != STATION_CODE_LENGTH) {
+    private void validateStationCode(String stationCode) throws Exception {
+        if (stationCode.length() != STATION_CODE_LENGTH) {
             throw new Exception("Code has to contain " + STATION_CODE_LENGTH + " characters");
         }
     }
 
-    public boolean checkPassword(String password) throws Exception {
-        boolean containsNumber = password.matches(".*\\d.*");
+    public boolean checkPassword(String password) {
+        boolean containsNumber = password.matches(".*[0-9].*");
         boolean containsUppercase = password.matches(".*[A-Z].*");
         boolean containsLowercase = password.matches(".*[a-z].*");
 
