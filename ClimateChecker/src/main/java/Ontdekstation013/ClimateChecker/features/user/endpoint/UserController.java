@@ -1,46 +1,56 @@
 package Ontdekstation013.ClimateChecker.features.user.endpoint;
 
-
+import Ontdekstation013.ClimateChecker.features.user.User;
+import Ontdekstation013.ClimateChecker.features.user.UserMapper;
 import Ontdekstation013.ClimateChecker.features.user.UserService;
-import Ontdekstation013.ClimateChecker.features.user.authentication.EmailSenderService;
-import org.springframework.beans.factory.annotation.Autowired;
+import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.GrantUserAdminRequest;
+import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/User")
 public class UserController {
     private final UserService userService;
-    private final EmailSenderService emailSenderService;
 
-    @Autowired
-    public UserController(UserService userService, EmailSenderService emailSEnderService) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.emailSenderService = emailSEnderService;
     }
 
-    @GetMapping("{userId}")
-    public ResponseEntity<UserDto> getUserById(@PathVariable long userId) {
-        UserDto dto = userService.findUserById(userId);
-        return ResponseEntity.ok(dto);
+    @GetMapping("{id}")
+    public ResponseEntity<UserResponse> getUserById(@PathVariable long id) {
+        Optional<User> user = userService.getUserById(id);
+        if (user.isPresent()) {
+            UserResponse response = UserMapper.toUserResponse(user.get());
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
 
     @GetMapping
-    public ResponseEntity<List<UserDto>> getAllUsers(){
+    public ResponseEntity<List<UserResponse>> getAllUsers(){
+        List<User> users = userService.getAllUsers();
+        List<UserResponse> response = users.stream()
+                .map(UserMapper::toUserResponse)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("page/{pageId}")
+    public ResponseEntity<List<UserResponse>> getAllUsersByPage(@PathVariable long pageId) {
         throw new UnsupportedOperationException();
     }
 
-    @GetMapping("page/{pageNumber}")
-    public ResponseEntity<List<UserDto>> getAllUsersByPage(@PathVariable long pageId) {
-        throw new UnsupportedOperationException();
-    }
-
-    @DeleteMapping("{userId}")
-    public ResponseEntity<UserDto> deleteUser(@PathVariable long userId){
-        throw new UnsupportedOperationException();
+    @DeleteMapping("{id}")
+    public ResponseEntity<UserResponse> deleteUser(@PathVariable long id){
+        userService.deleteUser(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/role")

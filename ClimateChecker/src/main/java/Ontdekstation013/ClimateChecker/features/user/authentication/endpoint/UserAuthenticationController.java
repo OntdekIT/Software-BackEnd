@@ -2,6 +2,9 @@ package Ontdekstation013.ClimateChecker.features.user.authentication.endpoint;
 
 import Ontdekstation013.ClimateChecker.features.user.UserService;
 import Ontdekstation013.ClimateChecker.features.user.authentication.EmailSenderService;
+import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.LoginRequest;
+import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.RegisterRequest;
+import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.VerifyLoginRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,17 +26,17 @@ public class UserAuthenticationController {
     }
 
     @PostMapping("register")
-    public ResponseEntity<String> createNewUser(@RequestBody RegisterDto registerDto) throws Exception {
+    public ResponseEntity<String> createNewUser(@RequestBody RegisterRequest registerRequest) throws Exception {
         throw new UnsupportedOperationException();
     }
 
     @PostMapping("login")
-    public ResponseEntity<String> loginUser(@RequestBody LoginDto loginDto) throws Exception {
+    public ResponseEntity<String> loginUser(@RequestBody LoginRequest loginRequest) throws Exception {
         throw new UnsupportedOperationException();
     }
 
     @PostMapping("verify")
-    public ResponseEntity<Void> verifyEmailCode(@RequestBody VerifyDto verifyDto) {
+    public ResponseEntity<Void> verifyEmailCode(@RequestBody VerifyLoginRequest verifyLoginRequest) {
         throw new UnsupportedOperationException();
     }
 

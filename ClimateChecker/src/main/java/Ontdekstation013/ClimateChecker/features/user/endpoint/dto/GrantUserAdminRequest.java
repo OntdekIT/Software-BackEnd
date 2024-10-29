@@ -1,6 +1,6 @@
-package Ontdekstation013.ClimateChecker.features.user.endpoint;
+package Ontdekstation013.ClimateChecker.features.user.endpoint.dto;
 
 public record GrantUserAdminRequest(
         String userId,
-        Boolean adminRights
+        boolean hasAdminRights
 ) {}

@@ -1,7 +1,8 @@
 package Ontdekstation013.ClimateChecker.features.user;
 
 import Ontdekstation013.ClimateChecker.features.station.Station;
-import Ontdekstation013.ClimateChecker.features.user.endpoint.UserDto;
+import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserResponse;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,6 +20,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Setter(AccessLevel.NONE)
     private Long userId;
 
     @NotBlank
@@ -38,16 +40,12 @@ public class User {
     @OneToMany(mappedBy = "user")
     private Set<Station> stations;
 
-    public User(Long id, String firstName, String lastName, String email, boolean isAdmin, String password) {
-        this.userId = id;
+    public User(String firstName, String lastName, String email) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
-        this.isAdmin = isAdmin;
-        this.password = password;
     }
 
-    //register
     public User(String email, String firstName, String lastName, String password) {
         this.email = email;
         this.firstName = firstName;
@@ -55,15 +53,7 @@ public class User {
         this.password = password;
     }
 
-
-    public User(String email, Long id, String password) {
-        this.userId = id;
-        this.email = email;
-        this.password = password;
-    }
-
-
-    public User(UserDto dto){
+    public User(UserResponse dto){
         this.userId = dto.id();
         this.firstName = dto.firstName();
         this.lastName = dto.lastName();

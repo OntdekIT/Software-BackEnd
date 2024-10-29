@@ -1,5 +1,6 @@
 package Ontdekstation013.ClimateChecker.features.user.endpoint;
 
+import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +21,7 @@ public class MyAccountController {
     }
 
     @GetMapping()
-    public ResponseEntity<UserDto> getUser(HttpServletResponse response, HttpServletRequest request) {
+    public ResponseEntity<UserResponse> getUser(HttpServletResponse response, HttpServletRequest request) {
         throw new UnsupportedOperationException();
     }
 

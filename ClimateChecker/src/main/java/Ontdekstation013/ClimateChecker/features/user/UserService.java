@@ -2,14 +2,15 @@ package Ontdekstation013.ClimateChecker.features.user;
 
 import Ontdekstation013.ClimateChecker.features.station.IStationRepository;
 import Ontdekstation013.ClimateChecker.features.station.Station;
-import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.RegisterDto;
-import Ontdekstation013.ClimateChecker.features.user.endpoint.EditUserDto;
-import Ontdekstation013.ClimateChecker.features.user.endpoint.UserDto;
+import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.RegisterRequest;
+import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UpdateUserRequest;
+import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserResponse;
 import Ontdekstation013.ClimateChecker.features.workshopCode.WorkshopCodeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 import static Ontdekstation013.ClimateChecker.features.user.authentication.PasswordUtils.HashPassword;
 
@@ -27,47 +28,54 @@ public class UserService {
         this.workshopCodeService = workshopCodeService;
     }
 
-    public User createNewUser(RegisterDto registerDto) throws Exception {
+    public User createNewUser(RegisterRequest registerRequest) throws Exception {
         UserValidator userValidator = new UserValidator();
-        ValidationResult result = userValidator.validate(registerDto, userRepository, stationRepository, workshopCodeService);
+        ValidationResult result = userValidator.validate(registerRequest, userRepository, stationRepository, workshopCodeService);
         if (!result.isValid()) {
             throw new Exception(result.getErrorMessage());
         }
-        User user = new User(registerDto.email(), registerDto.firstName(), registerDto.lastName(), registerDto.password());
+        User user = new User(registerRequest.email(), registerRequest.firstName(), registerRequest.lastName(), registerRequest.password());
         user.setPassword(HashPassword(user.getPassword()));
 
         userRepository.save(user);
-        Station station = stationRepository.getByRegistrationCode(registerDto.stationCode());
+        Station station = stationRepository.getByRegistrationCode(registerRequest.stationCode());
         station.setUserid(user.getUserId());
 
         return user;
     }
 
-    public UserDto findUserById(long id) {
+    public Optional<User> getUserById(long id) {
+        return userRepository.findById(id);
+    }
+
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    public List<User> getAllUsers() {
         throw new UnsupportedOperationException();
     }
 
-    public List<UserDto> getAllUsers() {
+    public List<User> getAllByPageId(long pageId) {
         throw new UnsupportedOperationException();
     }
 
-    public List<UserDto> getAllByPageId(long pageId) {
-        throw new UnsupportedOperationException();
-    }
-
-    public User editUser(EditUserDto editUserDto) throws Exception {
-        throw new UnsupportedOperationException();
+    public Optional<User> updateUser(long id, UpdateUserRequest updatedUser) throws Exception {
+        return userRepository.findById(id).map(
+                user -> {
+                    user.setFirstName(user.getFirstName());
+                    user.setLastName(user.getLastName());
+                    user.setEmail(user.getEmail());
+                    user.setPassword(user.getPassword());
+                    return userRepository.save(user);
+                });
     }
 
     public void deleteUser(Long id) {
-        throw new UnsupportedOperationException();
+        userRepository.deleteById(id);
     }
 
-    public UserDto getUserByEmailMail(String email) {
-        throw new UnsupportedOperationException();
-    }
-
-    public Long grantUserAdmin(UserDto dto) {
+    public Long grantUserAdmin(UserResponse dto) {
         User updatedUser = new User(dto);
         return userRepository.save(updatedUser).getUserId();
     }

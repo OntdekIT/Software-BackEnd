@@ -2,7 +2,7 @@ package Ontdekstation013.ClimateChecker.features.user;
 
 import Ontdekstation013.ClimateChecker.features.station.IStationRepository;
 import Ontdekstation013.ClimateChecker.features.station.Station;
-import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.RegisterDto;
+import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.RegisterRequest;
 import Ontdekstation013.ClimateChecker.features.workshopCode.WorkshopCodeService;
 
 import javax.mail.internet.AddressException;
@@ -20,28 +20,28 @@ public class UserValidator {
     private static final int MAX_PASSWORD_LENGTH = 50;
     private static final int STATION_CODE_LENGTH = 3;
 
-    public ValidationResult validate(RegisterDto registerDto, IUserRepository userRepository, IStationRepository stationRepository, WorkshopCodeService workshopCodeService) {
+    public ValidationResult validate(RegisterRequest registerRequest, IUserRepository userRepository, IStationRepository stationRepository, WorkshopCodeService workshopCodeService) {
         ValidationResult result = new ValidationResult(true, null);
 
         try {
-            validateRequiredFields(registerDto);
-            validateFirstName(registerDto.firstName());
-            validateLastName(registerDto.lastName());
-            validateEmail(registerDto.email());
-            validatePassword(registerDto.password());
-            validateConfirmPassword(registerDto.password(), registerDto.confirmPassword());
-            validateStationCode(String.valueOf(registerDto.stationCode()));
+            validateRequiredFields(registerRequest);
+            validateFirstName(registerRequest.firstName());
+            validateLastName(registerRequest.lastName());
+            validateEmail(registerRequest.email());
+            validatePassword(registerRequest.password());
+            validateConfirmPassword(registerRequest.password(), registerRequest.confirmPassword());
+            validateStationCode(String.valueOf(registerRequest.stationCode()));
 
-            if (userRepository.existsUserByEmail(registerDto.email())) {
+            if (userRepository.existsUserByEmail(registerRequest.email())) {
                 return new ValidationResult(false, "Email already in use");
             }
 
-            Station station = stationRepository.getByRegistrationCode(registerDto.stationCode());
+            Station station = stationRepository.getByRegistrationCode(registerRequest.stationCode());
             if (station == null) {
                 result = new ValidationResult(false, "Station does not exist");
             } else if (station.getUserid() != null) {
                 result = new ValidationResult(false, "Station is already in use");
-            } else if (!workshopCodeService.VerifyWorkshopCode(registerDto.workshopCode())) {
+            } else if (!workshopCodeService.VerifyWorkshopCode(registerRequest.workshopCode())) {
                 result = new ValidationResult(false, "Workshop code is not valid");
             }
         } catch (Exception e) {
@@ -50,8 +50,8 @@ public class UserValidator {
         return result;
     }
 
-    private void validateRequiredFields(RegisterDto registerDto) throws Exception {
-        if (registerDto.firstName().isEmpty() || registerDto.lastName().isEmpty() || registerDto.email().isEmpty() || registerDto.password().isEmpty() || registerDto.confirmPassword().isEmpty() || registerDto.stationCode() == null) {
+    private void validateRequiredFields(RegisterRequest registerRequest) throws Exception {
+        if (registerRequest.firstName().isEmpty() || registerRequest.lastName().isEmpty() || registerRequest.email().isEmpty() || registerRequest.password().isEmpty() || registerRequest.confirmPassword().isEmpty() || registerRequest.stationCode() == null) {
             throw new Exception("Please fill out all fields");
         }
     }

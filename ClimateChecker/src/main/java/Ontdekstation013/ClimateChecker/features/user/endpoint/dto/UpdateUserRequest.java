@@ -1,6 +1,6 @@
 package Ontdekstation013.ClimateChecker.features.user.endpoint.dto;
 
-public record EditUserDto(
+public record UpdateUserRequest(
         Long id,
         String firstName,
         String lastName,

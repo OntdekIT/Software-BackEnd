@@ -1,13 +1,13 @@
 package Ontdekstation013.ClimateChecker.features.user.authentication;
 
 import Ontdekstation013.ClimateChecker.features.user.User;
-import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.LoginDto;
+import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.LoginRequest;
 import org.springframework.http.ResponseCookie;
 
 import javax.servlet.http.Cookie;
 
 public class AuthenticationService {
-    public User login(LoginDto loginDto) throws Exception {
+    public User login(LoginRequest loginRequest) throws Exception {
         throw new UnsupportedOperationException();
     }
 
