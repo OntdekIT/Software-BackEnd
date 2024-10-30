@@ -1,15 +1,15 @@
 package Ontdekstation013.ClimateChecker.features.user;
 
+import Ontdekstation013.ClimateChecker.exception.NotFoundException;
 import Ontdekstation013.ClimateChecker.features.station.IStationRepository;
 import Ontdekstation013.ClimateChecker.features.station.Station;
 import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.RegisterRequest;
-import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UpdateUserRequest;
-import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserResponse;
 import Ontdekstation013.ClimateChecker.features.workshopCode.WorkshopCodeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 import static Ontdekstation013.ClimateChecker.features.user.authentication.PasswordUtils.HashPassword;
@@ -44,39 +44,36 @@ public class UserService {
         return user;
     }
 
-    public Optional<User> getUserById(long id) {
-        return userRepository.findById(id);
+    public User getUserById(long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("User not found"));
     }
 
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
-    public List<User> getAllUsers() {
-        throw new UnsupportedOperationException();
+    public Page<User> getAllUsers(Pageable pageable) {
+        return userRepository.findAll(pageable);
     }
 
-    public List<User> getAllByPageId(long pageId) {
-        throw new UnsupportedOperationException();
+    public void updateUser(long id, User newUser) {
+        Optional<User> getUserResult = userRepository.findById(id);
+
+        if (getUserResult.isPresent()) {
+            User userToUpdate = getUserResult.get();
+            userToUpdate.setFirstName(newUser.getFirstName());
+            userToUpdate.setLastName(newUser.getLastName());
+            userToUpdate.setEmail(newUser.getEmail());
+            userToUpdate.setPassword(newUser.getPassword());
+            userToUpdate.setAdmin(newUser.isAdmin());
+            userRepository.save(userToUpdate);
+        } else {
+            throw new NotFoundException("User not found");
+        }
     }
 
-    public Optional<User> updateUser(long id, UpdateUserRequest updatedUser) throws Exception {
-        return userRepository.findById(id).map(
-                user -> {
-                    user.setFirstName(user.getFirstName());
-                    user.setLastName(user.getLastName());
-                    user.setEmail(user.getEmail());
-                    user.setPassword(user.getPassword());
-                    return userRepository.save(user);
-                });
-    }
-
-    public void deleteUser(Long id) {
+    public void deleteUser(long id) {
         userRepository.deleteById(id);
-    }
-
-    public Long grantUserAdmin(UserResponse dto) {
-        User updatedUser = new User(dto);
-        return userRepository.save(updatedUser).getUserId();
     }
 }

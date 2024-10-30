@@ -40,7 +40,7 @@ public class UserAuthenticationController {
         throw new UnsupportedOperationException();
     }
 
-    @GetMapping("checkLogin")
+    @GetMapping("login")
     public ResponseEntity<Boolean> verifyLogin(HttpServletResponse response, HttpServletRequest request) {
         throw new UnsupportedOperationException();
     }

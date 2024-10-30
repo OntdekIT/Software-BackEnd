@@ -53,6 +53,15 @@ public class User {
         this.password = password;
     }
 
+    public User(Long userId, String firstName, String lastName, String email, boolean isAdmin, String password) {
+        this.userId = userId;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.isAdmin = isAdmin;
+        this.password = password;
+    }
+
     public User(UserResponse dto){
         this.userId = dto.id();
         this.firstName = dto.firstName();

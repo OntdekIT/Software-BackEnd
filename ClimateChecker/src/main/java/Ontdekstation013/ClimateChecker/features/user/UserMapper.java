@@ -1,5 +1,6 @@
 package Ontdekstation013.ClimateChecker.features.user;
 
+import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UpdateMyAccountRequest;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserRequest;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserResponse;
 
@@ -19,6 +20,17 @@ public class UserMapper {
                 request.firstName(),
                 request.lastName(),
                 request.email()
+        );
+    }
+
+    public static User toUpdatedUser(User user, UpdateMyAccountRequest request) {
+        return new User(
+                user.getUserId(),
+                request.firstName(),
+                request.lastName(),
+                request.email(),
+                user.isAdmin(),
+                request.password()
         );
     }
 }

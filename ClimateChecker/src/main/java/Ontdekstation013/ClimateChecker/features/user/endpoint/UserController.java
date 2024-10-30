@@ -3,18 +3,17 @@ package Ontdekstation013.ClimateChecker.features.user.endpoint;
 import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.UserMapper;
 import Ontdekstation013.ClimateChecker.features.user.UserService;
-import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.GrantUserAdminRequest;
+import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.GetAllUsersRequest;
+import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UpdateUserRequest;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserResponse;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 @RestController
-@RequestMapping("/api/User")
+@RequestMapping("/api/users")
 public class UserController {
     private final UserService userService;
 
@@ -24,37 +23,30 @@ public class UserController {
 
     @GetMapping("{id}")
     public ResponseEntity<UserResponse> getUserById(@PathVariable long id) {
-        Optional<User> user = userService.getUserById(id);
-        if (user.isPresent()) {
-            UserResponse response = UserMapper.toUserResponse(user.get());
-            return ResponseEntity.ok(response);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-    }
-
-    @GetMapping
-    public ResponseEntity<List<UserResponse>> getAllUsers(){
-        List<User> users = userService.getAllUsers();
-        List<UserResponse> response = users.stream()
-                .map(UserMapper::toUserResponse)
-                .collect(Collectors.toList());
+        User user = userService.getUserById(id);
+        UserResponse response = UserMapper.toUserResponse(user);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("page/{pageId}")
-    public ResponseEntity<List<UserResponse>> getAllUsersByPage(@PathVariable long pageId) {
-        throw new UnsupportedOperationException();
+    @GetMapping
+    public ResponseEntity<Page<UserResponse>> getAllUsers(GetAllUsersRequest request) {
+        Pageable pageable = PageRequest.of(request.page(), 5);
+        Page<User> users = userService.getAllUsers(pageable);
+        Page<UserResponse> getUserResponse = users.map(UserMapper::toUserResponse);
+        return ResponseEntity.ok(getUserResponse);
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<UserResponse> deleteUser(@PathVariable long id){
+    public ResponseEntity<?> deleteUser(@PathVariable long id) {
         userService.deleteUser(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/role")
-    public ResponseEntity<String> grantUserAdmin(@RequestBody GrantUserAdminRequest request) {
-        throw new UnsupportedOperationException();
+    @PutMapping("{id}")
+    public ResponseEntity<?> updateUserRole(@PathVariable long id, @RequestBody UpdateUserRequest request) {
+        User user = userService.getUserById(id);
+        user.setAdmin(request.isAdmin());
+        userService.updateUser(id, user);
+        return ResponseEntity.ok().build();
     }
 }

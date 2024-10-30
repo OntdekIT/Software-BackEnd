@@ -1,19 +1,29 @@
 package Ontdekstation013.ClimateChecker.features.user.endpoint;
 
+import Ontdekstation013.ClimateChecker.features.user.User;
+import Ontdekstation013.ClimateChecker.features.user.UserMapper;
+import Ontdekstation013.ClimateChecker.features.user.UserService;
+import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UpdateMyAccountRequest;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserResponse;
+import Ontdekstation013.ClimateChecker.utility.AuthHelper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
-@RequestMapping("my-account")
+@RequestMapping("/api/my-account")
 public class MyAccountController {
+    private final UserService userService;
+
+    public MyAccountController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping("/name")
     public ResponseEntity<String> getName(HttpServletResponse response, HttpServletRequest request) {
@@ -26,18 +36,28 @@ public class MyAccountController {
     }
 
     @GetMapping("/id")
-    public ResponseEntity<String> getId(HttpServletResponse response, HttpServletRequest request) {
-        Cookie[] cookies;
-        if (request.getCookies() != null) {
-            cookies = request.getCookies();
-            Long userID = Long.parseLong(cookies[0].getValue());
-            return ResponseEntity.status(HttpStatus.OK).body(userID.toString());
+    public ResponseEntity<?> getId(HttpServletResponse response, HttpServletRequest request) {
+        ResponseEntity<?> responseEntity = ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        Long userId = AuthHelper.getNullableUserIdFromRequestCookie(request);
+
+        if (userId != null) {
+            responseEntity = ResponseEntity.status(HttpStatus.OK).body(userId.toString());
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
+        return responseEntity;
+    }
+
+    @PutMapping()
+    public ResponseEntity<?> updateUser(HttpServletRequest request, UpdateMyAccountRequest updateMyAccountRequest) {
+        long userId = AuthHelper.getUserIdFromRequestCookie(request);
+        User user = userService.getUserById(userId);
+        user = UserMapper.toUpdatedUser(user, updateMyAccountRequest);
+        userService.updateUser(userId, user);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/admin")
-    public ResponseEntity<Boolean> checkAdmin(HttpServletResponse response, HttpServletRequest request) {
+    public ResponseEntity<Boolean> checkRole(HttpServletResponse response, HttpServletRequest request) {
         throw new UnsupportedOperationException();
     }
 }
