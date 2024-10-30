@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping("/api/my-account")
@@ -25,23 +24,15 @@ public class MyAccountController {
         this.userService = userService;
     }
 
-    @GetMapping("/name")
-    public ResponseEntity<String> getName(HttpServletResponse response, HttpServletRequest request) {
-        throw new UnsupportedOperationException();
-    }
-
     @GetMapping()
-    public ResponseEntity<UserResponse> getUser(HttpServletResponse response, HttpServletRequest request) {
-        throw new UnsupportedOperationException();
-    }
-
-    @GetMapping("/id")
-    public ResponseEntity<?> getId(HttpServletResponse response, HttpServletRequest request) {
-        ResponseEntity<?> responseEntity = ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    public ResponseEntity<UserResponse> getUser(HttpServletRequest request) {
+        ResponseEntity<UserResponse> responseEntity = ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         Long userId = AuthHelper.getNullableUserIdFromRequestCookie(request);
 
         if (userId != null) {
-            responseEntity = ResponseEntity.status(HttpStatus.OK).body(userId.toString());
+            User user = userService.getUserById(userId);
+            UserResponse userResponse = UserMapper.toUserResponse(user);
+            responseEntity = ResponseEntity.ok(userResponse);
         }
 
         return responseEntity;
@@ -54,10 +45,5 @@ public class MyAccountController {
         user = UserMapper.toUpdatedUser(user, updateMyAccountRequest);
         userService.updateUser(userId, user);
         return ResponseEntity.ok().build();
-    }
-
-    @GetMapping("/admin")
-    public ResponseEntity<Boolean> checkRole(HttpServletResponse response, HttpServletRequest request) {
-        throw new UnsupportedOperationException();
     }
 }
