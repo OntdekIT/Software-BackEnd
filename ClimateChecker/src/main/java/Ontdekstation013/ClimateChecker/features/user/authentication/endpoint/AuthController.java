@@ -18,7 +18,6 @@ import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping("/api/Authentication")
-@CrossOrigin(origins = {"http://localhost:3000"}, allowCredentials = "true")
 public class AuthController {
     private final UserService userService;
     private final JWTService jwtService;
