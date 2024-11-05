@@ -1,14 +1,17 @@
 package Ontdekstation013.ClimateChecker.features.user.authentication.endpoint;
 
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
+import Ontdekstation013.ClimateChecker.features.station.Station;
+import Ontdekstation013.ClimateChecker.features.station.StationService;
 import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.UserMapper;
 import Ontdekstation013.ClimateChecker.features.user.UserService;
 import Ontdekstation013.ClimateChecker.features.user.authentication.*;
 import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.LoginRequest;
-import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.RegisterRequest;
+import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.RegisterUserRequest;
 import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.VerifyLoginRequest;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserResponse;
+import Ontdekstation013.ClimateChecker.features.workshopCode.WorkshopCodeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -30,19 +33,38 @@ public class UserAuthenticationController {
     private final UserService userService;
     private final TokenService tokenService;
     private final EmailSenderService emailSenderService;
+    private final WorkshopCodeService workshopCodeService;
+    private final StationService stationService;
 
     @Autowired
-    public UserAuthenticationController(AuthenticationService authenticationService, UserService userService, TokenService tokenService, EmailSenderService emailSenderService)
-    {
+    public UserAuthenticationController(AuthenticationService authenticationService, UserService userService, TokenService tokenService, EmailSenderService emailSenderService, WorkshopCodeService workshopCodeService, StationService stationService) {
         this.authService = authenticationService;
         this.userService = userService;
         this.tokenService = tokenService;
         this.emailSenderService = emailSenderService;
+        this.workshopCodeService = workshopCodeService;
+        this.stationService = stationService;
     }
 
     @PostMapping("register")
-    public ResponseEntity<?> createNewUser(@RequestBody RegisterRequest registerRequest) throws Exception {
-        User user = userService.createNewUser(registerRequest);
+    public ResponseEntity<?> createNewUser(@RequestBody RegisterUserRequest registerRequest) {
+        if (!workshopCodeService.VerifyWorkshopCode(registerRequest.workshopCode())) {
+            throw new InvalidArgumentException("Invalid workshop code");
+        }
+
+        Station station = stationService.getByRegistrationCode(registerRequest.stationCode());
+
+        if (station == null) {
+            throw new InvalidArgumentException("Invalid station code");
+        } else if (station.getUserid() != null) {
+            throw new InvalidArgumentException("Station is already claimed");
+        }
+
+        User user = UserMapper.toUser(registerRequest);
+        user = userService.createNewUser(user);
+        station.setUserid(user.getUserId());
+        stationService.UpdateMeetstation(station);
+
         UserResponse response = UserMapper.toUserResponse(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-
 public interface IWorkshopCodeRepository extends JpaRepository<WorkshopCode, Long> {
     WorkshopCode findByCode(Long code);
     List<WorkshopCode> findByExpirationDateBefore(LocalDateTime now);

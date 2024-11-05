@@ -32,4 +32,7 @@ public class StationDto {
     public StationDto() {
 
     }
+
+    public StationDto(Long stationid, String name, String databaseTag, Boolean isPublic, Long registrationCode, Long locationLocationid, Long userid, Object o) {
+    }
 }

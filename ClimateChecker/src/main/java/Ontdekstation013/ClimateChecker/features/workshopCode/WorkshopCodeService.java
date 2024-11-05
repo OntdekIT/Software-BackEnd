@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class WorkshopCodeService {
-
     private final IWorkshopCodeRepository workshopCodeRepository;
 
     public WorkshopCodeService(IWorkshopCodeRepository workshopCodeRepository) {

@@ -28,11 +28,11 @@ public class Station {
     private Long registrationCode;
     @Column(name = "location_locationid")
     private Long location_locationid;
-    @Column(name = "userid")
+    @Column(name = "user_id")
     private Long userid;
 
     @ManyToOne(optional = true)
-    @JoinColumn(name = "userid", nullable = true, insertable = false, updatable = false)
+    @JoinColumn(name = "user_id", nullable = true, insertable = false, updatable = false)
     private User user;
 
 

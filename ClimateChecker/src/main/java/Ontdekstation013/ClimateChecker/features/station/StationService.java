@@ -21,6 +21,10 @@ public class StationService {
         return null;
     }
 
+    public Station getByRegistrationCode(long registrationCode) {
+        return stationRepository.getByRegistrationCode(registrationCode);
+    }
+
     public void UpdateMeetstation(Station station){
         stationRepository.save(station);
     }

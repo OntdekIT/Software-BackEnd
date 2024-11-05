@@ -1,13 +1,7 @@
 package Ontdekstation013.ClimateChecker.features.user;
 
-import Ontdekstation013.ClimateChecker.features.station.IStationRepository;
-import Ontdekstation013.ClimateChecker.features.station.Station;
-import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.RegisterRequest;
-import Ontdekstation013.ClimateChecker.features.workshopCode.WorkshopCodeService;
-
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
-import java.util.Objects;
 
 public class UserValidator {
     private static final int MIN_FIRST_NAME_LENGTH = 2;
@@ -20,38 +14,23 @@ public class UserValidator {
     private static final int MAX_PASSWORD_LENGTH = 50;
     private static final int STATION_CODE_LENGTH = 3;
 
-    public ValidationResult validate(RegisterRequest registerRequest, IUserRepository userRepository, IStationRepository stationRepository, WorkshopCodeService workshopCodeService) {
+    public ValidationResult validate(User user) {
         ValidationResult result = new ValidationResult(true, null);
 
         try {
-            validateRequiredFields(registerRequest);
-            validateFirstName(registerRequest.firstName());
-            validateLastName(registerRequest.lastName());
-            validateEmail(registerRequest.email());
-            validatePassword(registerRequest.password());
-            validateConfirmPassword(registerRequest.password(), registerRequest.confirmPassword());
-            validateStationCode(String.valueOf(registerRequest.stationCode()));
-
-            if (userRepository.existsUserByEmail(registerRequest.email())) {
-                return new ValidationResult(false, "Email already in use");
-            }
-
-            Station station = stationRepository.getByRegistrationCode(registerRequest.stationCode());
-            if (station == null) {
-                result = new ValidationResult(false, "Station does not exist");
-            } else if (station.getUserid() != null) {
-                result = new ValidationResult(false, "Station is already in use");
-            } else if (!workshopCodeService.VerifyWorkshopCode(registerRequest.workshopCode())) {
-                result = new ValidationResult(false, "Workshop code is not valid");
-            }
+            validateRequiredFields(user);
+            validateFirstName(user.getFirstName());
+            validateLastName(user.getLastName());
+            validateEmail(user.getEmail());
+            validatePassword(user.getPassword());
         } catch (Exception e) {
             return new ValidationResult(false, e.getMessage());
         }
         return result;
     }
 
-    private void validateRequiredFields(RegisterRequest registerRequest) throws Exception {
-        if (registerRequest.firstName().isEmpty() || registerRequest.lastName().isEmpty() || registerRequest.email().isEmpty() || registerRequest.password().isEmpty() || registerRequest.confirmPassword().isEmpty() || registerRequest.stationCode() == null) {
+    private void validateRequiredFields(User user) throws Exception {
+        if (user.getFirstName().isEmpty() || user.getLastName().isEmpty() || user.getEmail().isEmpty() || user.getPassword().isEmpty()) {
             throw new Exception("Please fill out all fields");
         }
     }
@@ -89,18 +68,6 @@ public class UserValidator {
         }
         if (!checkPassword(password)) {
             throw new Exception("Password has to contain a lowercase letter, uppercase letter and a number");
-        }
-    }
-
-    private void validateConfirmPassword(String password, String confirmPassword) throws Exception {
-        if (!Objects.equals(password, confirmPassword)) {
-            throw new Exception("Password and confirmation password do not match");
-        }
-    }
-
-    private void validateStationCode(String stationCode) throws Exception {
-        if (stationCode.length() != STATION_CODE_LENGTH) {
-            throw new Exception("Code has to contain " + STATION_CODE_LENGTH + " characters");
         }
     }
 

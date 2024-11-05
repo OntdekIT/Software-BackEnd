@@ -11,13 +11,14 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class Token {
-    private String numericCode;
-    private LocalDateTime creationTime;
-
     @Id
     private Long id;
 
     private long userId;
+
+    private String numericCode;
+
+    private LocalDateTime creationTime;
 
     public Token() {
     }

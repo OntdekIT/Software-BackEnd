@@ -30,7 +30,7 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<Page<UserResponse>> getAllUsers(GetAllUsersRequest request) {
-        Pageable pageable = PageRequest.of(request.page(), 5);
+        Pageable pageable = PageRequest.of(request.page(), request.pageSize());
         Page<User> users = userService.getAllUsers(pageable);
         Page<UserResponse> getUserResponse = users.map(UserMapper::toUserResponse);
         return ResponseEntity.ok(getUserResponse);
