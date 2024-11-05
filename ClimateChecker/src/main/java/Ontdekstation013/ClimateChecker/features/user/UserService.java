@@ -59,17 +59,19 @@ public class UserService {
 
 
     // not yet functional
-    public List<UserDto> getAllUsers(String firstName, String lastName, String mailAddress) {
+    public List<UserDto> getAllUsers(String firstName, String lastName, String mailAddress, Boolean admin) {
         List<User> userList = userRepository.findUsersByOptionalFilters(
                 firstName != null && !firstName.isEmpty() ? firstName : null,
                 lastName != null && !lastName.isEmpty() ? lastName : null,
-                mailAddress != null && !mailAddress.isEmpty() ? mailAddress : null
+                mailAddress != null && !mailAddress.isEmpty() ? mailAddress : null,
+                admin
         );
 
         return userList.stream()
                 .map(user -> userConverter.userToUserDto(user))
                 .collect(Collectors.toList());
     }
+
 
     // not yet functional
     // why?

@@ -13,13 +13,16 @@ public interface IUserRepository extends JpaRepository<User, Long> {
     boolean existsUserByMailAddress(String mailAddress);
 
     User findByMailAddress(String mail);
-    
+
     @Query("SELECT u FROM User u WHERE " +
             "(:firstName IS NULL OR u.firstName LIKE %:firstName%) AND " +
             "(:lastName IS NULL OR u.lastName LIKE %:lastName%) AND " +
-            "(:mailAddress IS NULL OR u.mailAddress LIKE %:mailAddress%)")
+            "(:mailAddress IS NULL OR u.mailAddress LIKE %:mailAddress%) AND " +
+            "(:admin IS NULL OR u.Admin = :admin)")
     List<User> findUsersByOptionalFilters(
             @Param("firstName") String firstName,
             @Param("lastName") String lastName,
-            @Param("mailAddress") String mailAddress);
+            @Param("mailAddress") String mailAddress,
+            @Param("admin") Boolean admin);
+
 }

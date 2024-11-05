@@ -39,21 +39,22 @@ public class UserController {
     }
 
     // get all users
-    @GetMapping
+    @GetMapping("/filter")
     public ResponseEntity<?> filterUsers(
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String lastName,
-            @RequestParam(required = false) String email) {
+            @RequestParam(required = false) String mailAddress,
+            @RequestParam(required = false) Boolean admin) {
 
-        List<UserDto> filteredUsers = userService.getAllUsers(firstName, lastName, email);
+        List<UserDto> filteredUsers = userService.getAllUsers(firstName, lastName, mailAddress, admin);
 
         if (filteredUsers.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No users found.");
         } else {
             return ResponseEntity.ok(filteredUsers);
         }
-    
     }
+
 
     // get users by page number
     @GetMapping("page/{pageNumber}")
