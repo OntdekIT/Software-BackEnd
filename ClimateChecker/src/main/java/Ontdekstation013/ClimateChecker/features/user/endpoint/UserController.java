@@ -39,13 +39,13 @@ public class UserController {
     }
 
     // get all users
-    @GetMapping("/filter")
+    @GetMapping
     public ResponseEntity<?> filterUsers(
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String lastName,
-            @RequestParam(required = false) String mailAddress) {
+            @RequestParam(required = false) String email) {
 
-        List<UserDto> filteredUsers = userService.getAllUsers(firstName, lastName, mailAddress);
+        List<UserDto> filteredUsers = userService.getAllUsers(firstName, lastName, email);
 
         if (filteredUsers.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No users found.");
