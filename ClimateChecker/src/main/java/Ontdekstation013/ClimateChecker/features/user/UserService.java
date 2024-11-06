@@ -2,25 +2,17 @@ package Ontdekstation013.ClimateChecker.features.user;
 
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.exception.NotFoundException;
-import Ontdekstation013.ClimateChecker.features.station.IStationRepository;
 import Ontdekstation013.ClimateChecker.features.station.Station;
-import Ontdekstation013.ClimateChecker.features.user.authentication.ITokenRepository;
-import Ontdekstation013.ClimateChecker.features.user.authentication.JWTService;
-import Ontdekstation013.ClimateChecker.features.user.authentication.Token;
-import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.LoginDto;
-import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.RegisterDto;
-import Ontdekstation013.ClimateChecker.features.user.endpoint.EditUserDto;
-import Ontdekstation013.ClimateChecker.features.user.endpoint.UserDataDto;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.UserDto;
-import Ontdekstation013.ClimateChecker.features.workshopCode.WorkshopCodeService;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -105,10 +97,4 @@ public class UserService {
     public void deleteUser(long id) {
         userRepository.deleteById(id);
     }
-
-//    public User getUserWithSations(Long userid) {
-//            User user = userRepository.findById(userid)
-//               .orElseThrow(() -> new NotFoundException("User not found"));
-//
-//    }
 }
