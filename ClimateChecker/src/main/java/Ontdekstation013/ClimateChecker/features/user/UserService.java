@@ -2,6 +2,18 @@ package Ontdekstation013.ClimateChecker.features.user;
 
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.exception.NotFoundException;
+import Ontdekstation013.ClimateChecker.features.station.IStationRepository;
+import Ontdekstation013.ClimateChecker.features.station.Station;
+import Ontdekstation013.ClimateChecker.features.user.authentication.ITokenRepository;
+import Ontdekstation013.ClimateChecker.features.user.authentication.JWTService;
+import Ontdekstation013.ClimateChecker.features.user.authentication.Token;
+import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.LoginDto;
+import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.RegisterDto;
+import Ontdekstation013.ClimateChecker.features.user.endpoint.EditUserDto;
+import Ontdekstation013.ClimateChecker.features.user.endpoint.UserDataDto;
+import Ontdekstation013.ClimateChecker.features.user.endpoint.UserDto;
+import Ontdekstation013.ClimateChecker.features.workshopCode.WorkshopCodeService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -48,6 +60,22 @@ public class UserService {
     public User getUserById(long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found"));
+
+
+    public User getUserWithStations(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        Set<Station> stations = getStationsForUser(user.getUserID());
+        user.setStations(stations);
+
+        return user;
+    }
+
+    private Set<Station> getStationsForUser(Long userId) {
+        List<Station> stations = stationRepository.findByUserid(userId);
+        return new HashSet<>(stations);
+    }
     }
 
     public User getUserByEmail(String email) {
