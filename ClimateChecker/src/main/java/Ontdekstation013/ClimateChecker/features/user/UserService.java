@@ -3,6 +3,7 @@ package Ontdekstation013.ClimateChecker.features.user;
 import Ontdekstation013.ClimateChecker.exception.ExistingUniqueIdentifierException;
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.exception.NotFoundException;
+import Ontdekstation013.ClimateChecker.features.station.endpoint.StationDto;
 import Ontdekstation013.ClimateChecker.features.workshopCode.WorkshopCodeService;
 import Ontdekstation013.ClimateChecker.features.user.authentication.ITokenRepository;
 import Ontdekstation013.ClimateChecker.features.user.authentication.JWTService;
@@ -24,9 +25,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.Cookie;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -70,28 +69,24 @@ public class UserService {
         return newDtoList;
     }
 
-    public List<UserDataDto> getAllUsersWithStationStatus() {
-        List<User> userList = userRepository.findAll();
-        List<UserDataDto> newDtoList = new ArrayList<>();
 
-        for (User user : userList) {
-            UserDataDto dto = userConverter.userToUserDataDto(user);
 
-            // Haal alle stations op voor de gebruiker
-            List<Station> stations = stationRepository.findByUserid(user.getUserID());
+    public User getUserWithStations(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found"));
 
-            // Als de gebruiker stations heeft, kijk dan of er een actief station is
-            boolean hasActiveStation = stations.stream().anyMatch(Station::getIsActive);
-            dto.setIsStationActive(hasActiveStation);
+        Set<Station> stations = getStationsForUser(user.getUserID());
+        user.setStations(stations);
 
-            newDtoList.add(dto);
-        }
-
-        return newDtoList;
+        return user;
     }
 
+    private Set<Station> getStationsForUser(Long userId) {
+        List<Station> stations = stationRepository.findByUserid(userId);
+        return new HashSet<>(stations);
+    }
 
-
+    
 
     // not yet functional
     // why?

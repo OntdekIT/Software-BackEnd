@@ -1,6 +1,8 @@
 package Ontdekstation013.ClimateChecker.features.user.endpoint;
 
 
+import Ontdekstation013.ClimateChecker.features.station.endpoint.StationDto;
+import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.authentication.EmailSenderService;
 import Ontdekstation013.ClimateChecker.features.user.UserConverter;
 import Ontdekstation013.ClimateChecker.features.user.UserService;
@@ -13,6 +15,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -45,11 +49,44 @@ public class UserController {
         return ResponseEntity.ok(newDtoList);
     }
 
-    @GetMapping("/users")
-    public ResponseEntity<List<UserDataDto>> getAllUsersWithStationStatus() {
-        List<UserDataDto> userList = userService.getAllUsersWithStationStatus();
-        return ResponseEntity.ok(userList);
+
+//    @GetMapping("/{userId}/stations")
+//    public ResponseEntity<UserDto> getUserWithStations(@PathVariable Long userId) {
+//        UserDto userWithStations = userService.getUserWithStations(userId);
+//        return ResponseEntity.ok(userWithStations);
+//    }
+
+    @GetMapping("/userWithStations/{userId}")
+    public ResponseEntity <UserDto> getUserWithStations(@PathVariable Long userId) {
+        User user = userService.getUserWithStations(userId);
+        return ResponseEntity.ok(toUserDto(user));
     }
+
+    private UserDto toUserDto(User user) {
+        UserDto userDto = new UserDto();
+        userDto.setId(user.getUserID());
+        userDto.setFirstName(user.getFirstName());
+        userDto.setLastName(user.getLastName());
+        userDto.setMailAddress(user.getMailAddress());
+
+        // Stations converteren naar StationDto
+        Set<StationDto> stationDtos = user.getStations().stream()
+                .map(station -> new StationDto(
+                        station.getStationid(),
+                        station.getName(),
+                        station.getDatabase_tag(),
+                        station.getIs_public(),
+                        station.getRegistrationCode(),
+                        station.getLocation_locationid(),
+                        station.getUserid(),
+                        station.getIsActive()
+                ))
+                .collect(Collectors.toSet());
+        userDto.setMeetstations(stationDtos);
+
+        return userDto;
+    }
+
 
     // get users by page number
     @GetMapping("page/{pageNumber}")
