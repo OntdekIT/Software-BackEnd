@@ -28,6 +28,17 @@ public class UserService {
         }
 
         return userRepository.save(user);
+    public List<UserDto> getAllUsers(String firstName, String lastName, String mailAddress, Boolean admin) {
+        List<User> userList = userRepository.findUsersByOptionalFilters(
+                firstName != null && !firstName.isEmpty() ? firstName : null,
+                lastName != null && !lastName.isEmpty() ? lastName : null,
+                mailAddress != null && !mailAddress.isEmpty() ? mailAddress : null,
+                admin
+        );
+
+        return userList.stream()
+                .map(user -> userConverter.userToUserDto(user))
+                .collect(Collectors.toList());
     }
 
     public User getUserById(long id) {

@@ -34,6 +34,19 @@ public class UserController {
         Page<User> users = userService.getAllUsers(pageable);
         Page<UserResponse> getUserResponse = users.map(UserMapper::toUserResponse);
         return ResponseEntity.ok(getUserResponse);
+    public ResponseEntity<?> filterUsers(
+            @RequestParam(required = false) String firstName,
+            @RequestParam(required = false) String lastName,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) Boolean admin) {
+
+        List<UserDto> filteredUsers = userService.getAllUsers(firstName, lastName, email, admin);
+
+        if (filteredUsers.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No users found.");
+        } else {
+            return ResponseEntity.ok(filteredUsers);
+        }
     }
 
     @DeleteMapping("{id}")
@@ -48,5 +61,70 @@ public class UserController {
         user.setAdmin(request.isAdmin());
         userService.updateUser(id, user);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("getName")
+    public ResponseEntity<String> getName(HttpServletResponse response, HttpServletRequest request){
+        Cookie[] cookies;
+        if (request.getCookies() != null) {
+            cookies = request.getCookies();
+            Long userID = Long.parseLong(cookies[0].getValue());
+            UserDto user = userService.findUserById(userID);
+        return ResponseEntity.ok(user.getFirstName());
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    @GetMapping("getUser")
+    public ResponseEntity<UserDto> getUser(HttpServletResponse response, HttpServletRequest request){
+        Cookie[] cookies;
+        if (request.getCookies() != null) {
+            cookies = request.getCookies();
+            Long userID = Long.parseLong(cookies[0].getValue());
+            UserDto user = userService.findUserById(userID);
+            return ResponseEntity.ok(user);
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    @GetMapping("getID")
+    public ResponseEntity<String> getId(HttpServletResponse response, HttpServletRequest request){
+        Cookie[] cookies;
+        if (request.getCookies() != null) {
+            cookies = request.getCookies();
+            Long userID = Long.parseLong(cookies[0].getValue());
+            return ResponseEntity.status(HttpStatus.OK).body(userID.toString());
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    @GetMapping("checkAdmin")
+    public ResponseEntity<Boolean> checkAdmin(HttpServletResponse response, HttpServletRequest request){
+        Cookie[] cookies;
+        if (request.getCookies() != null) {
+            cookies = request.getCookies();
+            Long userID = Long.parseLong(cookies[0].getValue());
+            UserDto user = userService.findUserById(userID);
+            return ResponseEntity.status(HttpStatus.OK).body(user.getAdmin());
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    @PostMapping("grantuseradmin")
+    public ResponseEntity<String> grantUserAdmin(@RequestBody GrantUserAdminRequest request) {
+        if (request.getUserId() != null & request.getAdminRights() != null) {
+            Long userId = Long.parseLong(request.getUserId());
+            Boolean adminRights = request.getAdminRights();
+            UserDto dto = userService.findUserById(userId);
+
+            if(dto != null)
+            {
+                dto.setAdmin(adminRights);
+                Long returnedUserId = userService.grantUserAdmin(dto);
+                return ResponseEntity.status(200).body(returnedUserId.toString());
+            }
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("User could not be found");
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please fill out all fields");
     }
 }
