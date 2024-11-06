@@ -7,7 +7,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -28,6 +30,8 @@ public class UserService {
         }
 
         return userRepository.save(user);
+    }
+
     public List<UserDto> getAllUsers(String firstName, String lastName, String mailAddress, Boolean admin) {
         List<User> userList = userRepository.findUsersByOptionalFilters(
                 firstName != null && !firstName.isEmpty() ? firstName : null,
