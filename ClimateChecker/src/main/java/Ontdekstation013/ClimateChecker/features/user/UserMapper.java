@@ -1,10 +1,10 @@
 package Ontdekstation013.ClimateChecker.features.user;
 
-import Ontdekstation013.ClimateChecker.features.user.authentication.PasswordUtils;
 import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.RegisterUserRequest;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UpdateMyAccountRequest;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserRequest;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserResponse;
+import Ontdekstation013.ClimateChecker.utility.PasswordUtils;
 
 public class UserMapper {
     public static UserResponse toUserResponse(User user) {
