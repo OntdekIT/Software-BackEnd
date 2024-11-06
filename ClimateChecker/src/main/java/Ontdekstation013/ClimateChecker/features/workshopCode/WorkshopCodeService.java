@@ -10,9 +10,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class WorkshopCodeService {
-    private final IWorkshopCodeRepository workshopCodeRepository;
+    private final WorkshopCodeRepository workshopCodeRepository;
 
-    public WorkshopCodeService(IWorkshopCodeRepository workshopCodeRepository) {
+    public WorkshopCodeService(WorkshopCodeRepository workshopCodeRepository) {
         this.workshopCodeRepository = workshopCodeRepository;
     }
 

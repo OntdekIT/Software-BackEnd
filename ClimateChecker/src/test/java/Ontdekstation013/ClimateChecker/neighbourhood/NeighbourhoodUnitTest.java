@@ -1,10 +1,13 @@
 package Ontdekstation013.ClimateChecker.neighbourhood;
 
 import Ontdekstation013.ClimateChecker.features.measurement.Measurement;
-import Ontdekstation013.ClimateChecker.utility.DayMeasurementResponse;
 import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadParameters;
 import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadService;
-import Ontdekstation013.ClimateChecker.features.neighbourhood.*;
+import Ontdekstation013.ClimateChecker.features.neighbourhood.Neighbourhood;
+import Ontdekstation013.ClimateChecker.features.neighbourhood.NeighbourhoodCoords;
+import Ontdekstation013.ClimateChecker.features.neighbourhood.NeighbourhoodRepository;
+import Ontdekstation013.ClimateChecker.features.neighbourhood.NeighbourhoodService;
+import Ontdekstation013.ClimateChecker.utility.DayMeasurementResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,7 +36,7 @@ public class NeighbourhoodUnitTest {
     private List<Measurement> measurementList;
 
     @Mock
-    private INeighbourhoodRepository INeighbourhoodRepository;
+    private NeighbourhoodRepository NeighbourhoodRepository;
     private List<Neighbourhood> neighbourhoodList;
 
     @BeforeEach
@@ -104,7 +107,7 @@ public class NeighbourhoodUnitTest {
                 lastDayMeasurements.get(2)
         );
 
-        when(INeighbourhoodRepository.findById(1L)).thenReturn(Optional.of(stijn));
+        when(NeighbourhoodRepository.findById(1L)).thenReturn(Optional.of(stijn));
 
         ArgumentCaptor<MeetJeStadParameters> paramCaptor = ArgumentCaptor.forClass(MeetJeStadParameters.class);
         when(meetJeStadService.getMeasurements(paramCaptor.capture()))
@@ -115,7 +118,7 @@ public class NeighbourhoodUnitTest {
 
         // Assert
         verify(meetJeStadService, times(2)).getMeasurements(any());
-        verify(INeighbourhoodRepository).findById(1L);
+        verify(NeighbourhoodRepository).findById(1L);
 
         assertEquals(2, dayMeasurements.size());
 

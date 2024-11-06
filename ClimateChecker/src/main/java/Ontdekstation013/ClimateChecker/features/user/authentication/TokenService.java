@@ -8,9 +8,9 @@ import java.util.List;
 
 @Service
 public class TokenService {
-    private final ITokenRepository tokenRepository;
+    private final TokenRepository tokenRepository;
 
-    public TokenService(ITokenRepository tokenRepository) {
+    public TokenService(TokenRepository tokenRepository) {
         this.tokenRepository = tokenRepository;
     }
 

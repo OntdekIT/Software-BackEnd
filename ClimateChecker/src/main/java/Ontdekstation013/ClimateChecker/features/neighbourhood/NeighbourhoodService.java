@@ -23,7 +23,7 @@ public class NeighbourhoodService {
     // Longitude = X
 
     private final MeetJeStadService meetJeStadService;
-    private final INeighbourhoodRepository neighbourhoodRepository;
+    private final NeighbourhoodRepository neighbourhoodRepository;
 
     private List<NeighbourhoodDto> getNeighbourhoodsAverageTemp(List<Neighbourhood> neighbourhoods, List<Measurement> measurements){
         List<NeighbourhoodDto> neighbourhoodDtos = new ArrayList<>();
