@@ -16,7 +16,6 @@ public class WorkshopCodeService {
         this.workshopCodeRepository = workshopCodeRepository;
     }
 
-
     public WorkshopCode createWorkshopCode(LocalDateTime expirationDate) {
         Long uniqueRandomCode = generateUniqueRandomCode();
         WorkshopCode workshopCode = new WorkshopCode(uniqueRandomCode, expirationDate);
@@ -50,7 +49,7 @@ public class WorkshopCodeService {
 
     public boolean VerifyWorkshopCode(Long code) {
         WorkshopCode officialCode = workshopCodeRepository.findByCode(code);
-        if (officialCode != null){
+        if (officialCode != null) {
             if (officialCode.getCode().equals(code)) {
                 if (officialCode.getExpirationDate().isAfter(LocalDateTime.now())) {
                     return true;

@@ -2,25 +2,19 @@ package Ontdekstation013.ClimateChecker.features.user;
 
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.exception.NotFoundException;
-import Ontdekstation013.ClimateChecker.features.station.Station;
-import Ontdekstation013.ClimateChecker.features.station.StationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Service
 public class UserService {
     private final UserRepository userRepository;
-    private final StationRepository stationRepository;
 
     @Autowired
-    public UserService(UserRepository userRepository, StationRepository stationRepository) {
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.stationRepository = stationRepository;
     }
 
     public User createNewUser(User user) {
@@ -39,10 +33,8 @@ public class UserService {
     }
 
     public User getUserById(long id) {
-        User user = userRepository.findById(id)
+        return userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found"));
-
-        return user;
     }
 
     public User getUserByEmail(String email) {
@@ -67,10 +59,5 @@ public class UserService {
 
     public void deleteUser(long id) {
         userRepository.deleteById(id);
-    }
-
-    private Set<Station> getStationsForUser(Long userId) {
-        List<Station> stations = stationRepository.findByUserid(userId);
-        return new HashSet<>(stations);
     }
 }
