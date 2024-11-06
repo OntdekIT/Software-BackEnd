@@ -69,7 +69,7 @@ public class UserAuthenticationController {
         station.setUserid(user.getUserId());
         stationService.UpdateMeetstation(station);
 
-        UserResponse response = UserMapper.toUserResponse(user);
+        UserResponse response = UserMapper.toUserResponse(user, false);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

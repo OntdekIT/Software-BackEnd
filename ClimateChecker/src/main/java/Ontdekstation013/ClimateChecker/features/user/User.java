@@ -1,7 +1,6 @@
 package Ontdekstation013.ClimateChecker.features.user;
 
 import Ontdekstation013.ClimateChecker.features.station.Station;
-import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserResponse;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,14 +36,8 @@ public class User {
 
     private String password;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     private Set<Station> stations;
-
-    public User(String firstName, String lastName, String email) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-    }
 
     public User(String firstName, String lastName, String email, String password) {
         this.firstName = firstName;
@@ -60,13 +53,5 @@ public class User {
         this.email = email;
         this.isAdmin = isAdmin;
         this.password = password;
-    }
-
-    public User(UserResponse dto){
-        this.userId = dto.id();
-        this.firstName = dto.firstName();
-        this.lastName = dto.lastName();
-        this.email = dto.email();
-        this.isAdmin = dto.isAdmin();
     }
 }

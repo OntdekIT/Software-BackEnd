@@ -12,7 +12,6 @@ public class UserValidator {
     private static final int MAX_EMAIL_LENGTH = 60;
     private static final int MIN_PASSWORD_LENGTH = 8;
     private static final int MAX_PASSWORD_LENGTH = 50;
-    private static final int STATION_CODE_LENGTH = 3;
 
     public ValidationResult validate(User user) {
         ValidationResult result = new ValidationResult(true, null);
@@ -71,7 +70,7 @@ public class UserValidator {
         }
     }
 
-    public boolean checkPassword(String password) {
+    private boolean checkPassword(String password) {
         boolean containsNumber = password.matches(".*[0-9].*");
         boolean containsUppercase = password.matches(".*[A-Z].*");
         boolean containsLowercase = password.matches(".*[a-z].*");
@@ -79,7 +78,7 @@ public class UserValidator {
         return containsNumber && containsUppercase && containsLowercase;
     }
 
-    public static boolean checkEmail(String email) {
+    private static boolean checkEmail(String email) {
         try {
             InternetAddress.parse(email, false);
             return true;

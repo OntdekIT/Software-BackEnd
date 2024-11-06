@@ -31,7 +31,7 @@ public class MyAccountController {
 
         if (userId != null) {
             User user = userService.getUserById(userId);
-            UserResponse userResponse = UserMapper.toUserResponse(user);
+            UserResponse userResponse = UserMapper.toUserResponse(user, false);
             responseEntity = ResponseEntity.ok(userResponse);
         }
 

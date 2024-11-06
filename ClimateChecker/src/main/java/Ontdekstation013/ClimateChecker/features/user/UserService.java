@@ -3,26 +3,24 @@ package Ontdekstation013.ClimateChecker.features.user;
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.exception.NotFoundException;
 import Ontdekstation013.ClimateChecker.features.station.Station;
-import Ontdekstation013.ClimateChecker.features.user.endpoint.UserDto;
+import Ontdekstation013.ClimateChecker.features.station.StationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService {
-
-    private final IUserRepository userRepository;
+    private final UserRepository userRepository;
+    private final StationRepository stationRepository;
 
     @Autowired
-    public UserService(IUserRepository userRepository) {
+    public UserService(UserRepository userRepository, StationRepository stationRepository) {
         this.userRepository = userRepository;
+        this.stationRepository = stationRepository;
     }
 
     public User createNewUser(User user) {
@@ -36,46 +34,19 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public List<UserDto> getAllUsers(String firstName, String lastName, String mailAddress, Boolean admin) {
-        List<User> userList = userRepository.findUsersByOptionalFilters(
-                firstName != null && !firstName.isEmpty() ? firstName : null,
-                lastName != null && !lastName.isEmpty() ? lastName : null,
-                mailAddress != null && !mailAddress.isEmpty() ? mailAddress : null,
-                admin
-        );
-
-        return userList.stream()
-                .map(user -> userConverter.userToUserDto(user))
-                .collect(Collectors.toList());
+    public List<User> getAllUsers(UserFilter filter) {
+        return userRepository.findUsersByOptionalFilters(filter.getFirstName(), filter.getLastName(), filter.getEmail(), filter.getIsAdmin());
     }
 
     public User getUserById(long id) {
-        return userRepository.findById(id)
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found"));
-
-
-    public User getUserWithStations(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User not found"));
-
-        Set<Station> stations = getStationsForUser(user.getUserID());
-        user.setStations(stations);
 
         return user;
     }
 
-    private Set<Station> getStationsForUser(Long userId) {
-        List<Station> stations = stationRepository.findByUserid(userId);
-        return new HashSet<>(stations);
-    }
-    }
-
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email);
-    }
-
-    public Page<User> getAllUsers(Pageable pageable) {
-        return userRepository.findAll(pageable);
     }
 
     public void updateUser(long id, User newUser) {
@@ -96,5 +67,10 @@ public class UserService {
 
     public void deleteUser(long id) {
         userRepository.deleteById(id);
+    }
+
+    private Set<Station> getStationsForUser(Long userId) {
+        List<Station> stations = stationRepository.findByUserid(userId);
+        return new HashSet<>(stations);
     }
 }
