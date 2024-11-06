@@ -10,11 +10,10 @@ import Ontdekstation013.ClimateChecker.features.user.authentication.JWTService;
 import Ontdekstation013.ClimateChecker.features.user.authentication.Token;
 import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.LoginDto;
 import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.RegisterDto;
-import Ontdekstation013.ClimateChecker.features.station.IStationRepository;
-import Ontdekstation013.ClimateChecker.features.station.Station;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.EditUserDto;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.UserDataDto;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.UserDto;
+import Ontdekstation013.ClimateChecker.features.workshopCode.WorkshopCodeService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseCookie;
@@ -58,15 +57,17 @@ public class UserService {
 
 
     // not yet functional
-    public List<UserDataDto> getAllUsers() {
-        List<User> userList = userRepository.findAll();
-        List<UserDataDto> newDtoList = new ArrayList<>();
+    public List<UserDto> getAllUsers(String firstName, String lastName, String mailAddress, Boolean admin) {
+        List<User> userList = userRepository.findUsersByOptionalFilters(
+                firstName != null && !firstName.isEmpty() ? firstName : null,
+                lastName != null && !lastName.isEmpty() ? lastName : null,
+                mailAddress != null && !mailAddress.isEmpty() ? mailAddress : null,
+                admin
+        );
 
-        for (User user: userList) {
-            newDtoList.add(userConverter.userToUserDataDto(user));
-        }
-
-        return newDtoList;
+        return userList.stream()
+                .map(user -> userConverter.userToUserDto(user))
+                .collect(Collectors.toList());
     }
 
 
@@ -137,30 +138,25 @@ public class UserService {
     }
 
     public User createNewUser(RegisterDto registerDto) throws Exception {
-        try
-        {
+        try {
             User user = new User();
-            if(user.ValidateInput(registerDto)) {
+            if (user.ValidateInput(registerDto)) {
                 registerDto.setMailAddress(registerDto.getMailAddress().toLowerCase());
                 if (!userRepository.existsUserByMailAddress(registerDto.getMailAddress())) { //check if email is unique
                     user = new User(registerDto.getMailAddress(), registerDto.getFirstName(), registerDto.getLastName(), registerDto.getPassword());
-                }
-                else {
+                } else {
                     throw new ExistingUniqueIdentifierException("Email already in use");
                 }
-            }
-            else {
+            } else {
                 throw new InvalidArgumentException("Invalid information");
             }
 
             user.setPassword(HashPassword(user.getPassword()));
 
             Station station = stationRepository.getByRegistrationCode(registerDto.getMeetstationCode().longValue());
-            if(station != null)
-            {
-                if(station.getUserid() == null)
-                {
-                    if(adminService.VerifyWorkshopCode(registerDto.getWorkshopCode().longValue())) {
+            if (station != null) {
+                if (station.getUserid() == null) {
+                    if (adminService.VerifyWorkshopCode(registerDto.getWorkshopCode().longValue())) {
                         user = userRepository.save(user);
                         station.setUserid(user.getUserID());
                         return user;
@@ -175,9 +171,7 @@ public class UserService {
             throw new Exception("Meetstation bestaat niet");
 
 
-        }
-
-        catch (Exception ex) {
+        } catch (Exception ex) {
             throw ex;
         }
 
@@ -185,7 +179,7 @@ public class UserService {
 
     public User login(LoginDto loginDto) throws Exception {
         User user = userRepository.findByMailAddress(loginDto.getMailAddress());
-        if (verifyPassword(loginDto.getPassword(), user.getPassword())){
+        if (verifyPassword(loginDto.getPassword(), user.getPassword())) {
             return userRepository.findByMailAddress(loginDto.getMailAddress());
         }
         throw new NotFoundException("User not found");
@@ -197,7 +191,7 @@ public class UserService {
         UserConverter converter = new UserConverter();
         dto = converter.userToUserDto(userRepository.findByMailAddress(mail));
         //dto = new userDto(mail);
-         return dto;
+        return dto;
     }
 
 
@@ -217,7 +211,7 @@ public class UserService {
         return userRepository.save(updatedUser).getUserID();
     }
 
-    public Token createVerifyToken(User user){
+    public Token createVerifyToken(User user) {
         Token token = new Token();
         token.setUserid(user.getUserID());
         token.setCreationTime(LocalDateTime.now());
@@ -226,14 +220,14 @@ public class UserService {
         return token;
     }
 
-    private String randomCode(float length){
-        char[] NUMERIC ="0123456789".toCharArray();
+    private String randomCode(float length) {
+        char[] NUMERIC = "0123456789".toCharArray();
 
         StringBuilder string = new StringBuilder();
 
         Random random = new Random();
 
-        for(int i = 0; i < length; i++) {
+        for (int i = 0; i < length; i++) {
             int index = random.nextInt(NUMERIC.length);
 
             string.append(NUMERIC[index]);
@@ -241,7 +235,7 @@ public class UserService {
         return string.toString();
     }
 
-    public void saveToken(Token token){
+    public void saveToken(Token token) {
         List<Token> tokensToRemove = ITokenRepository.findAllByUserid(token.getUserid());
         ITokenRepository.deleteAll(tokensToRemove);
         token.setId(token.getUserid());
@@ -251,7 +245,7 @@ public class UserService {
     public boolean verifyToken(String linkHash, String email) {
         User user = userRepository.findByMailAddress(email);
         Token officialToken = ITokenRepository.findByUserid(user.getUserID());
-        if (officialToken != null){
+        if (officialToken != null) {
             if (officialToken.getNumericCode().equals(linkHash)) {
                 if (officialToken.getCreationTime().isBefore(LocalDateTime.now().plusMinutes(5))) {
                     ITokenRepository.delete(officialToken);
@@ -262,8 +256,7 @@ public class UserService {
         return false;
     }
 
-    private String HashPassword(String password)
-    {
+    private String HashPassword(String password) {
         int saltLength = 16;
         int hashLength = 32;
         int parallelism = 8;
@@ -279,5 +272,6 @@ public class UserService {
         Argon2PasswordEncoder encoder = new Argon2PasswordEncoder();
         return encoder.matches(rawPassword, hashedPassword);
     }
+
 
 }
