@@ -1,5 +1,6 @@
 package Ontdekstation013.ClimateChecker.features.user.authentication;
 
+import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.utility.StringGenerator;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +15,7 @@ public class TokenService {
         this.tokenRepository = tokenRepository;
     }
 
-    public Token createVerifyToken(long userId){
+    public Token createVerifyToken(long userId) {
         Token token = new Token();
         token.setUserId(userId);
         token.setCreationTime(LocalDateTime.now());
@@ -23,14 +24,29 @@ public class TokenService {
         return token;
     }
 
-    public void saveToken(Token token){
+    public void saveToken(Token token) {
         List<Token> tokensToRemove = tokenRepository.findAllByUserId(token.getUserId());
         tokenRepository.deleteAll(tokensToRemove);
         token.setId(token.getUserId());
         tokenRepository.save(token);
     }
 
-    public boolean verifyToken(String linkHash, String email) {
-        throw new UnsupportedOperationException();
+    public boolean verifyToken(String linkHash, long userId) {
+        boolean isVerified = false;
+        Token token = tokenRepository.findByUserId(userId);
+
+        if (token != null && token.getNumericCode().equals(linkHash)) {
+            tokenRepository.delete(token);
+
+            if (isTokenInCreationTimeWindow(token.getCreationTime())) {
+                isVerified = true;
+            }
+        }
+
+        return isVerified;
+    }
+
+    private boolean isTokenInCreationTimeWindow(LocalDateTime tokenCreationTime) {
+        return tokenCreationTime.isBefore(LocalDateTime.now().plusMinutes(5));
     }
 }
