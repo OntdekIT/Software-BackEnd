@@ -99,7 +99,7 @@ public class EmailSenderService {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-        String body = "Je hebt net je email changed 013,"
+        String body = "Je hebt net je 013 email aangepast,"
                 + "<br>"
                 + "<br>"
                 + "<br>"

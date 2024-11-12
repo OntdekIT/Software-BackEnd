@@ -10,13 +10,11 @@ import java.util.stream.Collectors;
 
 @Service
 public class WorkshopCodeService {
+    private final WorkshopCodeRepository workshopCodeRepository;
 
-    private final IWorkshopCodeRepository workshopCodeRepository;
-
-    public WorkshopCodeService(IWorkshopCodeRepository workshopCodeRepository) {
+    public WorkshopCodeService(WorkshopCodeRepository workshopCodeRepository) {
         this.workshopCodeRepository = workshopCodeRepository;
     }
-
 
     public WorkshopCode createWorkshopCode(LocalDateTime expirationDate) {
         Long uniqueRandomCode = generateUniqueRandomCode();
@@ -51,7 +49,7 @@ public class WorkshopCodeService {
 
     public boolean VerifyWorkshopCode(Long code) {
         WorkshopCode officialCode = workshopCodeRepository.findByCode(code);
-        if (officialCode != null){
+        if (officialCode != null) {
             if (officialCode.getCode().equals(code)) {
                 if (officialCode.getExpirationDate().isAfter(LocalDateTime.now())) {
                     return true;

@@ -33,15 +33,14 @@ public class Station {
 
     @Column(name = "location_locationid")
     private Long location_locationid;
-
-    @Column(name = "userid")
+    @Column(name = "user_id")
     private Long userid;
 
     @Column(name = "is_active") // Nieuwe kolom voor de status
     private Boolean isActive;
 
     @ManyToOne(optional = true)
-    @JoinColumn(name = "userid", nullable = true, insertable = false, updatable = false)
+    @JoinColumn(name = "user_id", nullable = true, insertable = false, updatable = false)
     private User user;
 
     public Station(String name, String database_tag, Boolean is_public, Long registrationCode, Long location_locationid, Long userid, Boolean isActive) {

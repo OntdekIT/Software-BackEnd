@@ -7,8 +7,8 @@ import java.util.Optional;
 
 @Service
 public class StationService {
-    private final IStationRepository stationRepository;
-    public StationService(IStationRepository stationRepository){
+    private final StationRepository stationRepository;
+    public StationService(StationRepository stationRepository){
         this.stationRepository = stationRepository;
     }
 
@@ -19,6 +19,10 @@ public class StationService {
             return meetstation.get().toDto();
         }
         return null;
+    }
+
+    public Station getByRegistrationCode(long registrationCode) {
+        return stationRepository.getByRegistrationCode(registrationCode);
     }
 
     public void UpdateMeetstation(Station station){
