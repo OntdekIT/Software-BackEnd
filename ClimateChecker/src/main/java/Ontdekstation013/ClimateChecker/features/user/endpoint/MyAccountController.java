@@ -8,10 +8,7 @@ import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserResponse;
 import Ontdekstation013.ClimateChecker.utility.AuthHelper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -25,13 +22,13 @@ public class MyAccountController {
     }
 
     @GetMapping()
-    public ResponseEntity<UserResponse> getUser(HttpServletRequest request) {
+    public ResponseEntity<UserResponse> getUser(HttpServletRequest request, @RequestParam(defaultValue = "false") boolean includeStations) {
         ResponseEntity<UserResponse> responseEntity = ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         Long userId = AuthHelper.getNullableUserIdFromRequestCookie(request);
 
         if (userId != null) {
             User user = userService.getUserById(userId);
-            UserResponse userResponse = UserMapper.toUserResponse(user, false);
+            UserResponse userResponse = UserMapper.toUserResponse(user, includeStations);
             responseEntity = ResponseEntity.ok(userResponse);
         }
 
