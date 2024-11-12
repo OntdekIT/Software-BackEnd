@@ -91,7 +91,7 @@ public class UserAuthenticationController {
         ResponseEntity<?> responseEntity = ResponseEntity.badRequest().build();
         User user = userService.getUserByEmail(verifyLoginRequest.email());
 
-        if (user != null && tokenService.verifyToken(verifyLoginRequest.code(), verifyLoginRequest.email())) {
+        if (user != null && tokenService.verifyToken(verifyLoginRequest.code(), user.getUserId())) {
             ResponseCookie cookie = authService.createCookie(user);
             HttpHeaders headers = new HttpHeaders();
             headers.add("Set-Cookie", cookie.toString() + "; HttpOnly; SameSite=none; Secure");
