@@ -3,6 +3,7 @@ package Ontdekstation013.ClimateChecker.features.user.authentication.endpoint;
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.features.station.Station;
 import Ontdekstation013.ClimateChecker.features.station.StationService;
+import Ontdekstation013.ClimateChecker.features.user.PasswordUtils;
 import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.UserMapper;
 import Ontdekstation013.ClimateChecker.features.user.UserService;
@@ -14,8 +15,7 @@ import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto
 import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.RegisterUserRequest;
 import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.VerifyLoginRequest;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserResponse;
-import Ontdekstation013.ClimateChecker.features.workshopCode.WorkshopCodeService;
-import Ontdekstation013.ClimateChecker.utility.PasswordUtils;
+import Ontdekstation013.ClimateChecker.features.workshopCode.WorkshopService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -37,22 +37,22 @@ public class UserAuthenticationController {
     private final UserService userService;
     private final TokenService tokenService;
     private final EmailSenderService emailSenderService;
-    private final WorkshopCodeService workshopCodeService;
+    private final WorkshopService workshopService;
     private final StationService stationService;
 
     @Autowired
-    public UserAuthenticationController(AuthenticationService authenticationService, UserService userService, TokenService tokenService, EmailSenderService emailSenderService, WorkshopCodeService workshopCodeService, StationService stationService) {
+    public UserAuthenticationController(AuthenticationService authenticationService, UserService userService, TokenService tokenService, EmailSenderService emailSenderService, WorkshopService workshopService, StationService stationService) {
         this.authService = authenticationService;
         this.userService = userService;
         this.tokenService = tokenService;
         this.emailSenderService = emailSenderService;
-        this.workshopCodeService = workshopCodeService;
+        this.workshopService = workshopService;
         this.stationService = stationService;
     }
 
     @PostMapping("register")
     public ResponseEntity<?> createNewUser(@RequestBody RegisterUserRequest registerRequest) {
-        if (!workshopCodeService.VerifyWorkshopCode(registerRequest.workshopCode())) {
+        if (!workshopService.VerifyWorkshopCode(registerRequest.workshopCode())) {
             throw new InvalidArgumentException("Invalid workshop code");
         }
 
