@@ -1,6 +1,7 @@
 package Ontdekstation013.ClimateChecker.features.workshopCode.endpoint;
 
 import Ontdekstation013.ClimateChecker.features.user.User;
+import Ontdekstation013.ClimateChecker.features.user.UserService;
 import Ontdekstation013.ClimateChecker.features.workshopCode.Workshop;
 import Ontdekstation013.ClimateChecker.features.workshopCode.WorkshopService;
 import Ontdekstation013.ClimateChecker.features.workshopCode.endpoint.dto.WorkshopRequest;
@@ -14,9 +15,11 @@ import java.util.List;
 @RequestMapping("/api/workshopcodes")
 public class WorkshopController {
     private final WorkshopService workshopService;
+    private final UserService userService;
 
-    public WorkshopController(WorkshopService workshopService) {
+    public WorkshopController(WorkshopService workshopService, UserService userService) {
         this.workshopService = workshopService;
+        this.userService = userService;
     }
 
     @PostMapping()
@@ -34,6 +37,7 @@ public class WorkshopController {
         throw new UnsupportedOperationException();
     }
 
+    // TODO: Combine workshop with userService
     @GetMapping()
     public ResponseEntity<List<User>> getAllUsersByWorkshopCode() {
         throw new UnsupportedOperationException();

@@ -29,10 +29,18 @@ public class Workshop {
     @Column(name = "expiration_date")
     private LocalDateTime expirationDate;
 
+    @NotBlank
+    @Column(name = "creation_date")
     private LocalDateTime creationTime;
 
-    public Workshop(Long code, LocalDateTime expirationDate) {
+    public Workshop(@Unique Long code, LocalDateTime expirationDate) {
         this.code = code;
         this.expirationDate = expirationDate;
+    }
+
+    public Workshop(@Unique Long code, LocalDateTime expirationDate, LocalDateTime creationTime) {
+        this.code = code;
+        this.expirationDate = expirationDate;
+        this.creationTime = creationTime;
     }
 }

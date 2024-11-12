@@ -39,15 +39,7 @@ public class WorkshopService {
         throw new UnsupportedOperationException();
     }
 
-    private Long generateUniqueRandomCode() {
-        Long randomCode = ThreadLocalRandom.current().nextLong(100000, 999999);
-        if (workshopRepository.existsById(randomCode)) {
-            return generateUniqueRandomCode();
-        } else {
-            return randomCode;
-        }
-    }
-
+    // TODO: Clean up nested if statements
     public boolean VerifyWorkshopCode(Long code) {
         Workshop officialCode = workshopRepository.findByCode(code);
         if (officialCode != null) {
@@ -61,5 +53,14 @@ public class WorkshopService {
             }
         }
         return false;
+    }
+
+    private Long generateUniqueRandomCode() {
+        Long randomCode = ThreadLocalRandom.current().nextLong(100000, 999999);
+        if (workshopRepository.existsById(randomCode)) {
+            return generateUniqueRandomCode();
+        } else {
+            return randomCode;
+        }
     }
 }
