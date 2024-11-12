@@ -1,4 +1,4 @@
-package Ontdekstation013.ClimateChecker.utility;
+package Ontdekstation013.ClimateChecker.features.user;
 
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 
