@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class WorkshopCode {
+public class Workshop {
 
 
     @Id
@@ -29,7 +29,9 @@ public class WorkshopCode {
     @Column(name = "expiration_date")
     private LocalDateTime expirationDate;
 
-    public WorkshopCode(Long code, LocalDateTime expirationDate) {
+    private LocalDateTime creationTime;
+
+    public Workshop(Long code, LocalDateTime expirationDate) {
         this.code = code;
         this.expirationDate = expirationDate;
     }

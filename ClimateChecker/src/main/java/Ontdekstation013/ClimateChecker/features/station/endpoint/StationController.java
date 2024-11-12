@@ -4,7 +4,7 @@ import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.features.measurement.MeasurementService;
 import Ontdekstation013.ClimateChecker.features.station.Station;
 import Ontdekstation013.ClimateChecker.features.station.StationService;
-import Ontdekstation013.ClimateChecker.features.workshopCode.WorkshopCodeService;
+import Ontdekstation013.ClimateChecker.features.workshopCode.WorkshopService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,12 +24,12 @@ import java.time.format.DateTimeFormatter;
 public class StationController {
     private final StationService stationService;
     private final MeasurementService measurementService;
-    private final WorkshopCodeService adminService;
+    private final WorkshopService adminService;
 
-    public StationController(StationService stationService, MeasurementService measurementService, WorkshopCodeService workshopCodeService){
+    public StationController(StationService stationService, MeasurementService measurementService, WorkshopService workshopService){
         this.stationService = stationService;
         this.measurementService = measurementService;
-        this.adminService = workshopCodeService;
+        this.adminService = workshopService;
     }
 
     @GetMapping("{id}")
