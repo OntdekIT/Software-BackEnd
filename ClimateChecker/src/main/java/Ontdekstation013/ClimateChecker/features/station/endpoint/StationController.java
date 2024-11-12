@@ -89,7 +89,7 @@ public class StationController {
             if (!stationService.IsAvailable(stationId)){
                 return ResponseEntity.status(HttpStatus.OK).body(402);
             }
-            else if (!adminService.VerifyWorkshopCode(workshopCode)){
+            else if (!adminService.verifyWorkshopCode(workshopCode)) {
                 return ResponseEntity.status(HttpStatus.OK).body(403);
             }
             return ResponseEntity.status(HttpStatus.OK).body(200);

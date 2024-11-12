@@ -1,45 +1,58 @@
 package Ontdekstation013.ClimateChecker.features.workshopCode.endpoint;
 
-import Ontdekstation013.ClimateChecker.features.user.User;
-import Ontdekstation013.ClimateChecker.features.user.UserService;
+import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserResponse;
 import Ontdekstation013.ClimateChecker.features.workshopCode.Workshop;
+import Ontdekstation013.ClimateChecker.features.workshopCode.WorkshopMapper;
 import Ontdekstation013.ClimateChecker.features.workshopCode.WorkshopService;
 import Ontdekstation013.ClimateChecker.features.workshopCode.endpoint.dto.WorkshopRequest;
 import Ontdekstation013.ClimateChecker.features.workshopCode.endpoint.dto.WorkshopResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/workshopcodes")
 public class WorkshopController {
     private final WorkshopService workshopService;
-    private final UserService userService;
+//    private final UserService userService;
 
-    public WorkshopController(WorkshopService workshopService, UserService userService) {
+    public WorkshopController(WorkshopService workshopService) {
         this.workshopService = workshopService;
-        this.userService = userService;
     }
 
     @PostMapping()
     public ResponseEntity<WorkshopResponse> createNewWorkshop(@RequestBody WorkshopRequest request) {
-        throw new UnsupportedOperationException();
+        Workshop workshop = workshopService.createWorkshop(LocalDateTime.parse(request.expirationDate(), DateTimeFormatter.ISO_DATE_TIME));
+        WorkshopResponse response = WorkshopMapper.toResponse(workshop);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping()
-    public ResponseEntity<List<Workshop>> getAllActiveWorkshops() {
-        throw new UnsupportedOperationException();
+    public ResponseEntity<List<WorkshopResponse>> getAllActiveWorkshops() {
+        List<Workshop> activeWorkshops = workshopService.getAllActiveWorkshops();
+        List<WorkshopResponse> response = activeWorkshops.stream()
+                .map(WorkshopMapper::toResponse)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(response);
     }
 
-    @GetMapping()
-    public ResponseEntity<List<Workshop>> getAllExpiredWorkshops() {
-        throw new UnsupportedOperationException();
+    @GetMapping("/expired")
+    public ResponseEntity<List<WorkshopResponse>> getAllExpiredWorkshops() {
+        List<Workshop> expiredWorkshops = workshopService.getAllExpiredWorkshops();
+        List<WorkshopResponse> response = expiredWorkshops.stream()
+                .map(WorkshopMapper::toResponse)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(response);
     }
 
     // TODO: Combine workshop with userService
-    @GetMapping()
-    public ResponseEntity<List<User>> getAllUsersByWorkshopCode() {
+    @GetMapping("/{code}")
+    public ResponseEntity<List<UserResponse>> getAllUsersByWorkshopCode(@PathVariable long code) {
         throw new UnsupportedOperationException();
     }
 }

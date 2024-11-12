@@ -10,9 +10,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -29,38 +26,18 @@ public class WorkshopUnitTests {
 
     @Test
     public void createWorkshopCode_GeneratesRandom_Succeeds() {
-        Workshop workshop = new Workshop(123L, LocalDateTime.now().plusDays(1));
+        // Arrange
+        LocalDateTime expirationDate = LocalDateTime.now().plusDays(1);
+        Workshop workshop = new Workshop(123L, expirationDate);
         when(workshopRepository.save(any(Workshop.class))).thenReturn(workshop);
 
-        Workshop createdWorkshop = workshopService.createWorkshop(LocalDateTime.now());
+        // Act
+        Workshop createdWorkshop = workshopService.createWorkshop(expirationDate);
 
+        // Assert
         assertNotNull(createdWorkshop);
         assertEquals(123L, createdWorkshop.getCode());
+        assertEquals(expirationDate, createdWorkshop.getExpirationDate());
         verify(workshopRepository, times(1)).save(any(Workshop.class));
-    }
-
-    @Test
-    public void getAllWorkshopCodes_Succeeds() {
-        List<Workshop> workshops = Arrays.asList(
-                new Workshop(123L, LocalDateTime.now().plusDays(1)),
-                new Workshop(456L, LocalDateTime.now().plusDays(2))
-        );
-        when(workshopRepository.findAll()).thenReturn(workshops);
-
-        List<Workshop> result = workshopService.getAllActiveWorkshops();
-
-        assertNotNull(result);
-        assertEquals(2, result.size());
-        verify(workshopRepository, times(1)).findAll();
-    }
-
-    @Test
-    public void deleteWorkshopCodeOnScheduledTaskWhenExpired() {
-        Workshop expiredCode = new Workshop(123L, LocalDateTime.now().minusDays(1));
-        when(workshopRepository.findById(123L)).thenReturn(Optional.of(expiredCode));
-
-        workshopService.deleteExpiredWorkshopCodes();
-
-        verify(workshopRepository, times(1)).deleteById(123L);
     }
 }

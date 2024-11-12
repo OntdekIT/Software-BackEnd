@@ -1,6 +1,5 @@
 package Ontdekstation013.ClimateChecker.features.workshopCode;
 
-import Ontdekstation013.ClimateChecker.features.user.User;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -16,10 +15,11 @@ public class WorkshopService {
         this.workshopRepository = workshopRepository;
     }
 
-    // TODO: refactor by adding creationTime
     public Workshop createWorkshop(LocalDateTime expirationDate) {
-        Long uniqueRandomCode = generateUniqueRandomCode();
-        Workshop workshop = new Workshop(uniqueRandomCode, expirationDate);
+        Workshop workshop = new Workshop();
+        workshop.setExpirationDate(expirationDate);
+        workshop.setCode(generateUniqueRandomCode());
+        workshop.setCreationTime(LocalDateTime.now());
         return workshopRepository.save(workshop);
     }
 
@@ -32,35 +32,26 @@ public class WorkshopService {
     }
 
     public List<Workshop> getAllExpiredWorkshops() {
-        throw new UnsupportedOperationException();
+        LocalDateTime now = LocalDateTime.now();
+        return workshopRepository.findByExpirationDateBefore(now);
     }
 
-    public List<User> getAllUsersByWorkshop(Long code) {
-        throw new UnsupportedOperationException();
-    }
+    public boolean verifyWorkshopCode(Long code) {
+        boolean isValid = false;
 
-    // TODO: Clean up nested if statements
-    public boolean VerifyWorkshopCode(Long code) {
-        Workshop officialCode = workshopRepository.findByCode(code);
-        if (officialCode != null) {
-            if (officialCode.getCode().equals(code)) {
-                if (officialCode.getExpirationDate().isAfter(LocalDateTime.now())) {
-                    return true;
-                }
-                else {
-                    workshopRepository.delete(officialCode);
-                }
-            }
+        Workshop workshop = workshopRepository.findByCode(code);
+        if (workshop != null && workshop.getExpirationDate().isAfter(LocalDateTime.now())) {
+            isValid = true;
         }
-        return false;
+        return isValid;
     }
 
     private Long generateUniqueRandomCode() {
-        Long randomCode = ThreadLocalRandom.current().nextLong(100000, 999999);
-        if (workshopRepository.existsById(randomCode)) {
-            return generateUniqueRandomCode();
-        } else {
-            return randomCode;
-        }
+        Long randomCode;
+        do {
+            randomCode = ThreadLocalRandom.current().nextLong(100000, 999999);
+        } while (workshopRepository.existsById(randomCode));
+
+        return randomCode;
     }
 }

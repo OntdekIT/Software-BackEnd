@@ -52,7 +52,7 @@ public class UserAuthenticationController {
 
     @PostMapping("register")
     public ResponseEntity<?> createNewUser(@RequestBody RegisterUserRequest registerRequest) {
-        if (!workshopService.VerifyWorkshopCode(registerRequest.workshopCode())) {
+        if (!workshopService.verifyWorkshopCode(registerRequest.workshopCode())) {
             throw new InvalidArgumentException("Invalid workshop code");
         }
 
