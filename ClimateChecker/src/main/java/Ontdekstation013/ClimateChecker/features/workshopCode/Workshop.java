@@ -17,9 +17,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class WorkshopCode {
-
-
+public class Workshop {
     @Id
     @Unique
     @Column
@@ -29,8 +27,22 @@ public class WorkshopCode {
     @Column(name = "expiration_date")
     private LocalDateTime expirationDate;
 
-    public WorkshopCode(Long code, LocalDateTime expirationDate) {
+    @NotBlank
+    @Column(name = "creation_date")
+    private LocalDateTime creationTime;
+
+    public Workshop(LocalDateTime expirationDate) {
+        this.expirationDate = expirationDate;
+    }
+
+    public Workshop(@Unique Long code, LocalDateTime expirationDate) {
         this.code = code;
         this.expirationDate = expirationDate;
+    }
+
+    public Workshop(@Unique Long code, LocalDateTime expirationDate, LocalDateTime creationTime) {
+        this.code = code;
+        this.expirationDate = expirationDate;
+        this.creationTime = creationTime;
     }
 }
