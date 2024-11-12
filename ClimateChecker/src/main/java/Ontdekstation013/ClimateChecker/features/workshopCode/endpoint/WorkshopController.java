@@ -33,18 +33,14 @@ public class WorkshopController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<WorkshopResponse>> getAllActiveWorkshops() {
-        List<Workshop> activeWorkshops = workshopService.getAllActiveWorkshops();
-        List<WorkshopResponse> response = activeWorkshops.stream()
-                .map(WorkshopMapper::toResponse)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/expired")
-    public ResponseEntity<List<WorkshopResponse>> getAllExpiredWorkshops() {
-        List<Workshop> expiredWorkshops = workshopService.getAllExpiredWorkshops();
-        List<WorkshopResponse> response = expiredWorkshops.stream()
+    public ResponseEntity<List<WorkshopResponse>> getAllWorkshops(@RequestParam(defaultValue = "false") boolean isExpired) {
+        List<Workshop> workshops;
+        if (isExpired) {
+            workshops = workshopService.getAllExpiredWorkshops();
+        } else {
+            workshops = workshopService.getAllActiveWorkshops();
+        }
+        List<WorkshopResponse> response = workshops.stream()
                 .map(WorkshopMapper::toResponse)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(response);
@@ -54,5 +50,11 @@ public class WorkshopController {
     @GetMapping("/{code}")
     public ResponseEntity<List<UserResponse>> getAllUsersByWorkshopCode(@PathVariable long code) {
         throw new UnsupportedOperationException();
+    }
+
+    @DeleteMapping("/{code}")
+    public ResponseEntity<?> deleteWorkshopCode(@PathVariable long code) {
+        workshopService.deleteWorkshopCode(code);
+        return ResponseEntity.noContent().build();
     }
 }

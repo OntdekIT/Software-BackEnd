@@ -36,6 +36,15 @@ public class WorkshopService {
         return workshopRepository.findByExpirationDateBefore(now);
     }
 
+    public Workshop getByCode(long code) {
+        return workshopRepository.findByCode(code);
+    }
+
+    public void deleteWorkshopCode(long code) {
+        Workshop workshop = workshopRepository.findByCode(code);
+        workshopRepository.delete(workshop);
+    }
+
     public boolean verifyWorkshopCode(Long code) {
         boolean isValid = false;
 
