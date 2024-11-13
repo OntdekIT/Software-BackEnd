@@ -33,7 +33,7 @@ public class NeighbourhoodService {
 
             dto.setId(neighbourhood.getId());
             dto.setName(neighbourhood.getName());
-            dto.setCoordinates(convertToFloatArray(neighbourhood.coordinates));
+            dto.setCoordinates(convertToFloatArray(neighbourhood.getCoordinates()));
 
             List<Measurement> tempMeasurements = new ArrayList<>();
             for (Measurement measurement : measurements) {
@@ -89,7 +89,7 @@ public class NeighbourhoodService {
         params.includeFaultyMeasurements = false;
         List<Measurement> measurements = meetJeStadService.getMeasurements(params);
 
-        float[][] neighbourhoodCoords = convertToFloatArray(neighbourhood.coordinates);
+        float[][] neighbourhoodCoords = convertToFloatArray(neighbourhood.getCoordinates());
         List<Integer> stations = new ArrayList<>();
         for (Measurement measurement : measurements) {
             float[] point = { measurement.getLatitude(), measurement.getLongitude() };

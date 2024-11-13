@@ -4,7 +4,7 @@ import Ontdekstation013.ClimateChecker.features.user.User;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.Cookie;
+import jakarta.servlet.http.Cookie;
 
 @Service
 public class AuthenticationService {

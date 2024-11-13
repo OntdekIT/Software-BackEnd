@@ -2,11 +2,10 @@ package Ontdekstation013.ClimateChecker.features.station;
 
 import Ontdekstation013.ClimateChecker.features.station.endpoint.StationDto;
 import Ontdekstation013.ClimateChecker.features.user.User;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import javax.persistence.*;
 
 @Entity
 @Table(name = "station")
