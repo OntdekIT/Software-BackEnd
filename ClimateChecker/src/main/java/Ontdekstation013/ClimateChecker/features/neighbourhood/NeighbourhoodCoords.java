@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "region_cords")
+@Table(name = "region_coords")
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
