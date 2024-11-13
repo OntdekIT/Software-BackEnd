@@ -1,18 +1,16 @@
 package Ontdekstation013.ClimateChecker.features.workshopCode;
 
-import Ontdekstation013.ClimateChecker.features.user.User;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.checkerframework.common.aliasing.qual.Unique;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.checkerframework.common.aliasing.qual.Unique;
+
 import java.time.LocalDateTime;
-import java.util.Set;
 
 @Entity
 @Table(name = "workshopcode")
@@ -33,21 +31,8 @@ public class Workshop {
     @Column(name = "creation_date")
     private LocalDateTime creationTime;
 
-    @OneToMany
-    private Set<User> user;
-
-    public Workshop(LocalDateTime expirationDate) {
-        this.expirationDate = expirationDate;
-    }
-
     public Workshop(@Unique Long code, LocalDateTime expirationDate) {
         this.code = code;
         this.expirationDate = expirationDate;
-    }
-
-    public Workshop(@Unique Long code, LocalDateTime expirationDate, LocalDateTime creationTime) {
-        this.code = code;
-        this.expirationDate = expirationDate;
-        this.creationTime = creationTime;
     }
 }
