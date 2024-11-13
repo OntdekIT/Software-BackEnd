@@ -14,7 +14,7 @@
 	<name>ClimateChecker</name>
 	<description>Application used to measure and display various attributes in the local environment</description>
 	<properties>
-		<java.version>17</java.version>
+		<java.version>21</java.version>
 	</properties>
 	<dependencies>
 
@@ -78,8 +78,8 @@
 			<scope>test</scope>
 		</dependency>
         <dependency>
-            <groupId>jakarta.validation</groupId>
-            <artifactId>jakarta.validation-api</artifactId>
+            <groupId>javax.validation</groupId>
+            <artifactId>javax.validation-api</artifactId>
             <version>2.0.2</version>
         </dependency>
 		<dependency>
