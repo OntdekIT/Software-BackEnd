@@ -29,12 +29,12 @@ public class UserMapper {
         );
     }
 
-    public static User toUser(RegisterUserRequest request) {
+    public static User toUser(RegisterUserRequest request, String hashedPassword) {
         return new User(
                 request.firstName(),
                 request.lastName(),
                 request.email(),
-                PasswordUtils.HashPassword(request.password())
+                hashedPassword
         );
     }
 

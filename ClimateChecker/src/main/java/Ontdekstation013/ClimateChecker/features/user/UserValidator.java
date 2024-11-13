@@ -1,7 +1,7 @@
 package Ontdekstation013.ClimateChecker.features.user;
 
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
+import jakarta.mail.internet.AddressException;
+import jakarta.mail.internet.InternetAddress;
 
 public class UserValidator {
     private static final int MIN_FIRST_NAME_LENGTH = 2;
