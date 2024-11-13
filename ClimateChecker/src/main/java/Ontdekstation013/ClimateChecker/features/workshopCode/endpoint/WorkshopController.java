@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/workshopcodes")
+@RequestMapping("/api/workshops")
 public class WorkshopController {
     private final WorkshopService workshopService;
     private final UserService userService;
@@ -54,13 +54,13 @@ public class WorkshopController {
     // TODO: Combine workshop with userService
     @GetMapping("/{code}/users")
     public ResponseEntity<List<UserResponse>> getAllUsersByWorkshopCode(@PathVariable long code) {
-        List<User> users = userService.getUsersByWorkshopCode(code);
+        Workshop workshop = workshopService.getByCode(code);
+        List<User> users = userService.getUsersByWorkshopCode(workshop);
         List<UserResponse> response = new ArrayList<>();
 
         for(User user : users) {
             response.add(UserMapper.toUserResponse(user, false));
         }
-
         return ResponseEntity.ok(response);
     }
 

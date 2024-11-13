@@ -10,6 +10,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 @Entity
@@ -41,6 +42,7 @@ public class User {
     private Set<Station> stations;
 
     @ManyToOne
+    @NotNull
     private Workshop workshopCode;
 
     public User(String firstName, String lastName, String email, String password) {

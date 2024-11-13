@@ -1,5 +1,6 @@
 package Ontdekstation013.ClimateChecker.features.user;
 
+import Ontdekstation013.ClimateChecker.features.workshopCode.Workshop;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -23,5 +24,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
             @Param("email") String email,
             @Param("isAdmin") Boolean isAdmin);
 
-    List<User> findByWorkshopCode(Long code);
+    List<User> findByWorkshopCode(Workshop workshop);
 }

@@ -36,12 +36,8 @@ public class UserService {
         return userRepository.findUsersByOptionalFilters(filter.getFirstName(), filter.getLastName(), filter.getEmail(), filter.getIsAdmin());
     }
 
-    public List<User> getUsersByWorkshopCode(long code) {
-        Workshop workshop = workshopRepository.findByCode(code);
-        if(workshop == null) {
-            throw new NotFoundException("Workshop with code " + code + " not found.");
-        }
-        return userRepository.findByWorkshopCode(code);
+    public List<User> getUsersByWorkshopCode(Workshop workshop) {
+        return userRepository.findByWorkshopCode(workshop);
     }
 
     public User getUserById(long id) {
