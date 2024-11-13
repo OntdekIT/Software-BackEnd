@@ -1,16 +1,15 @@
 package Ontdekstation013.ClimateChecker.features.workshopCode;
 
+import Ontdekstation013.ClimateChecker.features.user.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.checkerframework.common.aliasing.qual.Unique;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @Table(name = "workshopcode")
@@ -30,6 +29,9 @@ public class Workshop {
     @NotBlank
     @Column(name = "creation_date")
     private LocalDateTime creationTime;
+
+    @OneToMany
+    private Set<User> user;
 
     public Workshop(LocalDateTime expirationDate) {
         this.expirationDate = expirationDate;
