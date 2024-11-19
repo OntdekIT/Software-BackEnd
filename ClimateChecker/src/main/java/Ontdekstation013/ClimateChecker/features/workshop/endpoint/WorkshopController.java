@@ -1,14 +1,14 @@
-package Ontdekstation013.ClimateChecker.features.workshopCode.endpoint;
+package Ontdekstation013.ClimateChecker.features.workshop.endpoint;
 
 import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.UserMapper;
 import Ontdekstation013.ClimateChecker.features.user.UserService;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserResponse;
-import Ontdekstation013.ClimateChecker.features.workshopCode.Workshop;
-import Ontdekstation013.ClimateChecker.features.workshopCode.WorkshopMapper;
-import Ontdekstation013.ClimateChecker.features.workshopCode.WorkshopService;
-import Ontdekstation013.ClimateChecker.features.workshopCode.endpoint.dto.WorkshopRequest;
-import Ontdekstation013.ClimateChecker.features.workshopCode.endpoint.dto.WorkshopResponse;
+import Ontdekstation013.ClimateChecker.features.workshop.Workshop;
+import Ontdekstation013.ClimateChecker.features.workshop.WorkshopMapper;
+import Ontdekstation013.ClimateChecker.features.workshop.WorkshopService;
+import Ontdekstation013.ClimateChecker.features.workshop.endpoint.dto.WorkshopRequest;
+import Ontdekstation013.ClimateChecker.features.workshop.endpoint.dto.WorkshopResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

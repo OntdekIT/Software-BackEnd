@@ -1,8 +1,8 @@
-package Ontdekstation013.ClimateChecker.workshopCode;
+package Ontdekstation013.ClimateChecker.workshop;
 
-import Ontdekstation013.ClimateChecker.features.workshopCode.Workshop;
-import Ontdekstation013.ClimateChecker.features.workshopCode.WorkshopRepository;
-import Ontdekstation013.ClimateChecker.features.workshopCode.WorkshopService;
+import Ontdekstation013.ClimateChecker.features.workshop.Workshop;
+import Ontdekstation013.ClimateChecker.features.workshop.WorkshopRepository;
+import Ontdekstation013.ClimateChecker.features.workshop.WorkshopService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

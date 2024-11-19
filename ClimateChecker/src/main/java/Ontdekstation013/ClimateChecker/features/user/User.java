@@ -1,7 +1,7 @@
 package Ontdekstation013.ClimateChecker.features.user;
 
 import Ontdekstation013.ClimateChecker.features.station.Station;
-import Ontdekstation013.ClimateChecker.features.workshopCode.Workshop;
+import Ontdekstation013.ClimateChecker.features.workshop.Workshop;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

@@ -1,4 +1,4 @@
-package Ontdekstation013.ClimateChecker.features.workshopCode;
+package Ontdekstation013.ClimateChecker.features.workshop;
 
 import Ontdekstation013.ClimateChecker.features.user.User;
 import jakarta.persistence.*;
