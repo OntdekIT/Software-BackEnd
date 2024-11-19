@@ -1,5 +1,8 @@
 package Ontdekstation013.ClimateChecker.features.workshopCode.endpoint;
 
+import Ontdekstation013.ClimateChecker.features.user.User;
+import Ontdekstation013.ClimateChecker.features.user.UserMapper;
+import Ontdekstation013.ClimateChecker.features.user.UserService;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserResponse;
 import Ontdekstation013.ClimateChecker.features.workshopCode.Workshop;
 import Ontdekstation013.ClimateChecker.features.workshopCode.WorkshopMapper;
@@ -12,17 +15,19 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/workshopcodes")
+@RequestMapping("/api/workshops")
 public class WorkshopController {
     private final WorkshopService workshopService;
-//    private final UserService userService;
+    private final UserService userService;
 
-    public WorkshopController(WorkshopService workshopService) {
+    public WorkshopController(WorkshopService workshopService, UserService userService) {
         this.workshopService = workshopService;
+        this.userService = userService;
     }
 
     @PostMapping()
@@ -47,9 +52,16 @@ public class WorkshopController {
     }
 
     // TODO: Combine workshop with userService
-    @GetMapping("/{code}")
+    @GetMapping("/{code}/users")
     public ResponseEntity<List<UserResponse>> getAllUsersByWorkshopCode(@PathVariable long code) {
-        throw new UnsupportedOperationException();
+        Workshop workshop = workshopService.getByCode(code);
+        List<User> users = userService.getUsersByWorkshopCode(workshop);
+        List<UserResponse> response = new ArrayList<>();
+
+        for(User user : users) {
+            response.add(UserMapper.toUserResponse(user, false));
+        }
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{code}")

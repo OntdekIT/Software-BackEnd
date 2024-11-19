@@ -2,6 +2,8 @@ package Ontdekstation013.ClimateChecker.features.user;
 
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.exception.NotFoundException;
+import Ontdekstation013.ClimateChecker.features.workshopCode.Workshop;
+import Ontdekstation013.ClimateChecker.features.workshopCode.WorkshopRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,10 +13,12 @@ import java.util.Optional;
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    private final WorkshopRepository workshopRepository;
 
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, WorkshopRepository workshopRepository) {
         this.userRepository = userRepository;
+        this.workshopRepository = workshopRepository;
     }
 
     public User createNewUser(User user) {
@@ -30,6 +34,10 @@ public class UserService {
 
     public List<User> getAllUsers(UserFilter filter) {
         return userRepository.findUsersByOptionalFilters(filter.getFirstName(), filter.getLastName(), filter.getEmail(), filter.getIsAdmin());
+    }
+
+    public List<User> getUsersByWorkshopCode(Workshop workshop) {
+        return userRepository.findByWorkshopCode(workshop);
     }
 
     public User getUserById(long id) {
