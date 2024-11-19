@@ -24,7 +24,7 @@ public class UserMapper {
                 user.getFirstName(),
                 user.getLastName(),
                 user.getEmail(),
-                user.isAdmin(),
+                user.getRole(),
                 stationDTOs
         );
     }
@@ -44,7 +44,7 @@ public class UserMapper {
                 request.firstName(),
                 request.lastName(),
                 request.email(),
-                user.isAdmin(),
+                user.getRole(),
                 request.password()
         );
     }
@@ -54,7 +54,7 @@ public class UserMapper {
                 .firstName(request.firstName())
                 .lastName(request.lastName())
                 .email(request.email())
-                .isAdmin(request.isAdmin())
+                .role(request.role())
                 .build();
     }
 
