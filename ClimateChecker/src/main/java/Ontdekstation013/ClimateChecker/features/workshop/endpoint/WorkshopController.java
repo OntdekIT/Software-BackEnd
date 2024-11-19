@@ -55,7 +55,7 @@ public class WorkshopController {
     @GetMapping("/{code}/users")
     public ResponseEntity<List<UserResponse>> getAllUsersByWorkshopCode(@PathVariable long code) {
         Workshop workshop = workshopService.getByCode(code);
-        List<User> users = userService.getUsersByWorkshopCode(workshop);
+        List<User> users = userService.getUsersByWorkshop(workshop);
         List<UserResponse> response = new ArrayList<>();
 
         for(User user : users) {
