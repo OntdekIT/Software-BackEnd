@@ -17,8 +17,8 @@ public class WorkshopService {
 
     public Workshop createWorkshop(LocalDateTime expirationDate) {
         Workshop workshop = new Workshop();
-        workshop.setExpirationDate(expirationDate);
         workshop.setCode(generateUniqueRandomCode());
+        workshop.setExpirationDate(expirationDate);
         workshop.setCreationTime(LocalDateTime.now());
         return workshopRepository.save(workshop);
     }

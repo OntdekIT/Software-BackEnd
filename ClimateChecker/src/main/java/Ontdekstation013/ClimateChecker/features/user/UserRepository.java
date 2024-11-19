@@ -24,5 +24,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
             @Param("email") String email,
             @Param("isAdmin") Boolean isAdmin);
 
-    List<User> findByWorkshopCode(Workshop workshop);
+    List<User> findByWorkshop(Workshop workshop);
 }

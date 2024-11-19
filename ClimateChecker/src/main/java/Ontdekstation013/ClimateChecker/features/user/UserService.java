@@ -37,7 +37,7 @@ public class UserService {
     }
 
     public List<User> getUsersByWorkshopCode(Workshop workshop) {
-        return userRepository.findByWorkshopCode(workshop);
+        return userRepository.findByWorkshop(workshop);
     }
 
     public User getUserById(long id) {
