@@ -6,6 +6,7 @@ import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.UserFilter;
 import Ontdekstation013.ClimateChecker.features.user.UserRepository;
 import Ontdekstation013.ClimateChecker.features.user.UserService;
+import Ontdekstation013.ClimateChecker.features.workshop.Workshop;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,11 +30,15 @@ public class UserUnitTests {
     @InjectMocks
     private UserService userService;
 
+    private Workshop workshop;
     private User user;
+    private User user2;
 
     @BeforeEach
     public void setUp() {
+        workshop = new Workshop();
         user = new User(1L, "John", "Doe", "john.doe@email.com", true, "MyPassword123");
+        user2 = new User(1L, "Jane", "Doe", "jane.doe@email.com", false, "GoodPassword1!");
     }
 
     @Test
@@ -140,5 +145,17 @@ public class UserUnitTests {
         userService.deleteUser(1L);
 
         verify(userRepository, times(1)).deleteById(1L);
+    }
+
+    @Test
+    public void getUsersByWorkshopCode_ReturnsUsers() {
+        when(userRepository.findByWorkshop(workshop)).thenReturn(Arrays.asList(user, user2));
+
+        List<User> users = userService.getUsersByWorkshop(workshop);
+
+        assertEquals(2, users.size());
+        assertEquals(user.getEmail(), users.get(0).getEmail());
+        assertEquals(user2.getEmail(), users.get(1).getEmail());
+        verify(userRepository, times(1)).findByWorkshop(workshop);
     }
 }

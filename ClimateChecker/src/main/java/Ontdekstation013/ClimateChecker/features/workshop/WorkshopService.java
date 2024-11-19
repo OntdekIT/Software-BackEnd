@@ -1,4 +1,4 @@
-package Ontdekstation013.ClimateChecker.features.workshopCode;
+package Ontdekstation013.ClimateChecker.features.workshop;
 
 import org.springframework.stereotype.Service;
 
@@ -17,8 +17,8 @@ public class WorkshopService {
 
     public Workshop createWorkshop(LocalDateTime expirationDate) {
         Workshop workshop = new Workshop();
-        workshop.setExpirationDate(expirationDate);
         workshop.setCode(generateUniqueRandomCode());
+        workshop.setExpirationDate(expirationDate);
         workshop.setCreationTime(LocalDateTime.now());
         return workshopRepository.save(workshop);
     }

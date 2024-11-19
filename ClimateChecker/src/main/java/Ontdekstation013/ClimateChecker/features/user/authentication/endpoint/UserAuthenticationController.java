@@ -15,7 +15,10 @@ import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto
 import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.RegisterUserRequest;
 import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.VerifyLoginRequest;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserResponse;
-import Ontdekstation013.ClimateChecker.features.workshopCode.WorkshopService;
+import Ontdekstation013.ClimateChecker.features.workshop.WorkshopService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -25,10 +28,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 @AllArgsConstructor
 @RestController

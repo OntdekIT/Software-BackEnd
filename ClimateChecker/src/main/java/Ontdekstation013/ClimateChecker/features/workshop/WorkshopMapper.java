@@ -1,6 +1,6 @@
-package Ontdekstation013.ClimateChecker.features.workshopCode;
+package Ontdekstation013.ClimateChecker.features.workshop;
 
-import Ontdekstation013.ClimateChecker.features.workshopCode.endpoint.dto.WorkshopResponse;
+import Ontdekstation013.ClimateChecker.features.workshop.endpoint.dto.WorkshopResponse;
 
 public class WorkshopMapper {
     public static WorkshopResponse toResponse(Workshop workshop) {

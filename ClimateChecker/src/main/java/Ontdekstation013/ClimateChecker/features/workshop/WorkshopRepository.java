@@ -1,4 +1,4 @@
-package Ontdekstation013.ClimateChecker.features.workshopCode;
+package Ontdekstation013.ClimateChecker.features.workshop;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

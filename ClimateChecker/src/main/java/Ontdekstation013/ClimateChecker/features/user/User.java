@@ -1,17 +1,19 @@
 package Ontdekstation013.ClimateChecker.features.user;
 
 import Ontdekstation013.ClimateChecker.features.station.Station;
+import Ontdekstation013.ClimateChecker.features.workshop.Workshop;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import java.util.Set;
 
 @Entity
+@Table(name = "user")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -38,6 +40,10 @@ public class User {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     private Set<Station> stations;
+
+    @ManyToOne
+    @JoinColumn(name = "workshop_code")
+    private Workshop workshop;
 
     public User(String firstName, String lastName, String email, String password) {
         this.firstName = firstName;
