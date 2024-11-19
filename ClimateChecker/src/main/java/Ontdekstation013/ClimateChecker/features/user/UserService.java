@@ -30,7 +30,7 @@ public class UserService {
     }
 
     public List<User> getAllUsers(UserFilter filter) {
-        return userRepository.findUsersByOptionalFilters(filter.getFirstName(), filter.getLastName(), filter.getEmail(), filter.getIsAdmin());
+        return userRepository.findUsersByOptionalFilters(filter.getFirstName(), filter.getLastName(), filter.getEmail(), filter.getRole());
     }
 
     public List<User> getUsersByWorkshop(Workshop workshop) {
@@ -55,7 +55,7 @@ public class UserService {
             userToUpdate.setLastName(newUser.getLastName());
             userToUpdate.setEmail(newUser.getEmail());
             userToUpdate.setPassword(newUser.getPassword());
-            userToUpdate.setAdmin(newUser.isAdmin());
+            userToUpdate.setRole(newUser.getRole());
             userRepository.save(userToUpdate);
         } else {
             throw new NotFoundException("User not found");
