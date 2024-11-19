@@ -1,0 +1,2 @@
+ALTER TABLE ontdekstation013.`user` CHANGE is_admin `role` TINYINT DEFAULT 0 NOT NULL;
+ALTER TABLE ontdekstation013.`user` MODIFY COLUMN `role` TINYINT DEFAULT 0 NOT NULL;

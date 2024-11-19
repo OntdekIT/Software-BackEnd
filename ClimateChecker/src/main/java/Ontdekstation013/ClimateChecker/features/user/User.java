@@ -34,7 +34,8 @@ public class User {
     @Email
     private String email;
 
-    private boolean isAdmin = false;
+    @Enumerated(EnumType.ORDINAL)
+    private UserRole role = UserRole.USER;
 
     private String password;
 
@@ -52,12 +53,12 @@ public class User {
         this.password = password;
     }
 
-    public User(Long userId, String firstName, String lastName, String email, boolean isAdmin, String password) {
+    public User(Long userId, String firstName, String lastName, String email, UserRole role, String password) {
         this.userId = userId;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
-        this.isAdmin = isAdmin;
+        this.role = role;
         this.password = password;
     }
 }

@@ -52,7 +52,7 @@ public class UserController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateUserRole(@PathVariable long id, @RequestBody UpdateUserRequest request) {
         User user = userService.getUserById(id);
-        user.setAdmin(request.isAdmin());
+        user.setRole(request.role());
         userService.updateUser(id, user);
         return ResponseEntity.ok().build();
     }
