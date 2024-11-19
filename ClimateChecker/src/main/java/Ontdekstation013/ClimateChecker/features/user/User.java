@@ -13,6 +13,7 @@ import lombok.Setter;
 import java.util.Set;
 
 @Entity
+@Table(name = "user")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -41,6 +42,7 @@ public class User {
     private Set<Station> stations;
 
     @ManyToOne
+    @JoinColumn(name = "workshop_code")
     private Workshop workshop;
 
     public User(String firstName, String lastName, String email, String password) {
