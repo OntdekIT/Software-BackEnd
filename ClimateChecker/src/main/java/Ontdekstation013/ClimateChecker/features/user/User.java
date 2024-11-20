@@ -46,11 +46,12 @@ public class User {
     @JoinColumn(name = "workshop_code")
     private Workshop workshop;
 
-    public User(String firstName, String lastName, String email, String password) {
+    public User(String firstName, String lastName, String email, String password, Workshop workshop) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
+        this.workshop = workshop;
     }
 
     public User(Long userId, String firstName, String lastName, String email, UserRole role, String password) {

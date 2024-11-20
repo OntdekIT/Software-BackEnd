@@ -15,6 +15,7 @@ import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto
 import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.RegisterUserRequest;
 import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.VerifyLoginRequest;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserResponse;
+import Ontdekstation013.ClimateChecker.features.workshop.Workshop;
 import Ontdekstation013.ClimateChecker.features.workshop.WorkshopService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -55,7 +56,8 @@ public class UserAuthenticationController {
             throw new InvalidArgumentException("Station is already claimed");
         }
 
-        User user = UserMapper.toUser(registerRequest, passwordEncodingService.encodePassword(registerRequest.password()));
+        Workshop workshop = workshopService.getByCode(registerRequest.workshopCode());
+        User user = UserMapper.toUser(registerRequest, passwordEncodingService.encodePassword(registerRequest.password()), workshop);
         user = userService.createNewUser(user);
         station.setUserid(user.getUserId());
         stationService.UpdateMeetstation(station);
