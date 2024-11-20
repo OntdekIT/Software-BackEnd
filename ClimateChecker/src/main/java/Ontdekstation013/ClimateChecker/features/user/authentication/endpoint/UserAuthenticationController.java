@@ -8,16 +8,14 @@ import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.UserMapper;
 import Ontdekstation013.ClimateChecker.features.user.UserService;
 import Ontdekstation013.ClimateChecker.features.user.authentication.*;
-import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.ForgotPasswordRequest;
-import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.LoginRequest;
-import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.RegisterUserRequest;
-import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.VerifyLoginRequest;
+import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.*;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserResponse;
 import Ontdekstation013.ClimateChecker.features.workshop.Workshop;
 import Ontdekstation013.ClimateChecker.features.workshop.WorkshopService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -93,12 +91,20 @@ public class UserAuthenticationController {
     }
 
     @PostMapping("reset-password")
-    public ResponseEntity<?> resetPassword(){
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest resetPasswordRequest) {
+        User user = userService.getUserByEmail(resetPasswordRequest.email());
+        if (user != null && tokenService.verifyToken(resetPasswordRequest.token(), user.getUserId(), TokenType.PASSWORD_RESET)) {
+            user.setPassword(passwordEncodingService.encodePassword(resetPasswordRequest.password()));
+            userService.updateUser(user.getUserId(), user);
+        } else {
+            throw new InvalidArgumentException("Invalid email and/or token");
+        }
+
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("forgot-password")
-    public ResponseEntity<?> createForgotPasswordRequest(@RequestBody ForgotPasswordRequest forgotPasswordRequest) throws Exception{
+    public ResponseEntity<?> createForgotPasswordRequest(@RequestBody ForgotPasswordRequest forgotPasswordRequest) throws Exception {
         User user = userService.getUserByEmail(forgotPasswordRequest.email());
 
         if (user != null) {
