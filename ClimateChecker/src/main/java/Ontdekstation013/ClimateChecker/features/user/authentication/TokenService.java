@@ -26,7 +26,7 @@ public class TokenService {
     }
 
     public void saveToken(Token token) {
-        List<Token> tokensToRemove = tokenRepository.findAllByUserId(token.getUserId());
+        List<Token> tokensToRemove = tokenRepository.findAllByUserIdAndTokenType(token.getUserId(), token.getTokenType());
         tokenRepository.deleteAll(tokensToRemove);
         token.setId(token.getUserId());
         tokenRepository.save(token);
@@ -34,7 +34,7 @@ public class TokenService {
 
     public boolean verifyToken(String linkHash, long userId, TokenType tokenType) {
         boolean isVerified = false;
-        Token token = tokenRepository.findByUserId(userId);
+        Token token = tokenRepository.findByUserIdAndTokenType(userId, tokenType);
 
         if (token != null && token.getNumericCode().equals(linkHash)) {
             tokenRepository.delete(token);

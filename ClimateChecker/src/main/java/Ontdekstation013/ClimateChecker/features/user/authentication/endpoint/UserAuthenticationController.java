@@ -8,6 +8,7 @@ import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.UserMapper;
 import Ontdekstation013.ClimateChecker.features.user.UserService;
 import Ontdekstation013.ClimateChecker.features.user.authentication.*;
+import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.ForgotPasswordRequest;
 import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.LoginRequest;
 import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.RegisterUserRequest;
 import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.VerifyLoginRequest;
@@ -89,6 +90,25 @@ public class UserAuthenticationController {
         }
 
         return responseEntity;
+    }
+
+    @PostMapping("reset-password")
+    public ResponseEntity<?> resetPassword(){
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("forgot-password")
+    public ResponseEntity<?> createForgotPasswordRequest(@RequestBody ForgotPasswordRequest forgotPasswordRequest) throws Exception{
+        User user = userService.getUserByEmail(forgotPasswordRequest.email());
+
+        if (user != null) {
+            Token token = tokenService.createVerifyToken(user.getUserId(), TokenType.PASSWORD_RESET);
+            emailSenderService.sendForgotPasswordMail(user.getEmail(), user.getFirstName(), user.getLastName(), token.getNumericCode());
+        } else {
+            throw new InvalidArgumentException("Invalid email");
+        }
+
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("logout")
