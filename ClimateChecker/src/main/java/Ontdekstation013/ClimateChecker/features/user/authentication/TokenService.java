@@ -34,9 +34,13 @@ public class TokenService {
     public boolean verifyToken(String linkHash, long userId) {
         boolean isVerified = false;
         Token token = tokenRepository.findByUserId(userId);
-        if (token != null && token.getNumericCode().equals(linkHash) && isTokenInCreationTimeWindow(token.getCreationTime())) {
-            isVerified = true;
+
+        if (token != null && token.getNumericCode().equals(linkHash)) {
             tokenRepository.delete(token);
+
+            if (isTokenInCreationTimeWindow(token.getCreationTime())) {
+                isVerified = true;
+            }
         }
 
         return isVerified;

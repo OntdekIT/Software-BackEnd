@@ -7,6 +7,8 @@ import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.GetAllUsersReq
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UpdateUserRequest;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserResponse;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -24,6 +26,9 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getUserById(@PathVariable long id, @RequestParam(defaultValue = "false") boolean includeStations) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("Gebruikersnaam: " + auth.getName());
+        System.out.println("Authorities: " + auth.getAuthorities());
         User user = userService.getUserById(id);
         UserResponse response = UserMapper.toUserResponse(user, includeStations);
         return ResponseEntity.ok(response);
@@ -31,7 +36,7 @@ public class UserController {
 
     //TODO: Re-add pagination
     //TODO: Remove stations from response
-    @GetMapping
+    @GetMapping("all")
     public ResponseEntity<List<UserResponse>> getAllUsers(GetAllUsersRequest request) {
         List<User> users = userService.getAllUsers(UserMapper.toUserFilter(request));
         List<UserResponse> responses = new ArrayList<>();
