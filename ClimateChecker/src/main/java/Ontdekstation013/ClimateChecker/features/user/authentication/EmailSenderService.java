@@ -1,5 +1,6 @@
 package Ontdekstation013.ClimateChecker.features.user.authentication;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -11,6 +12,9 @@ import jakarta.mail.internet.MimeMessage;
 @Service
 public class EmailSenderService {
     private final JavaMailSender mailSender;
+
+    @Value("${frontend.host}")
+    private String frontendHost;
 
     public EmailSenderService(JavaMailSender mailSender) {
         this.mailSender = mailSender;
@@ -88,8 +92,8 @@ public class EmailSenderService {
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
         String body = "<p> Beste " + firstName + " " + lastName + ", </p>"
-                + "<p>Er is zojuist een verzoek gedaan om je wachtwoord te resetten. Om dit te doen kun je de volgende code gebruiken:</p>"
-                + "<h1>" + code + "</h1>"
+                + "<p>Er is zojuist een verzoek gedaan om je wachtwoord te resetten. Om dit te doen kun je de volgende link openen:</p>"
+                + "<a href=\"" + frontendHost + "/auth/reset-password?mail=" + toEmail +"&token=" + code + "\">Wachtwoord resetten</a>"
                 + "<p>Heb je dit verzoek niet gedaan? Dan kun je deze mail negeren.</p>"
                 + "<p>Met vriendelijke groet,"
                 + "<br>"
