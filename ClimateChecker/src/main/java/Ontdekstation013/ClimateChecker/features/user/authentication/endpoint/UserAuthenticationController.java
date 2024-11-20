@@ -7,10 +7,7 @@ import Ontdekstation013.ClimateChecker.features.user.PasswordEncodingService;
 import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.UserMapper;
 import Ontdekstation013.ClimateChecker.features.user.UserService;
-import Ontdekstation013.ClimateChecker.features.user.authentication.AuthenticationService;
-import Ontdekstation013.ClimateChecker.features.user.authentication.EmailSenderService;
-import Ontdekstation013.ClimateChecker.features.user.authentication.Token;
-import Ontdekstation013.ClimateChecker.features.user.authentication.TokenService;
+import Ontdekstation013.ClimateChecker.features.user.authentication.*;
 import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.LoginRequest;
 import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.RegisterUserRequest;
 import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.VerifyLoginRequest;
@@ -70,7 +67,7 @@ public class UserAuthenticationController {
     public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) throws Exception {
         User user = userService.getUserByEmail(loginRequest.email());
         if (user != null && passwordEncodingService.verifyPassword(loginRequest.password(), user.getPassword())) {
-            Token token = tokenService.createVerifyToken(user.getUserId());
+            Token token = tokenService.createVerifyToken(user.getUserId(), TokenType.VERIFY_AUTH);
             emailSenderService.sendLoginMail(user.getEmail(), user.getFirstName(), user.getLastName(), token.getNumericCode());
         } else {
             throw new InvalidArgumentException("Invalid email and/or password");
@@ -84,7 +81,7 @@ public class UserAuthenticationController {
         ResponseEntity<?> responseEntity = ResponseEntity.badRequest().build();
         User user = userService.getUserByEmail(verifyLoginRequest.email());
 
-        if (user != null && tokenService.verifyToken(verifyLoginRequest.code(), user.getUserId())) {
+        if (user != null && tokenService.verifyToken(verifyLoginRequest.code(), user.getUserId(), TokenType.VERIFY_AUTH)) {
             ResponseCookie cookie = authService.createCookie(user);
             HttpHeaders headers = new HttpHeaders();
             headers.add("Set-Cookie", cookie.toString() + "; HttpOnly; SameSite=none; Secure");
