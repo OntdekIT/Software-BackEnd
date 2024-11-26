@@ -93,7 +93,7 @@ public class EmailSenderService {
 
         String body = "<p> Beste " + firstName + " " + lastName + ", </p>"
                 + "<p>Er is zojuist een verzoek gedaan om je wachtwoord te resetten. Om dit te doen kun je de volgende link openen:</p>"
-                + "<a href=\"" + frontendHost + "/auth/reset-password?mail=" + toEmail +"&token=" + code + "\">Wachtwoord resetten</a>"
+                + "<a href=\"" + frontendHost + "/auth/reset-password?email=" + toEmail +"&token=" + code + "\">Wachtwoord resetten</a>"
                 + "<p>Heb je dit verzoek niet gedaan? Dan kun je deze mail negeren.</p>"
                 + "<p>Met vriendelijke groet,"
                 + "<br>"
