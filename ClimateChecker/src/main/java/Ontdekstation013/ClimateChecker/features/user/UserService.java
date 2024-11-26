@@ -2,6 +2,7 @@ package Ontdekstation013.ClimateChecker.features.user;
 
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.exception.NotFoundException;
+import Ontdekstation013.ClimateChecker.features.workshop.Workshop;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +30,11 @@ public class UserService {
     }
 
     public List<User> getAllUsers(UserFilter filter) {
-        return userRepository.findUsersByOptionalFilters(filter.getFirstName(), filter.getLastName(), filter.getEmail(), filter.getIsAdmin());
+        return userRepository.findUsersByOptionalFilters(filter.getFirstName(), filter.getLastName(), filter.getEmail(), filter.getRole());
+    }
+
+    public List<User> getUsersByWorkshop(Workshop workshop) {
+        return userRepository.findByWorkshop(workshop);
     }
 
     public User getUserById(long id) {
@@ -50,7 +55,7 @@ public class UserService {
             userToUpdate.setLastName(newUser.getLastName());
             userToUpdate.setEmail(newUser.getEmail());
             userToUpdate.setPassword(newUser.getPassword());
-            userToUpdate.setAdmin(newUser.isAdmin());
+            userToUpdate.setRole(newUser.getRole());
             userRepository.save(userToUpdate);
         } else {
             throw new NotFoundException("User not found");

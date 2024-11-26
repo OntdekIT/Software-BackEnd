@@ -2,8 +2,8 @@ package Ontdekstation013.ClimateChecker.utility;
 
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 
 //TODO: Handle authorization more elegantly (e.g. by properly implementing Spring Security)
 

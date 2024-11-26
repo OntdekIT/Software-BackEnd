@@ -3,6 +3,7 @@ package Ontdekstation013.ClimateChecker.features.user.authentication.endpoint;
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.features.station.Station;
 import Ontdekstation013.ClimateChecker.features.station.StationService;
+import Ontdekstation013.ClimateChecker.features.user.PasswordEncodingService;
 import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.UserMapper;
 import Ontdekstation013.ClimateChecker.features.user.UserService;
@@ -14,9 +15,12 @@ import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto
 import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.RegisterUserRequest;
 import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.VerifyLoginRequest;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserResponse;
-import Ontdekstation013.ClimateChecker.features.workshopCode.WorkshopCodeService;
-import Ontdekstation013.ClimateChecker.utility.PasswordUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import Ontdekstation013.ClimateChecker.features.workshop.Workshop;
+import Ontdekstation013.ClimateChecker.features.workshop.WorkshopService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -26,10 +30,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+@AllArgsConstructor
 @RestController
 @RequestMapping("/api/authentication")
 public class UserAuthenticationController {
@@ -37,22 +38,13 @@ public class UserAuthenticationController {
     private final UserService userService;
     private final TokenService tokenService;
     private final EmailSenderService emailSenderService;
-    private final WorkshopCodeService workshopCodeService;
+    private final WorkshopService workshopService;
     private final StationService stationService;
-
-    @Autowired
-    public UserAuthenticationController(AuthenticationService authenticationService, UserService userService, TokenService tokenService, EmailSenderService emailSenderService, WorkshopCodeService workshopCodeService, StationService stationService) {
-        this.authService = authenticationService;
-        this.userService = userService;
-        this.tokenService = tokenService;
-        this.emailSenderService = emailSenderService;
-        this.workshopCodeService = workshopCodeService;
-        this.stationService = stationService;
-    }
+    private final PasswordEncodingService passwordEncodingService;
 
     @PostMapping("register")
     public ResponseEntity<?> createNewUser(@RequestBody RegisterUserRequest registerRequest) {
-        if (!workshopCodeService.VerifyWorkshopCode(registerRequest.workshopCode())) {
+        if (!workshopService.verifyWorkshopCode(registerRequest.workshopCode())) {
             throw new InvalidArgumentException("Invalid workshop code");
         }
 
@@ -64,7 +56,8 @@ public class UserAuthenticationController {
             throw new InvalidArgumentException("Station is already claimed");
         }
 
-        User user = UserMapper.toUser(registerRequest);
+        Workshop workshop = workshopService.getByCode(registerRequest.workshopCode());
+        User user = UserMapper.toUser(registerRequest, passwordEncodingService.encodePassword(registerRequest.password()), workshop);
         user = userService.createNewUser(user);
         station.setUserid(user.getUserId());
         stationService.UpdateMeetstation(station);
@@ -76,7 +69,7 @@ public class UserAuthenticationController {
     @PostMapping("login")
     public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) throws Exception {
         User user = userService.getUserByEmail(loginRequest.email());
-        if (user != null && PasswordUtils.verifyPassword(loginRequest.password(), user.getPassword())) {
+        if (user != null && passwordEncodingService.verifyPassword(loginRequest.password(), user.getPassword())) {
             Token token = tokenService.createVerifyToken(user.getUserId());
             emailSenderService.sendLoginMail(user.getEmail(), user.getFirstName(), user.getLastName(), token.getNumericCode());
         } else {

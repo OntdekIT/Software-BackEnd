@@ -1,5 +1,6 @@
 package Ontdekstation013.ClimateChecker.features.user;
 
+import Ontdekstation013.ClimateChecker.features.workshop.Workshop;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,11 +17,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "(:firstName IS NULL OR u.firstName LIKE %:firstName%) AND " +
             "(:lastName IS NULL OR u.lastName LIKE %:lastName%) AND " +
             "(:email IS NULL OR u.email LIKE %:email%) AND " +
-            "(:isAdmin IS NULL OR u.isAdmin = :isAdmin)")
+            "(:role IS NULL OR u.role = :role)")
     List<User> findUsersByOptionalFilters(
             @Param("firstName") String firstName,
             @Param("lastName") String lastName,
             @Param("email") String email,
-            @Param("isAdmin") Boolean isAdmin);
+            @Param("role") UserRole role);
 
+    List<User> findByWorkshop(Workshop workshop);
 }

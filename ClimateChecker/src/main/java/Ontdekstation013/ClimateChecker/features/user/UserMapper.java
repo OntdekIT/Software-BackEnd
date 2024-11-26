@@ -7,7 +7,7 @@ import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.GetAllUsersRequest;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UpdateMyAccountRequest;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserResponse;
-import Ontdekstation013.ClimateChecker.utility.PasswordUtils;
+import Ontdekstation013.ClimateChecker.features.workshop.Workshop;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -25,17 +25,18 @@ public class UserMapper {
                 user.getFirstName(),
                 user.getLastName(),
                 user.getEmail(),
-                user.isAdmin(),
+                user.getRole(),
                 stationDTOs
         );
     }
 
-    public static User toUser(RegisterUserRequest request) {
+    public static User toUser(RegisterUserRequest request, String hashedPassword, Workshop workshop) {
         return new User(
                 request.firstName(),
                 request.lastName(),
                 request.email(),
-                PasswordUtils.HashPassword(request.password())
+                hashedPassword,
+                workshop
         );
     }
 
@@ -45,7 +46,7 @@ public class UserMapper {
                 request.firstName(),
                 request.lastName(),
                 request.email(),
-                user.isAdmin(),
+                user.getRole(),
                 request.password()
         );
     }
@@ -55,7 +56,7 @@ public class UserMapper {
                 .firstName(request.firstName())
                 .lastName(request.lastName())
                 .email(request.email())
-                .isAdmin(request.isAdmin())
+                .role(request.role())
                 .build();
     }
 

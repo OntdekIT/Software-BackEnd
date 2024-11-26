@@ -2,10 +2,7 @@ package Ontdekstation013.ClimateChecker.user;
 
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.exception.NotFoundException;
-import Ontdekstation013.ClimateChecker.features.user.User;
-import Ontdekstation013.ClimateChecker.features.user.UserFilter;
-import Ontdekstation013.ClimateChecker.features.user.UserRepository;
-import Ontdekstation013.ClimateChecker.features.user.UserService;
+import Ontdekstation013.ClimateChecker.features.user.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,11 +26,13 @@ public class UserUnitTests {
     @InjectMocks
     private UserService userService;
 
+    private Workshop workshop;
     private User user;
+    private User user2;
 
     @BeforeEach
     public void setUp() {
-        user = new User(1L, "John", "Doe", "john.doe@email.com", true, "MyPassword123");
+        user = new User(1L, "John", "Doe", "john.doe@email.com", UserRole.USER, "MyPassword123");
     }
 
     @Test
@@ -57,7 +56,7 @@ public class UserUnitTests {
 
     @Test
     public void getUsersWithoutFilters() {
-        List<User> users = Arrays.asList(user, new User(2L, "Jane", "Doe", "jane.doe@email.com", false, "AnotherPassword123"));
+        List<User> users = Arrays.asList(user, new User(2L, "Jane", "Doe", "jane.doe@email.com", UserRole.USER, "AnotherPassword123"));
         when(userRepository.findUsersByOptionalFilters(null, null, null, null)).thenReturn(users);
 
         List<User> result = userService.getAllUsers(new UserFilter());
@@ -70,14 +69,14 @@ public class UserUnitTests {
     @Test
     public void getUsersWithOptionalFilters() {
         List<User> users = Collections.singletonList(user);
-        when(userRepository.findUsersByOptionalFilters("John", "Doe", "john.doe@email.com", true)).thenReturn(users);
+        when(userRepository.findUsersByOptionalFilters("John", "Doe", "john.doe@email.com", UserRole.USER)).thenReturn(users);
 
-        UserFilter filter = new UserFilter("John", "Doe", "john.doe@email.com", true);
+        UserFilter filter = new UserFilter("John", "Doe", "john.doe@email.com", UserRole.USER);
         List<User> result = userService.getAllUsers(filter);
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        verify(userRepository, times(1)).findUsersByOptionalFilters("John", "Doe", "john.doe@email.com", true);
+        verify(userRepository, times(1)).findUsersByOptionalFilters("John", "Doe", "john.doe@email.com", UserRole.USER);
     }
 
     @Test
@@ -112,7 +111,7 @@ public class UserUnitTests {
 
     @Test
     public void updateUser_WhenUserFound_Succeeds() {
-        User updatedUser = new User(1L, "John", "Smith", "john.smith@email.com", true, "NewPassword123");
+        User updatedUser = new User(1L, "John", "Smith", "john.smith@email.com", UserRole.USER, "NewPassword123");
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(userRepository.save(any(User.class))).thenReturn(updatedUser);
 
@@ -126,7 +125,7 @@ public class UserUnitTests {
     public void updateUser_WhenUserNotFound_ThrowsException() {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
-        User updatedUser = new User(1L, "John", "Smith", "john.smith@email.com", true, "NewPassword123");
+        User updatedUser = new User(1L, "John", "Smith", "john.smith@email.com", UserRole.USER, "NewPassword123");
 
         assertThrows(NotFoundException.class, () -> userService.updateUser(1L, updatedUser));
         verify(userRepository, times(1)).findById(1L);
@@ -140,5 +139,17 @@ public class UserUnitTests {
         userService.deleteUser(1L);
 
         verify(userRepository, times(1)).deleteById(1L);
+    }
+
+    @Test
+    public void getUsersByWorkshopCode_ReturnsUsers() {
+        when(userRepository.findByWorkshop(workshop)).thenReturn(Arrays.asList(user, user2));
+
+        List<User> users = userService.getUsersByWorkshop(workshop);
+
+        assertEquals(2, users.size());
+        assertEquals(user.getEmail(), users.get(0).getEmail());
+        assertEquals(user2.getEmail(), users.get(1).getEmail());
+        verify(userRepository, times(1)).findByWorkshop(workshop);
     }
 }
