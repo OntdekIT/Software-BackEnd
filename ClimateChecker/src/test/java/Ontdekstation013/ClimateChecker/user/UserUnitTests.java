@@ -3,6 +3,7 @@ package Ontdekstation013.ClimateChecker.user;
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.exception.NotFoundException;
 import Ontdekstation013.ClimateChecker.features.user.*;
+import Ontdekstation013.ClimateChecker.features.workshop.Workshop;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

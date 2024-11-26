@@ -51,7 +51,6 @@ public class WorkshopController {
         return ResponseEntity.ok(response);
     }
 
-    // TODO: Combine workshop with userService
     @GetMapping("/{code}/users")
     public ResponseEntity<List<UserResponse>> getAllUsersByWorkshopCode(@PathVariable long code) {
         Workshop workshop = workshopService.getByCode(code);
