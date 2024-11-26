@@ -9,7 +9,7 @@ public class WorkshopMapper {
 
     public static WorkshopResponse toResponse(Workshop workshop) {
         String expirationDate = workshop.getExpirationDate().atOffset(utc).toString();
-        String creationDate = workshop.getCreationTime().atOffset(utc).toString();
+        String creationDate = workshop.getCreationTime() != null ?  workshop.getCreationTime().atOffset(utc).toString() : null;
         return new WorkshopResponse(
                 workshop.getCode(),
                 expirationDate,
