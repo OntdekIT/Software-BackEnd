@@ -7,19 +7,15 @@ import Ontdekstation013.ClimateChecker.features.user.PasswordEncodingService;
 import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.UserMapper;
 import Ontdekstation013.ClimateChecker.features.user.UserService;
-import Ontdekstation013.ClimateChecker.features.user.authentication.AuthenticationService;
-import Ontdekstation013.ClimateChecker.features.user.authentication.EmailSenderService;
-import Ontdekstation013.ClimateChecker.features.user.authentication.Token;
-import Ontdekstation013.ClimateChecker.features.user.authentication.TokenService;
-import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.LoginRequest;
-import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.RegisterUserRequest;
-import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.VerifyLoginRequest;
+import Ontdekstation013.ClimateChecker.features.user.authentication.*;
+import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.*;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserResponse;
 import Ontdekstation013.ClimateChecker.features.workshop.Workshop;
 import Ontdekstation013.ClimateChecker.features.workshop.WorkshopService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -70,7 +66,7 @@ public class UserAuthenticationController {
     public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) throws Exception {
         User user = userService.getUserByEmail(loginRequest.email());
         if (user != null && passwordEncodingService.verifyPassword(loginRequest.password(), user.getPassword())) {
-            Token token = tokenService.createVerifyToken(user.getUserId());
+            Token token = tokenService.createVerifyToken(user.getUserId(), TokenType.VERIFY_AUTH);
             emailSenderService.sendLoginMail(user.getEmail(), user.getFirstName(), user.getLastName(), token.getNumericCode());
         } else {
             throw new InvalidArgumentException("Invalid email and/or password");
@@ -84,7 +80,7 @@ public class UserAuthenticationController {
         ResponseEntity<?> responseEntity = ResponseEntity.badRequest().build();
         User user = userService.getUserByEmail(verifyLoginRequest.email());
 
-        if (user != null && tokenService.verifyToken(verifyLoginRequest.code(), user.getUserId())) {
+        if (user != null && tokenService.verifyToken(verifyLoginRequest.code(), user.getUserId(), TokenType.VERIFY_AUTH)) {
             ResponseCookie cookie = authService.createCookie(user);
             HttpHeaders headers = new HttpHeaders();
             headers.add("Set-Cookie", cookie.toString() + "; HttpOnly; SameSite=none; Secure");
@@ -92,6 +88,33 @@ public class UserAuthenticationController {
         }
 
         return responseEntity;
+    }
+
+    @PostMapping("reset-password")
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest resetPasswordRequest) {
+        User user = userService.getUserByEmail(resetPasswordRequest.email());
+        if (user != null && tokenService.verifyToken(resetPasswordRequest.token(), user.getUserId(), TokenType.PASSWORD_RESET)) {
+            user.setPassword(passwordEncodingService.encodePassword(resetPasswordRequest.password()));
+            userService.updateUser(user.getUserId(), user);
+        } else {
+            throw new InvalidArgumentException("Invalid email and/or token");
+        }
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("forgot-password")
+    public ResponseEntity<?> createForgotPasswordRequest(@RequestBody ForgotPasswordRequest forgotPasswordRequest) throws Exception {
+        User user = userService.getUserByEmail(forgotPasswordRequest.email());
+
+        if (user != null) {
+            Token token = tokenService.createVerifyToken(user.getUserId(), TokenType.PASSWORD_RESET);
+            emailSenderService.sendForgotPasswordMail(user.getEmail(), user.getFirstName(), user.getLastName(), token.getNumericCode());
+        } else {
+            throw new InvalidArgumentException("Invalid email");
+        }
+
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("logout")

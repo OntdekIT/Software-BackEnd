@@ -1,5 +1,6 @@
 package Ontdekstation013.ClimateChecker.features.user.authentication;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -12,11 +13,14 @@ import jakarta.mail.internet.MimeMessage;
 public class EmailSenderService {
     private final JavaMailSender mailSender;
 
+    @Value("${frontend.host}")
+    private String frontendHost;
+
     public EmailSenderService(JavaMailSender mailSender) {
         this.mailSender = mailSender;
     }
 
-    public void sendEmail(String toEmail, String firstName, String lastName, String body){
+    public void sendEmail(String toEmail, String firstName, String lastName, String body) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("kayletmail@gmail.com");
         message.setTo(toEmail);
@@ -76,6 +80,30 @@ public class EmailSenderService {
         helper.setTo("kayletmail@host.com");
         helper.setTo(toEmail);
         helper.setSubject(String.format("Welkom %s", firstName + " " + lastName));
+        helper.setText(body, true);
+
+        mailSender.send(message);
+
+        System.out.print("Mail Sent");
+    }
+
+    public void sendForgotPasswordMail(String toEmail, String firstName, String lastName, String code) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+        String body = "<p> Beste " + firstName + " " + lastName + ", </p>"
+                + "<p>Er is zojuist een verzoek gedaan om je wachtwoord te resetten. Om dit te doen kun je de volgende link openen:</p>"
+                + "<a href=\"" + frontendHost + "/auth/reset-password?email=" + toEmail +"&token=" + code + "\">Wachtwoord resetten</a>"
+                + "<p>Heb je dit verzoek niet gedaan? Dan kun je deze mail negeren.</p>"
+                + "<p>Met vriendelijke groet,"
+                + "<br>"
+                + " Ontdekstation 013"
+                + "<br>"
+                + "<img src=\"cid:logo.png\"></img><br/></p>";
+
+        helper.setTo("kayletmail@host.com");
+        helper.setTo(toEmail);
+        helper.setSubject("Wachtwoord resetten");
         helper.setText(body, true);
 
         mailSender.send(message);

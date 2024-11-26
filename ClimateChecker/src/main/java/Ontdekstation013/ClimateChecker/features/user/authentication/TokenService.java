@@ -15,9 +15,10 @@ public class TokenService {
         this.tokenRepository = tokenRepository;
     }
 
-    public Token createVerifyToken(long userId) {
+    public Token createVerifyToken(long userId, TokenType tokenType) {
         Token token = new Token();
         token.setUserId(userId);
+        token.setTokenType(tokenType);
         token.setCreationTime(LocalDateTime.now());
         token.setNumericCode(StringGenerator.generateRandomNumericCode(6));
         saveToken(token);
@@ -25,20 +26,20 @@ public class TokenService {
     }
 
     public void saveToken(Token token) {
-        List<Token> tokensToRemove = tokenRepository.findAllByUserId(token.getUserId());
+        List<Token> tokensToRemove = tokenRepository.findAllByUserIdAndTokenType(token.getUserId(), token.getTokenType());
         tokenRepository.deleteAll(tokensToRemove);
         token.setId(token.getUserId());
         tokenRepository.save(token);
     }
 
-    public boolean verifyToken(String linkHash, long userId) {
+    public boolean verifyToken(String linkHash, long userId, TokenType tokenType) {
         boolean isVerified = false;
-        Token token = tokenRepository.findByUserId(userId);
+        Token token = tokenRepository.findByUserIdAndTokenType(userId, tokenType);
 
         if (token != null && token.getNumericCode().equals(linkHash)) {
             tokenRepository.delete(token);
 
-            if (isTokenInCreationTimeWindow(token.getCreationTime())) {
+            if (isTokenInCreationTimeWindow(token.getCreationTime() ) && token.getTokenType().equals(tokenType)) {
                 isVerified = true;
             }
         }
