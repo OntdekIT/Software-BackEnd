@@ -1,8 +1,8 @@
 # ---- Base JDK ----
-FROM eclipse-temurin:17-jdk AS base
+FROM eclipse-temurin:21-jdk AS base
 ENV APP_PATH app/climatechecker/api-server
 EXPOSE 8082
-EXPOSE 3306
+EXPOSE 3307
 
 # ---- Dependencies ----
 # Install Maven
@@ -15,10 +15,23 @@ RUN cd /opt \
     && tar -zxvf apache-maven-${MAVEN_VERSION}-bin.tar.gz \
     && mv apache-maven-${MAVEN_VERSION} maven
 
-# Copy application source and install maven dependencies
+# Copy application source and install Maven dependencies
 WORKDIR /${APP_PATH}
 COPY . .
 RUN mvn clean package
+
+# ---- Flyway Migration Stage ----
+FROM flyway/flyway:latest AS flyway
+
+# Copy Flyway configuration
+WORKDIR /flyway
+COPY ${APP_PATH}/flyway.conf /flyway/conf/flyway.conf
+
+# Copy migrations from the specified directory
+COPY ${APP_PATH}/src/main/resources/db.migrations /flyway/sql
+
+# Run migrations
+RUN ./flyway migrate
 
 # ---- Release ----
 # Copy target .jar file
