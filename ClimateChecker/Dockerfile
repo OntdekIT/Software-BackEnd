@@ -2,7 +2,7 @@
 FROM eclipse-temurin:21-jdk AS base
 ENV APP_PATH app/climatechecker/api-server
 EXPOSE 8082
-EXPOSE 3307
+EXPOSE 3306
 
 # ---- Dependencies ----
 # Install Maven
