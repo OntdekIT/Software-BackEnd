@@ -20,3 +20,7 @@ jobs:
       - name: Create the JAR file with Maven
         run: mvn package -DskipTests  
         working-directory: ClimateChecker
+
+      - name: Run unit-tests
+        run: mvn test
+        working-directory: ClimateChecker
