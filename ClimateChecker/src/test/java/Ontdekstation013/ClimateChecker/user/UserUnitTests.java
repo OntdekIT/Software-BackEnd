@@ -34,7 +34,9 @@ public class UserUnitTests {
     @BeforeEach
     public void setUp() {
         user = new User(1L, "John", "Doe", "john.doe@email.com", UserRole.USER, "MyPassword123");
+        user2 = new User(2L, "Jane", "Doe", "jane.doe@email.com", UserRole.USER, "MyPassword123");
     }
+
 
     @Test
     public void createUser_ValidatesFields_Succeeds() {
