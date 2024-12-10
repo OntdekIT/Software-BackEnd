@@ -79,6 +79,7 @@ public class EmailSenderService {
 
         helper.setTo("kayletmail@host.com");
         helper.setTo(toEmail);
+        helper.setFrom("local@gmail.com");
         helper.setSubject(String.format("Welkom %s", firstName + " " + lastName));
         helper.setText(body, true);
 

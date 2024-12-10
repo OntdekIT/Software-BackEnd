@@ -1,8 +1,10 @@
 package Ontdekstation013.ClimateChecker.user;
 
+import Ontdekstation013.ClimateChecker.config.JwtService;
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.exception.NotFoundException;
 import Ontdekstation013.ClimateChecker.features.user.*;
+import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.AuthenticationResponse;
 import Ontdekstation013.ClimateChecker.features.workshop.Workshop;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,6 +26,9 @@ public class UserUnitTests {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private JwtService jwtService;
+
     @InjectMocks
     private UserService userService;
 
@@ -39,22 +44,26 @@ public class UserUnitTests {
 
 
     @Test
-    public void createUser_ValidatesFields_Succeeds() {
+    public void createNewUser_Success() {
+        when(userRepository.existsUserByEmail(user.getEmail())).thenReturn(false);
         when(userRepository.save(any(User.class))).thenReturn(user);
+        when(jwtService.generateToken(user)).thenReturn("mocked-jwt-token");
 
-        User createdUser = userService.createNewUser(user);
+        AuthenticationResponse response = userService.createNewUser(user);
 
-        assertNotNull(createdUser);
-        assertEquals(user.getEmail(), createdUser.getEmail());
-        verify(userRepository, times(1)).save(any(User.class));
+        assertNotNull(response);
+        assertEquals("mocked-jwt-token", response.getToken());
+        verify(userRepository, times(1)).save(user);
+        verify(jwtService, times(1)).generateToken(user);
     }
 
     @Test
-    public void createUser_ThrowsDuplicateEmailException_Fails() {
+    public void createNewUser_EmailAlreadyExists_ThrowsException() {
         when(userRepository.existsUserByEmail(user.getEmail())).thenReturn(true);
 
         assertThrows(InvalidArgumentException.class, () -> userService.createNewUser(user));
         verify(userRepository, never()).save(any(User.class));
+        verify(jwtService, never()).generateToken(any(User.class));
     }
 
     @Test
