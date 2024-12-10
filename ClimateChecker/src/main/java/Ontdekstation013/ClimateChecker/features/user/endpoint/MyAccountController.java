@@ -5,14 +5,10 @@ import Ontdekstation013.ClimateChecker.features.user.UserMapper;
 import Ontdekstation013.ClimateChecker.features.user.UserService;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UpdateMyAccountRequest;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserResponse;
-import Ontdekstation013.ClimateChecker.utility.AuthHelper;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-
-import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/my-account")
@@ -30,7 +26,7 @@ public class MyAccountController {
     }
 
     @PutMapping()
-    public ResponseEntity<?> updateUser(@AuthenticationPrincipal UserDetails userDetails, UpdateMyAccountRequest updateMyAccountRequest) {
+    public ResponseEntity<?> updateUser(@AuthenticationPrincipal UserDetails userDetails, @RequestBody UpdateMyAccountRequest updateMyAccountRequest) {
         User user = userService.getUserById(Long.parseLong(userDetails.getUsername()));
         user = UserMapper.toUpdatedUser(user, updateMyAccountRequest);
         userService.updateUser(user.getUserId(), user);
