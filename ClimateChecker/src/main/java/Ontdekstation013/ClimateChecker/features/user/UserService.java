@@ -1,14 +1,9 @@
 package Ontdekstation013.ClimateChecker.features.user;
 
-import Ontdekstation013.ClimateChecker.config.JwtService;
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.exception.NotFoundException;
-import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.AuthenticationRequest;
-import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.AuthenticationResponse;
 import Ontdekstation013.ClimateChecker.features.workshop.Workshop;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,14 +12,10 @@ import java.util.Optional;
 @Service
 public class UserService {
     private final UserRepository userRepository;
-    private final JwtService jwtService;
-    private final AuthenticationManager authenticationManager;
 
     @Autowired
-    public UserService(UserRepository userRepository, JwtService jwtService, AuthenticationManager authenticationManager) {
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.jwtService = jwtService;
-        this.authenticationManager = authenticationManager;
     }
 
     public User createNewUser(User user) {
