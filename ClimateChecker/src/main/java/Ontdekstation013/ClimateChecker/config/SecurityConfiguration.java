@@ -32,7 +32,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/Meetstation/**").permitAll()
                         .requestMatchers("/api/measurement/**").permitAll()
                         .requestMatchers("/api/neighbourhood/**").permitAll()
-                        .requestMatchers("/api/my-account/**").permitAll()
+                        .requestMatchers("/api/my-account/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider)
