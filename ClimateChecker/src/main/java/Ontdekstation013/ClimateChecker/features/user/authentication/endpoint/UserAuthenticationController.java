@@ -11,6 +11,7 @@ import Ontdekstation013.ClimateChecker.features.user.authentication.Authenticati
 import Ontdekstation013.ClimateChecker.features.user.authentication.EmailSenderService;
 import Ontdekstation013.ClimateChecker.features.user.authentication.Token;
 import Ontdekstation013.ClimateChecker.features.user.authentication.TokenService;
+import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.AuthenticationResponse;
 import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.LoginRequest;
 import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.RegisterUserRequest;
 import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.VerifyLoginRequest;
@@ -43,28 +44,30 @@ public class UserAuthenticationController {
     private final PasswordEncodingService passwordEncodingService;
 
     @PostMapping("register")
-    public ResponseEntity<?> createNewUser(@RequestBody RegisterUserRequest registerRequest) {
+    public ResponseEntity<AuthenticationResponse> createNewUser(@RequestBody RegisterUserRequest registerRequest) {
+
         if (!workshopService.verifyWorkshopCode(registerRequest.workshopCode())) {
             throw new InvalidArgumentException("Invalid workshop code");
         }
-
         Station station = stationService.getByRegistrationCode(registerRequest.stationCode());
-
         if (station == null) {
             throw new InvalidArgumentException("Invalid station code");
         } else if (station.getUserid() != null) {
             throw new InvalidArgumentException("Station is already claimed");
         }
-
         Workshop workshop = workshopService.getByCode(registerRequest.workshopCode());
-        User user = UserMapper.toUser(registerRequest, passwordEncodingService.encodePassword(registerRequest.password()), workshop);
-        user = userService.createNewUser(user);
+        User user = UserMapper.toUser(
+                registerRequest,
+                passwordEncodingService.encodePassword(registerRequest.password()),
+                workshop
+        );
+        AuthenticationResponse authResponse = userService.createNewUser(user);
         station.setUserid(user.getUserId());
         stationService.UpdateMeetstation(station);
 
-        UserResponse response = UserMapper.toUserResponse(user, false);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(authResponse);
     }
+
 
     @PostMapping("login")
     public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) throws Exception {
