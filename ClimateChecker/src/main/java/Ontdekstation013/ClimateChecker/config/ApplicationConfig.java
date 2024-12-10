@@ -8,9 +8,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -21,7 +19,8 @@ public class ApplicationConfig {
     private final UserRepository userRepository;
 
     @Bean
-    public PasswordEncoder passwordEncoder() {int saltLength = 16;
+    public PasswordEncoder passwordEncoder() {
+        int saltLength = 16;
         int hashLength = 32;
         int parallelism = 8;
         int memory = 65536;
@@ -32,8 +31,7 @@ public class ApplicationConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> userRepository.findByEmail(username);
-
+        return username -> userRepository.findById(Long.valueOf(username)).orElse(null);
     }
 
     @Bean

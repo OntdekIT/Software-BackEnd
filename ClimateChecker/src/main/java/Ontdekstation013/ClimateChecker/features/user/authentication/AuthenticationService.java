@@ -1,21 +1,16 @@
 package Ontdekstation013.ClimateChecker.features.user.authentication;
 
+import Ontdekstation013.ClimateChecker.config.JwtService;
 import Ontdekstation013.ClimateChecker.features.user.User;
-import org.springframework.http.ResponseCookie;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import jakarta.servlet.http.Cookie;
-
 @Service
+@RequiredArgsConstructor
 public class AuthenticationService {
-    public ResponseCookie createCookie(User user) {
-        Cookie jwtTokenCookie = new Cookie("user-id", user.getUserId().toString());
-        ResponseCookie springCookie = ResponseCookie.from(jwtTokenCookie.getName(), jwtTokenCookie.getValue())
-                .httpOnly(true)
-                .sameSite("None")
-                .path("/")
-                .build();
+    private final JwtService jwtService;
 
-        return springCookie;
+    public String authenticate(User user) {
+        return jwtService.generateToken(user);
     }
 }

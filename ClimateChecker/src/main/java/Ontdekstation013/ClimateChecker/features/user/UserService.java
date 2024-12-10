@@ -27,7 +27,7 @@ public class UserService {
         this.authenticationManager = authenticationManager;
     }
 
-    public AuthenticationResponse createNewUser(User user) {
+    public User createNewUser(User user) {
         UserValidator validator = new UserValidator();
         ValidationResult result = validator.validate(user);
 
@@ -35,24 +35,8 @@ public class UserService {
             throw new InvalidArgumentException("Email already exists");
         }
 
-        userRepository.save(user);
-        var jwtToken = jwtService.generateToken(user);
-        return AuthenticationResponse.builder().token(jwtToken).build();
+        return userRepository.save(user);
     }
-
-    public AuthenticationResponse authenticate(AuthenticationRequest request) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
-        User user = userRepository.findByEmail(request.getEmail());
-        if (user == null) {
-            throw new NotFoundException("User not found");
-        }
-
-
-        var jwtToken = jwtService.generateToken(user);
-        return AuthenticationResponse.builder().token(jwtToken).build();
-
-    }
-
 
     public List<User> getAllUsers(UserFilter filter) {
         return userRepository.findUsersByOptionalFilters(filter.getFirstName(), filter.getLastName(), filter.getEmail(), filter.getRole());

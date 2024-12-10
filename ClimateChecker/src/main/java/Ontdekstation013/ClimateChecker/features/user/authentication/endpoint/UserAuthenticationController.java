@@ -7,14 +7,8 @@ import Ontdekstation013.ClimateChecker.features.user.PasswordEncodingService;
 import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.UserMapper;
 import Ontdekstation013.ClimateChecker.features.user.UserService;
-import Ontdekstation013.ClimateChecker.features.user.authentication.AuthenticationService;
-import Ontdekstation013.ClimateChecker.features.user.authentication.EmailSenderService;
-import Ontdekstation013.ClimateChecker.features.user.authentication.Token;
-import Ontdekstation013.ClimateChecker.features.user.authentication.TokenService;
-import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.AuthenticationResponse;
-import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.LoginRequest;
-import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.RegisterUserRequest;
-import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.VerifyLoginRequest;
+import Ontdekstation013.ClimateChecker.features.user.authentication.*;
+import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.*;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserResponse;
 import Ontdekstation013.ClimateChecker.features.workshop.Workshop;
 import Ontdekstation013.ClimateChecker.features.workshop.WorkshopService;
@@ -45,28 +39,33 @@ public class UserAuthenticationController {
     private final PasswordEncodingService passwordEncodingService;
 
     @PostMapping("register")
-    public ResponseEntity<AuthenticationResponse> createNewUser(@RequestBody RegisterUserRequest registerRequest) {
-
+    public ResponseEntity<UserResponse> createNewUser(@RequestBody RegisterUserRequest registerRequest) {
         if (!workshopService.verifyWorkshopCode(registerRequest.workshopCode())) {
             throw new InvalidArgumentException("Invalid workshop code");
         }
+
         Station station = stationService.getByRegistrationCode(registerRequest.stationCode());
+
         if (station == null) {
             throw new InvalidArgumentException("Invalid station code");
         } else if (station.getUserid() != null) {
             throw new InvalidArgumentException("Station is already claimed");
         }
+
         Workshop workshop = workshopService.getByCode(registerRequest.workshopCode());
         User user = UserMapper.toUser(
                 registerRequest,
                 passwordEncodingService.encodePassword(registerRequest.password()),
                 workshop
         );
-        AuthenticationResponse authResponse = userService.createNewUser(user);
+
+        user = userService.createNewUser(user);
         station.setUserid(user.getUserId());
         stationService.UpdateMeetstation(station);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(authResponse);
+        UserResponse userResponse = UserMapper.toUserResponse(user, false);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(userResponse);
     }
 
 
@@ -84,15 +83,13 @@ public class UserAuthenticationController {
     }
 
     @PostMapping("verify")
-    public ResponseEntity<?> verifyEmailCode(@RequestBody VerifyLoginRequest verifyLoginRequest) {
-        ResponseEntity<?> responseEntity = ResponseEntity.badRequest().build();
+    public ResponseEntity<AuthenticationResponse> verifyEmailCode(@RequestBody VerifyLoginRequest verifyLoginRequest) {
+        ResponseEntity<AuthenticationResponse> responseEntity = ResponseEntity.badRequest().build();
         User user = userService.getUserByEmail(verifyLoginRequest.email());
 
         if (user != null && tokenService.verifyToken(verifyLoginRequest.code(), user.getUserId(), TokenType.VERIFY_AUTH)) {
-            ResponseCookie cookie = authService.createCookie(user);
-            HttpHeaders headers = new HttpHeaders();
-            headers.add("Set-Cookie", cookie.toString() + "; HttpOnly; SameSite=none; Secure");
-            responseEntity = ResponseEntity.ok().headers(headers).build();
+            String token = authService.authenticate(user);
+            responseEntity = ResponseEntity.ok(new AuthenticationResponse(token));
         }
 
         return responseEntity;
