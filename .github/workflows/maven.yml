@@ -57,9 +57,9 @@ jobs:
   #       password: ${{secrets.DOCKER_PASSWORD}} #(Add the password to github secrets, for safety use a personal access token)
 
   #     - name: Build docker image
-  #       run: docker build -t ${{secrets.DOCKER_USERNAME}}/Climatechecker-Frontend .  #"Climatechecker-Frontend" can be changed to a different name
+  #       run: docker build -t ${{secrets.DOCKER_USERNAME}}/Climatechecker-Backend .  #"Climatechecker-Backend" can be changed to a different name
 
   #     - name: Push docker image
-  #       run: docker push ${{secrets.DOCKER_USERNAME}}/Climatechecker-Frontend #Needs to be the same tag as in the docker build
+  #       run: docker push ${{secrets.DOCKER_USERNAME}}/Climatechecker-Backend #Needs to be the same tag as in the docker build
 
   
