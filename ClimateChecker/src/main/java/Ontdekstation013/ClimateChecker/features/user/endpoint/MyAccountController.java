@@ -1,46 +1,42 @@
 package Ontdekstation013.ClimateChecker.features.user.endpoint;
 
+import Ontdekstation013.ClimateChecker.features.user.PasswordEncodingService;
 import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.UserMapper;
 import Ontdekstation013.ClimateChecker.features.user.UserService;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UpdateMyAccountRequest;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserResponse;
-import Ontdekstation013.ClimateChecker.utility.AuthHelper;
-import org.springframework.http.HttpStatus;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.servlet.http.HttpServletRequest;
-
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/my-account")
 public class MyAccountController {
     private final UserService userService;
-
-    public MyAccountController(UserService userService) {
-        this.userService = userService;
-    }
+    private final PasswordEncodingService passwordEncodingService;
 
     @GetMapping()
-    public ResponseEntity<UserResponse> getUser(HttpServletRequest request, @RequestParam(defaultValue = "false") boolean includeStations) {
-        ResponseEntity<UserResponse> responseEntity = ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        Long userId = AuthHelper.getNullableUserIdFromRequestCookie(request);
-
-        if (userId != null) {
-            User user = userService.getUserById(userId);
-            UserResponse userResponse = UserMapper.toUserResponse(user, includeStations);
-            responseEntity = ResponseEntity.ok(userResponse);
-        }
-
-        return responseEntity;
+    public ResponseEntity<UserResponse> getUser(@AuthenticationPrincipal UserDetails userDetails, @RequestParam(defaultValue = "false") boolean includeStations) {
+        User user = userService.getUserById(Long.parseLong(userDetails.getUsername()));
+        return ResponseEntity.ok(UserMapper.toUserResponse(user, includeStations));
     }
 
     @PutMapping()
-    public ResponseEntity<?> updateUser(HttpServletRequest request, UpdateMyAccountRequest updateMyAccountRequest) {
-        long userId = AuthHelper.getUserIdFromRequestCookie(request);
-        User user = userService.getUserById(userId);
-        user = UserMapper.toUpdatedUser(user, updateMyAccountRequest);
-        userService.updateUser(userId, user);
+    public ResponseEntity<?> updateUser(@AuthenticationPrincipal UserDetails userDetails, @RequestBody UpdateMyAccountRequest updateRequest) {
+        User user = userService.getUserById(Long.parseLong(userDetails.getUsername()));
+        user.setEmail(updateRequest.email());
+        user.setFirstName(updateRequest.firstName());
+        user.setLastName(updateRequest.lastName());
+
+        if (updateRequest.password() != null && !updateRequest.password().isEmpty()) {
+            user.setPassword(passwordEncodingService.encodePassword(updateRequest.password()));
+        }
+
+        userService.updateUser(user.getUserId(), user);
         return ResponseEntity.ok().build();
     }
 }

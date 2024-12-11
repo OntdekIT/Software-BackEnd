@@ -9,16 +9,13 @@ import Ontdekstation013.ClimateChecker.features.user.UserMapper;
 import Ontdekstation013.ClimateChecker.features.user.UserService;
 import Ontdekstation013.ClimateChecker.features.user.authentication.*;
 import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.*;
+import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserResponse;
 import Ontdekstation013.ClimateChecker.features.workshop.Workshop;
 import Ontdekstation013.ClimateChecker.features.workshop.WorkshopService;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,28 +35,34 @@ public class UserAuthenticationController {
     private final PasswordEncodingService passwordEncodingService;
 
     @PostMapping("register")
-    public ResponseEntity<AuthenticationResponse> createNewUser(@RequestBody RegisterUserRequest registerRequest) {
-
+    public ResponseEntity<UserResponse> createNewUser(@RequestBody RegisterUserRequest registerRequest) throws MessagingException {
         if (!workshopService.verifyWorkshopCode(registerRequest.workshopCode())) {
             throw new InvalidArgumentException("Invalid workshop code");
         }
+
         Station station = stationService.getByRegistrationCode(registerRequest.stationCode());
+
         if (station == null) {
             throw new InvalidArgumentException("Invalid station code");
         } else if (station.getUserid() != null) {
             throw new InvalidArgumentException("Station is already claimed");
         }
+
         Workshop workshop = workshopService.getByCode(registerRequest.workshopCode());
         User user = UserMapper.toUser(
                 registerRequest,
                 passwordEncodingService.encodePassword(registerRequest.password()),
                 workshop
         );
-        AuthenticationResponse authResponse = userService.createNewUser(user);
+
+        user = userService.createNewUser(user);
         station.setUserid(user.getUserId());
         stationService.UpdateMeetstation(station);
+        Token token = tokenService.createVerifyToken(user.getUserId(), TokenType.VERIFY_AUTH);
+        emailSenderService.sendSignupMail(user.getEmail(), user.getFirstName(), user.getLastName(), token.getNumericCode());
+        UserResponse userResponse = UserMapper.toUserResponse(user, false);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(authResponse);
+        return ResponseEntity.status(HttpStatus.CREATED).body(userResponse);
     }
 
 
@@ -77,15 +80,13 @@ public class UserAuthenticationController {
     }
 
     @PostMapping("verify")
-    public ResponseEntity<?> verifyEmailCode(@RequestBody VerifyLoginRequest verifyLoginRequest) {
-        ResponseEntity<?> responseEntity = ResponseEntity.badRequest().build();
+    public ResponseEntity<AuthenticationResponse> verifyEmailCode(@RequestBody VerifyLoginRequest verifyLoginRequest) {
+        ResponseEntity<AuthenticationResponse> responseEntity = ResponseEntity.badRequest().build();
         User user = userService.getUserByEmail(verifyLoginRequest.email());
 
         if (user != null && tokenService.verifyToken(verifyLoginRequest.code(), user.getUserId(), TokenType.VERIFY_AUTH)) {
-            ResponseCookie cookie = authService.createCookie(user);
-            HttpHeaders headers = new HttpHeaders();
-            headers.add("Set-Cookie", cookie.toString() + "; HttpOnly; SameSite=none; Secure");
-            responseEntity = ResponseEntity.ok().headers(headers).build();
+            String token = authService.authenticate(user);
+            responseEntity = ResponseEntity.ok(new AuthenticationResponse(token));
         }
 
         return responseEntity;
@@ -118,17 +119,20 @@ public class UserAuthenticationController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("logout")
-    public ResponseEntity<String> clearCookies(HttpServletResponse response, HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                cookie.setMaxAge(0);
-                cookie.setPath("/");
-                response.addCookie(cookie);
-            }
-        }
-        return ResponseEntity.ok().build();
-    }
+    // Not necessary when using JWTs
+    // May need to be re-added when the auth mechanism is upgraded
+    // ---------------------------------------------------------
+    //    @PostMapping("logout")
+    //    public ResponseEntity<String> clearCookies(HttpServletResponse response, HttpServletRequest request) {
+    //        Cookie[] cookies = request.getCookies();
+    //
+    //        if (cookies != null) {
+    //            for (Cookie cookie : cookies) {
+    //                cookie.setMaxAge(0);
+    //                cookie.setPath("/");
+    //                response.addCookie(cookie);
+    //            }
+    //        }
+    //        return ResponseEntity.ok().build();
+    //    }
 }

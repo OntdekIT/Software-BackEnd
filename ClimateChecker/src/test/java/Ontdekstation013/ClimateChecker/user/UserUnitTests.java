@@ -44,17 +44,14 @@ public class UserUnitTests {
 
 
     @Test
-    public void createNewUser_Success() {
-        when(userRepository.existsUserByEmail(user.getEmail())).thenReturn(false);
+    public void createUser_ValidatesFields_Succeeds() {
         when(userRepository.save(any(User.class))).thenReturn(user);
-        when(jwtService.generateToken(user)).thenReturn("mocked-jwt-token");
 
-        AuthenticationResponse response = userService.createNewUser(user);
+        User createdUser = userService.createNewUser(user);
 
-        assertNotNull(response);
-        assertEquals("mocked-jwt-token", response.getToken());
-        verify(userRepository, times(1)).save(user);
-        verify(jwtService, times(1)).generateToken(user);
+        assertNotNull(createdUser);
+        assertEquals(user.getEmail(), createdUser.getEmail());
+        verify(userRepository, times(1)).save(any(User.class));
     }
 
     @Test
