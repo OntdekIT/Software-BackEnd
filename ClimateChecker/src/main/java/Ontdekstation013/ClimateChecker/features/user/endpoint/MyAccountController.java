@@ -6,6 +6,7 @@ import Ontdekstation013.ClimateChecker.features.user.UserMapper;
 import Ontdekstation013.ClimateChecker.features.user.UserService;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UpdateMyAccountRequest;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -26,7 +27,7 @@ public class MyAccountController {
     }
 
     @PutMapping()
-    public ResponseEntity<?> updateUser(@AuthenticationPrincipal UserDetails userDetails, @RequestBody UpdateMyAccountRequest updateRequest) {
+    public ResponseEntity<?> updateUser(@AuthenticationPrincipal UserDetails userDetails, @Valid @RequestBody UpdateMyAccountRequest updateRequest) {
         User user = userService.getUserById(Long.parseLong(userDetails.getUsername()));
         user.setEmail(updateRequest.email());
         user.setFirstName(updateRequest.firstName());
