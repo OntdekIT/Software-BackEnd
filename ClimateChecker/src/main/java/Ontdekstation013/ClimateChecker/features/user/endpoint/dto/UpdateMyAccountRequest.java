@@ -1,16 +1,17 @@
 package Ontdekstation013.ClimateChecker.features.user.endpoint.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 
 public record UpdateMyAccountRequest(
+        String password,
         @NotBlank
         String firstName,
         @NotBlank
         String lastName,
         @NotBlank
-        String email,
-        @Pattern(regexp = "^(?=.*[A-Z])(?=.*\\d).{8,}$", message = "must be at least 8 characters long, contain at least one capital letter and one number")
-        String password
+        String email
 ) {
+    public boolean isPasswordValid() {
+        return password == null || password.matches("^(?=.*[A-Z])(?=.*\\d).{8,}$");
+    }
 }
