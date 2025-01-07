@@ -48,6 +48,6 @@ public class TokenService {
     }
 
     private boolean isTokenInCreationTimeWindow(LocalDateTime tokenCreationTime) {
-        return tokenCreationTime.isBefore(LocalDateTime.now().plusMinutes(5));
+        return tokenCreationTime.isAfter(LocalDateTime.now().minusMinutes(5));
     }
 }
