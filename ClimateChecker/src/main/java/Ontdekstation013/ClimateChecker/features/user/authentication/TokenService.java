@@ -1,6 +1,5 @@
 package Ontdekstation013.ClimateChecker.features.user.authentication;
 
-import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.utility.StringGenerator;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +29,18 @@ public class TokenService {
         tokenRepository.deleteAll(tokensToRemove);
         token.setId(token.getUserId());
         tokenRepository.save(token);
+    }
+
+    public Token getTokenByUserIdAndTokenType(long userId, TokenType tokenType) {
+        List<Token> tokensToRemove = tokenRepository.findAllByUserIdAndTokenType(userId, tokenType);
+
+        for (Token token : tokensToRemove) {
+            if (!isTokenInCreationTimeWindow(token.getCreationTime())) {
+                tokenRepository.delete(token);
+            }
+        }
+
+        return tokenRepository.findByUserIdAndTokenType(userId, tokenType);
     }
 
     public boolean verifyToken(String linkHash, long userId, TokenType tokenType) {
