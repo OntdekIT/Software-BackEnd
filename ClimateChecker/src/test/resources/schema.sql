@@ -19,10 +19,11 @@ CREATE TABLE IF NOT EXISTS station (
     database_tag VARCHAR(255),
     is_public BOOLEAN,
     registration_code BIGINT,
+    location_locationid BIGINT,
     user_id BIGINT,
     is_active BOOLEAN
     );
 
 INSERT INTO workshop (code, expiration_date, creation_date) VALUES (123456, '2025-12-31 13:44:22.000', '2024-11-12 15:54:13.000');
 
-INSERT INTO station (name, database_tag, is_public, registration_code, user_id, is_active) VALUES ('Test', 'MJS', 1, 123, null, null);
+INSERT INTO station (name, database_tag, is_public, registration_code, location_locationid, user_id, is_active) VALUES ('Test', 'MJS', 1, 943, 27, null, null);
