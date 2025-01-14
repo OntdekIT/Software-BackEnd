@@ -13,6 +13,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = ClimateCheckerApplication.class)
@@ -29,7 +30,7 @@ public class AuthenticationControllerIntegrationTests {
     private ObjectMapper objectMapper;
 
     @Test
-    void registerUser_shouldReturn_statusCode201() throws Exception {
+    public void registerUser_shouldReturn_statusCode201() throws Exception {
         RegisterUserRequest request = new RegisterUserRequest(
                 "John",
                 "Doe",
@@ -41,7 +42,7 @@ public class AuthenticationControllerIntegrationTests {
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/authentication/register")
                 .contentType("application/json")
-                .content(objectMapper.writeValueAsString(request)));
-//                .andExpect(MockMvcResultMatchers.status().isCreated());
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(MockMvcResultMatchers.status().isCreated());
     }
 }

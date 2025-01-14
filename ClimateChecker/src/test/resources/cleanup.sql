@@ -1,3 +1,6 @@
+ALTER TABLE region_coords DROP CONSTRAINT FKipc2xjxtm50eiaxxcc6ggi6ry;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS workshop;
 DROP TABLE IF EXISTS station;
+DROP TABLE IF EXISTS region_coords;
+DROP TABLE IF EXISTS region;

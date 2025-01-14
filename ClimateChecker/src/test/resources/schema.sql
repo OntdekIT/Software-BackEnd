@@ -1,3 +1,8 @@
+CREATE TABLE IF NOT EXISTS region (
+     id BIGINT AUTO_INCREMENT PRIMARY KEY,
+     name VARCHAR(255)
+);
+
 CREATE TABLE IF NOT EXISTS users (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(255),
@@ -5,7 +10,7 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     user_role VARCHAR(50)
-    );
+);
 
 CREATE TABLE IF NOT EXISTS workshop (
     code BIGINT PRIMARY KEY,
@@ -22,7 +27,15 @@ CREATE TABLE IF NOT EXISTS station (
     location_locationid BIGINT,
     user_id BIGINT,
     is_active BOOLEAN
-    );
+);
+
+CREATE TABLE IF NOT EXISTS region_coords (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    region_id BIGINT,
+    latitude FLOAT,
+    longitude FLOAT,
+    CONSTRAINT FKipc2xjxtm50eiaxxcc6ggi6ry FOREIGN KEY (region_id) REFERENCES REGION(id)
+);
 
 INSERT INTO workshop (code, expiration_date, creation_date) VALUES (123456, '2025-12-31 13:44:22.000', '2024-11-12 15:54:13.000');
 
