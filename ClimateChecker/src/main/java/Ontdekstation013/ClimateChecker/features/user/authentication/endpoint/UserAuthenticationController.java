@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/authentication")
@@ -35,35 +37,42 @@ public class UserAuthenticationController {
     private final PasswordEncodingService passwordEncodingService;
 
     @PostMapping("register")
-    public ResponseEntity<UserResponse> createNewUser(@RequestBody RegisterUserRequest registerRequest) throws MessagingException {
-        if (!workshopService.verifyWorkshopCode(registerRequest.workshopCode())) {
-            throw new InvalidArgumentException("Invalid workshop code");
+    public ResponseEntity<?> createNewUser(@RequestBody RegisterUserRequest registerRequest) throws MessagingException {
+        try {
+            if (!workshopService.verifyWorkshopCode(registerRequest.workshopCode())) {
+                throw new InvalidArgumentException("Ongeldige workshopcode");
+            }
+
+            Station station = stationService.getByRegistrationCode(registerRequest.stationCode());
+
+            if (station == null) {
+                throw new InvalidArgumentException("Ongeldige stationcode");
+            } else if (station.getUserid() != null) {
+                throw new InvalidArgumentException("Station is al geclaimd");
+            }
+
+            Workshop workshop = workshopService.getByCode(registerRequest.workshopCode());
+            User user = UserMapper.toUser(
+                    registerRequest,
+                    passwordEncodingService.encodePassword(registerRequest.password()),
+                    workshop
+            );
+
+            user = userService.createNewUser(user);
+            station.setUserid(user.getUserId());
+            stationService.UpdateMeetstation(station);
+            Token token = tokenService.createVerifyToken(user.getUserId(), TokenType.VERIFY_AUTH);
+            emailSenderService.sendSignupMail(user.getEmail(), user.getFirstName(), user.getLastName(), token.getNumericCode());
+            UserResponse userResponse = UserMapper.toUserResponse(user, false);
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(userResponse);
+        } catch (InvalidArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Er is een onverwachte fout opgetreden.");
         }
-
-        Station station = stationService.getByRegistrationCode(registerRequest.stationCode());
-
-        if (station == null) {
-            throw new InvalidArgumentException("Invalid station code");
-        } else if (station.getUserid() != null) {
-            throw new InvalidArgumentException("Station is already claimed");
-        }
-
-        Workshop workshop = workshopService.getByCode(registerRequest.workshopCode());
-        User user = UserMapper.toUser(
-                registerRequest,
-                passwordEncodingService.encodePassword(registerRequest.password()),
-                workshop
-        );
-
-        user = userService.createNewUser(user);
-        station.setUserid(user.getUserId());
-        stationService.UpdateMeetstation(station);
-        Token token = tokenService.createVerifyToken(user.getUserId(), TokenType.VERIFY_AUTH);
-        emailSenderService.sendSignupMail(user.getEmail(), user.getFirstName(), user.getLastName(), token.getNumericCode());
-        UserResponse userResponse = UserMapper.toUserResponse(user, false);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(userResponse);
     }
+
 
 
     @PostMapping("login")
