@@ -77,55 +77,79 @@ public class UserAuthenticationController {
 
     @PostMapping("login")
     public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) throws Exception {
-        User user = userService.getUserByEmail(loginRequest.email());
-        if (user != null && passwordEncodingService.verifyPassword(loginRequest.password(), user.getPassword())) {
-            Token token = tokenService.createVerifyToken(user.getUserId(), TokenType.VERIFY_AUTH);
-            emailSenderService.sendLoginMail(user.getEmail(), user.getFirstName(), user.getLastName(), token.getNumericCode());
-        } else {
-            throw new InvalidArgumentException("Invalid email and/or password");
-        }
+        try {
+            User user = userService.getUserByEmail(loginRequest.email());
+            if (user != null && passwordEncodingService.verifyPassword(loginRequest.password(), user.getPassword())) {
+                Token token = tokenService.createVerifyToken(user.getUserId(), TokenType.VERIFY_AUTH);
+                emailSenderService.sendLoginMail(user.getEmail(), user.getFirstName(), user.getLastName(), token.getNumericCode());
+            } else {
+                throw new InvalidArgumentException("Invalid email and/or password");
+            }
 
-        return ResponseEntity.ok().build();
+            return ResponseEntity.ok().build();
+        }  catch (InvalidArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Er is een onverwachte fout opgetreden.");
+        }
     }
 
     @PostMapping("verify")
-    public ResponseEntity<AuthenticationResponse> verifyEmailCode(@RequestBody VerifyLoginRequest verifyLoginRequest) {
-        ResponseEntity<AuthenticationResponse> responseEntity = ResponseEntity.badRequest().build();
-        User user = userService.getUserByEmail(verifyLoginRequest.email());
+    public ResponseEntity<?> verifyEmailCode(@RequestBody VerifyLoginRequest verifyLoginRequest) {
+        try {
+            ResponseEntity<AuthenticationResponse> responseEntity = ResponseEntity.badRequest().build();
+            User user = userService.getUserByEmail(verifyLoginRequest.email());
 
-        if (user != null && tokenService.verifyToken(verifyLoginRequest.code(), user.getUserId(), TokenType.VERIFY_AUTH)) {
-            String token = authService.authenticate(user);
-            responseEntity = ResponseEntity.ok(new AuthenticationResponse(token));
+            if (user != null && tokenService.verifyToken(verifyLoginRequest.code(), user.getUserId(), TokenType.VERIFY_AUTH)) {
+                String token = authService.authenticate(user);
+                responseEntity = ResponseEntity.ok(new AuthenticationResponse(token));
+            }
+
+            return responseEntity;
+        }  catch (InvalidArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Er is een onverwachte fout opgetreden.");
         }
-
-        return responseEntity;
     }
 
     @PostMapping("reset-password")
     public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest resetPasswordRequest) {
-        User user = userService.getUserByEmail(resetPasswordRequest.email());
-        if (user != null && tokenService.verifyToken(resetPasswordRequest.token(), user.getUserId(), TokenType.PASSWORD_RESET)) {
-            user.setPassword(passwordEncodingService.encodePassword(resetPasswordRequest.password()));
-            userService.updateUser(user.getUserId(), user);
-        } else {
-            throw new InvalidArgumentException("Invalid email and/or token");
-        }
+        try {
+            User user = userService.getUserByEmail(resetPasswordRequest.email());
+            if (user != null && tokenService.verifyToken(resetPasswordRequest.token(), user.getUserId(), TokenType.PASSWORD_RESET)) {
+                user.setPassword(passwordEncodingService.encodePassword(resetPasswordRequest.password()));
+                userService.updateUser(user.getUserId(), user);
+            } else {
+                throw new InvalidArgumentException("Invalid email and/or token");
+            }
 
-        return ResponseEntity.ok().build();
+            return ResponseEntity.ok().build();
+        }  catch (InvalidArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Er is een onverwachte fout opgetreden.");
+        }
     }
 
     @PostMapping("forgot-password")
     public ResponseEntity<?> createForgotPasswordRequest(@RequestBody ForgotPasswordRequest forgotPasswordRequest) throws Exception {
-        User user = userService.getUserByEmail(forgotPasswordRequest.email());
+        try {
+            User user = userService.getUserByEmail(forgotPasswordRequest.email());
 
-        if (user != null) {
-            Token token = tokenService.createVerifyToken(user.getUserId(), TokenType.PASSWORD_RESET);
-            emailSenderService.sendForgotPasswordMail(user.getEmail(), user.getFirstName(), user.getLastName(), token.getNumericCode());
-        } else {
-            throw new InvalidArgumentException("Invalid email");
+            if (user != null) {
+                Token token = tokenService.createVerifyToken(user.getUserId(), TokenType.PASSWORD_RESET);
+                emailSenderService.sendForgotPasswordMail(user.getEmail(), user.getFirstName(), user.getLastName(), token.getNumericCode());
+            } else {
+                throw new InvalidArgumentException("Invalid email");
+            }
+
+            return ResponseEntity.ok().build();
+        }  catch (InvalidArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Er is een onverwachte fout opgetreden.");
         }
-
-        return ResponseEntity.ok().build();
     }
 
     // Not necessary when using JWTs
