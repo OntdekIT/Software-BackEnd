@@ -1,0 +1,29 @@
+{
+  "properties": [
+    {
+      "name": "frontend.host",
+      "type": "java.lang.String",
+      "description": "Host address of the frontend"
+    },
+    {
+      "name": "spring.application.root-user.email",
+      "type": "java.lang.String",
+      "description": "The email address of the root user."
+    },
+    {
+      "name": "spring.application.root-user.first-name",
+      "type": "java.lang.String",
+      "description": "The first name of the root user."
+    },
+    {
+      "name": "spring.application.root-user.last-name",
+      "type": "java.lang.String",
+      "description": "The last name of the root user."
+    },
+    {
+      "name": "spring.application.root-user.password",
+      "type": "java.lang.String",
+      "description": "The password for the root user."
+    }
+  ]
+}

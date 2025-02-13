@@ -2,10 +2,7 @@ package Ontdekstation013.ClimateChecker.features.neighbourhood;
 
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
@@ -20,7 +17,7 @@ public class Neighbourhood {
     private String name;
 
     @OneToMany(mappedBy = "neighbourhood")
-    List<NeighbourhoodCoords> coordinates;
+    private List<NeighbourhoodCoords> coordinates;
 
     public Neighbourhood(long id, String name) {
         this.id = id;
