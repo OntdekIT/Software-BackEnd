@@ -20,6 +20,10 @@ public class StationService {
         this.userRepository = userRepository;
     }
 
+    public Station addStation(Station station) {
+        return stationRepository.save(station);
+    }
+
     public StationDto ReadById(Long id) {
         Optional<Station> meetstation = Optional.ofNullable(stationRepository.getMeetstationByStationid(id));
         if (meetstation.isPresent()) {

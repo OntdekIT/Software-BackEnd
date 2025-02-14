@@ -27,7 +27,7 @@ public class Station {
     @Column(name = "is_public")
     private Boolean is_public;
 
-    @Column(name = "registration_code")
+    @Column(name = "registration_code", unique = true, nullable = false)
     private Long registrationCode;
 
     @Column(name = "location_locationid")

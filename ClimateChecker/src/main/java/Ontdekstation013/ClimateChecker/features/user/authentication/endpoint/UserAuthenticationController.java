@@ -74,7 +74,7 @@ public class UserAuthenticationController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }  catch (IncorrectResultSizeDataAccessException e) {  // Catch database constraint violation
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email is al in gebruik");
-        }    catch (Exception e) {
+        }  catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Er is een onverwachte fout opgetreden.");
         }
     }
