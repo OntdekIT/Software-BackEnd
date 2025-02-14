@@ -4,8 +4,8 @@ import Ontdekstation013.ClimateChecker.exception.NotFoundException;
 import Ontdekstation013.ClimateChecker.features.station.endpoint.StationDto;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
-
 @Service
 public class StationService {
     private final StationRepository stationRepository;
@@ -66,5 +66,9 @@ public class StationService {
         } else {
             throw new NotFoundException("Station not found");
         }
+    }
+
+    public List<Station> findAll(){
+        return stationRepository.findAll();
     }
 }

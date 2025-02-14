@@ -1,5 +1,7 @@
 package Ontdekstation013.ClimateChecker.features.user.authentication;
 
+import Ontdekstation013.ClimateChecker.features.station.Station;
+import Ontdekstation013.ClimateChecker.features.user.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -144,6 +146,34 @@ public class EmailSenderService {
         helper.setTo("kayletmail@host.com");
         helper.setTo(toEmail);
         helper.setSubject(String.format("Welkom %s", firstName + " " + lastName));
+        helper.setText(body, true);
+
+        mailSender.send(message);
+
+        System.out.print("Mail Sent");
+    }
+
+    public void sendEmailStationDown(User user, Station station) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+        String body = "Een van je meetstations heeft voor langer dan 24 geen informatie verstuurd. Het gaat om het volgende meetstation:"
+                + "<br>"
+                + "Nummer: " + station.getStationid()
+                + "<br>"
+                + "Naam: " + station.getName()
+                + "<br>"
+                + "<br>"
+                + "<br>"
+                + "<br>"
+                + "Met vriendelijke groet,"
+                + "<br>"
+                + " Ontdekstation 013"
+                + "<br>"
+                + "<img src=\"cid:logo.png\"></img><br/>";
+
+        helper.setTo(user.getEmail());
+        helper.setSubject(String.format("Hallo %s", user.getFirstName() + " " + user.getLastName()));
         helper.setText(body, true);
 
         mailSender.send(message);

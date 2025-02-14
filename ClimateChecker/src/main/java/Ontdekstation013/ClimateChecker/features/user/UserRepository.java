@@ -27,4 +27,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
             @Param("role") UserRole role);
 
     List<User> findByWorkshop(Workshop workshop);
+
+    User findByUserId(int userId);
 }
