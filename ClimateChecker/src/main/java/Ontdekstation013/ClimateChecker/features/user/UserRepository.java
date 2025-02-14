@@ -14,6 +14,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     User findByEmail(String email);
 
+    @Query("SELECT u FROM User u WHERE CONCAT(u.firstName, ' ', u.lastName) LIKE %:username%")
+    List<User> findByFullName(@Param("username") String username);
+
+
 
     @Query("SELECT u FROM User u WHERE " +
             "(:firstName IS NULL OR u.firstName LIKE %:firstName%) AND " +

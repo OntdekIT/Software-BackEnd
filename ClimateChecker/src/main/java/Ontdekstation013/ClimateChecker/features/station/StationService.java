@@ -2,16 +2,26 @@ package Ontdekstation013.ClimateChecker.features.station;
 
 import Ontdekstation013.ClimateChecker.exception.NotFoundException;
 import Ontdekstation013.ClimateChecker.features.station.endpoint.StationDto;
+import Ontdekstation013.ClimateChecker.features.user.User;
+import Ontdekstation013.ClimateChecker.features.user.UserFilter;
+import Ontdekstation013.ClimateChecker.features.user.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Coll
+import ections;
+import java.util.List;java.util.Optional;
+import java.util.stream.Collectors;
+
 @Service
 public class StationService {
     private final StationRepository stationRepository;
+    private final UserRepository userRepository;
 
-    public StationService(StationRepository stationRepository) {
+    public StationService(StationRepository stationRepository, UserRepository userRepository) {
         this.stationRepository = stationRepository;
+        this.userRepository = userRepository;
     }
 
     public StationDto ReadById(Long id) {
@@ -54,6 +64,19 @@ public class StationService {
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
     }
+
+    public List<Station> getAllStations(StationFilter filter) {
+        if (filter.getUsername() != null && !filter.getUsername().isEmpty()) {
+            List<User> users = userRepository.findByFullName(filter.getUsername());
+            if (users.isEmpty()) {
+                return Collections.emptyList();
+            }
+            List<Long> userIds = users.stream().map(User::getUserId).collect(Collectors.toList());
+            filter.setUserIds(userIds);  // Modify filter to support multiple userIds
+        }
+        return stationRepository.findStationsByOptionalFilters(filter.getName(), filter.getDatabaseTag(), filter.getIsPublic(), filter.getRegistrationCode(), filter.getUserIds(), filter.getIsActive());
+    }
+
 
     public void editstation(long id, Station newstation) {
         Optional<Station> getStationResult = stationRepository.findById(id);
