@@ -3,15 +3,11 @@ package Ontdekstation013.ClimateChecker.features.station;
 import Ontdekstation013.ClimateChecker.exception.NotFoundException;
 import Ontdekstation013.ClimateChecker.features.station.endpoint.StationDto;
 import Ontdekstation013.ClimateChecker.features.user.User;
-import Ontdekstation013.ClimateChecker.features.user.UserFilter;
 import Ontdekstation013.ClimateChecker.features.user.UserRepository;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
-import java.util.Coll
-import ections;
-import java.util.List;java.util.Optional;
+import java.util.Collections;
 import java.util.stream.Collectors;
 
 @Service
