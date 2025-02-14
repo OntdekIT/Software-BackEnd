@@ -37,6 +37,7 @@ public class User implements UserDetails {
 
     @NotBlank
     @Email
+    @Column(unique = true, nullable = false)
     private String email;
 
     @Enumerated(EnumType.ORDINAL)

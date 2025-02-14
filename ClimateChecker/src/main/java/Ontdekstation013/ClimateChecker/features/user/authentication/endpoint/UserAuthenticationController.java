@@ -15,6 +15,10 @@ import Ontdekstation013.ClimateChecker.features.workshop.WorkshopService;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.hibernate.NonUniqueResultException;
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -68,7 +72,9 @@ public class UserAuthenticationController {
             return ResponseEntity.status(HttpStatus.CREATED).body(userResponse);
         } catch (InvalidArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
+        }  catch (IncorrectResultSizeDataAccessException e) {  // Catch database constraint violation
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email is al in gebruik");
+        }    catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Er is een onverwachte fout opgetreden.");
         }
     }
