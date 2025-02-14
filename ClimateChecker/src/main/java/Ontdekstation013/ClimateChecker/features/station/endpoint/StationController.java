@@ -3,8 +3,14 @@ package Ontdekstation013.ClimateChecker.features.station.endpoint;
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.features.measurement.MeasurementService;
 import Ontdekstation013.ClimateChecker.features.station.Station;
+import Ontdekstation013.ClimateChecker.features.station.StationMapper;
 import Ontdekstation013.ClimateChecker.features.station.StationService;
+import Ontdekstation013.ClimateChecker.features.station.endpoint.dto.GetAllStationsRequest;
 import Ontdekstation013.ClimateChecker.features.station.endpoint.dto.UpdateStationRequest;
+import Ontdekstation013.ClimateChecker.features.user.User;
+import Ontdekstation013.ClimateChecker.features.user.UserMapper;
+import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.GetAllUsersRequest;
+import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserResponse;
 import Ontdekstation013.ClimateChecker.features.workshop.WorkshopService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,6 +24,8 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/Meetstation")
@@ -44,6 +52,24 @@ public class StationController {
 
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+    }
+
+    @GetMapping("/stations")
+    public ResponseEntity<?> getAllMeetstations(GetAllStationsRequest request) {
+        try {
+            List<Station> stations = stationService.getAllStations(StationMapper.toStationFilter(request));
+            List<StationDto> responses = new ArrayList<>();
+
+            for (Station station : stations) {
+                responses.add(StationMapper.toStationDTO(station));
+            }
+
+            return ResponseEntity.ok(responses);
+        } catch (InvalidArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Er is een onverwachte fout opgetreden.");
+        }
     }
 
     @PutMapping("/edit/{id}")
