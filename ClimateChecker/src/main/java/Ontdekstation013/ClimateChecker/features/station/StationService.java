@@ -7,9 +7,11 @@ import Ontdekstation013.ClimateChecker.features.user.UserFilter;
 import Ontdekstation013.ClimateChecker.features.user.UserRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Coll
+import ections;
+import java.util.List;java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -87,5 +89,9 @@ public class StationService {
         } else {
             throw new NotFoundException("Station not found");
         }
+    }
+
+    public List<Station> findAll(){
+        return stationRepository.findAll();
     }
 }

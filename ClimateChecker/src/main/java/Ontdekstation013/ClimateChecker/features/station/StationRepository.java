@@ -11,6 +11,8 @@ import java.util.List;
 public interface StationRepository extends JpaRepository <Station, Long> {
     Station getByRegistrationCode(Long meetstationCode);
     Station getMeetstationByStationid(Long id);
+
+    List<Station> findAll();
     List<Station> findByUserid(Long userid);
 
     @Query("SELECT s FROM Station s WHERE " +
