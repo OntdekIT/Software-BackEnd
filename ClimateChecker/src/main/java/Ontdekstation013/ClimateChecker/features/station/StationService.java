@@ -1,10 +1,15 @@
 package Ontdekstation013.ClimateChecker.features.station;
 
 import Ontdekstation013.ClimateChecker.exception.NotFoundException;
+import Ontdekstation013.ClimateChecker.features.measurement.MeasurementService;
+import Ontdekstation013.ClimateChecker.features.measurement.endpoint.MeasurementDto;
 import Ontdekstation013.ClimateChecker.features.station.endpoint.StationDto;
 import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.UserRepository;
 import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Collections;
@@ -14,10 +19,11 @@ import java.util.stream.Collectors;
 public class StationService {
     private final StationRepository stationRepository;
     private final UserRepository userRepository;
-
-    public StationService(StationRepository stationRepository, UserRepository userRepository) {
+    private final MeasurementService measurementService;
+    public StationService(StationRepository stationRepository, UserRepository userRepository, MeasurementService measurementService) {
         this.stationRepository = stationRepository;
         this.userRepository = userRepository;
+        this.measurementService = measurementService;
     }
 
     public Station addStation(Station station) {
@@ -76,6 +82,30 @@ public class StationService {
         }
         return stationRepository.findStationsByOptionalFilters(filter.getName(), filter.getDatabaseTag(), filter.getIsPublic(), filter.getRegistrationCode(), filter.getUserIds(), filter.getIsActive());
     }
+
+    public List<StationDto> getStationsWithMeasurements(Instant timestamp) {
+        List<Station> stations = stationRepository.findAll();
+        List<MeasurementDto> measurements = measurementService.getMeasurementsAtTime(timestamp);
+
+        List<StationDto> stationDtos = new ArrayList<>();
+
+        for (Station station : stations) {
+            // Filter measurements that belong to this station
+            List<MeasurementDto> stationMeasurements = new ArrayList<>();
+            for (MeasurementDto measurement : measurements) {
+                if (Long.valueOf(measurement.getId()).equals(station.getStationid())) {
+                    stationMeasurements.add(measurement);
+                }
+            }
+
+            // Convert station to DTO with measurements
+            StationDto stationDto = StationMapper.toStationDTOWithMeasurement(station, stationMeasurements);
+            stationDtos.add(stationDto);
+        }
+
+        return stationDtos;
+    }
+
 
 
     public void editstation(long id, Station newstation) {

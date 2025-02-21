@@ -38,8 +38,7 @@ public class MeasurementController {
      * @param timestamp - ISO 8601 format
      */
     @GetMapping("/history")
-    public List<MeasurementDto> getMeasurementsAtTime(
-            @RequestParam(value = "timestamp") String timestamp) {
+    public List<MeasurementDto> getMeasurementsAtTime(@RequestParam(value = "timestamp") String timestamp) {
         try {
             Instant utcDateTime = Instant.parse(timestamp);
             List<MeasurementDto> measurementList = measurementService.getMeasurementsAtTime(utcDateTime);
