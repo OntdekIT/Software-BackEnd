@@ -37,7 +37,7 @@ public class StationMonitorService {
     }
 
     private void scheduleCheck() {
-        scheduler.scheduleAtFixedRate(this::checkMeetstations, 0, 24, TimeUnit.HOURS);
+        scheduler.scheduleAtFixedRate(this::checkMeetstations, 0, 15, TimeUnit.SECONDS);
     }
 
     private void checkMeetstations() {
@@ -49,6 +49,7 @@ public class StationMonitorService {
                     MeetJeStadParameters params = new MeetJeStadParameters();
                     params.StationIds.add(station.getStationid().intValue());
                     params.StartDate = Instant.now().minusSeconds(24 * 60 * 60);
+                    params.includeFaultyMeasurements = true;
 
                     List<Measurement> measurements = meetJeStadService.getMeasurements(params);
                     if (measurements.isEmpty()){
@@ -59,6 +60,44 @@ public class StationMonitorService {
                         }
                         station.setIsActive(false);
                         stationService.UpdateMeetstation(station);
+                    }
+                    else{
+                        Boolean hasTemp = false;
+                        Boolean hasHum = false;
+                        Boolean hasPart = false;
+                        for (Measurement measurement : measurements) {
+                            if (measurement.getTemperature() != null){
+                                hasTemp = true;
+                            }
+                            if (measurement.getHumidity() != null){
+                                hasHum = true;
+                            }
+                            if (measurement.getParticulate() != null){
+                                hasPart = true;
+                            }
+                        }
+
+                        Boolean sendEmailTemp = null;
+                        Boolean sendEmailHum = null;
+                        Boolean sendEmailPart = null;
+
+                        if (!station.getTempError() != hasTemp){
+                            sendEmailTemp = hasTemp; //True = Fixed , False = Broken
+                            station.setTempError(!hasTemp);
+                        }
+                        if (!station.getHumError() != hasHum){
+                            sendEmailHum = hasHum; //True = Fixed , False = Broken
+                            station.setHumError(!hasHum);
+                        }
+                        if (!station.getPartError() != hasPart){
+                            sendEmailPart = hasPart; //True = Fixed , False = Broken
+                            station.setPartError(!hasPart);
+                        }
+                        stationService.UpdateMeetstation(station);
+                        User user = station.getUser();
+                        if (sendEmailTemp != null || sendEmailHum != null || sendEmailPart != null){
+                            emailSenderService.sendEmailStationMeasurements(user, station, sendEmailTemp, sendEmailHum, sendEmailPart);
+                        }
                     }
                 }
             }

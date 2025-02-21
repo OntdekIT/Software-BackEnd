@@ -21,8 +21,14 @@ public class StationDto {
     @JsonProperty("isActive")
     public Boolean isActive;
 
+    @JsonProperty("tempError")
+    public Boolean tempError;
+    @JsonProperty("humError")
+    public Boolean humError;
+    @JsonProperty("partError")
+    public Boolean partError;
 
-    public StationDto(Long stationid, String name, String database_tag, Boolean is_public, Long registrationCode, Long location_locationid, Long userid, Boolean isActive) {
+    public StationDto(Long stationid, String name, String database_tag, Boolean is_public, Long registrationCode, Long location_locationid, Long userid, Boolean isActive, Boolean tempError, Boolean humError, Boolean partError) {
         this.stationid = stationid;
         this.name = name;
         this.database_tag = database_tag;

@@ -15,7 +15,10 @@ public class StationMapper {
                 station.getRegistrationCode(),
                 station.getLocation_locationid(),
                 station.getUserid(),
-                station.getIsActive()
+                station.getIsActive(),
+                station.getTempError(),
+                station.getHumError(),
+                station.getPartError()
         );
     }
 

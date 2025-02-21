@@ -25,6 +25,8 @@ public class MeasurementDto {
     private Float temperature;
     @JsonProperty("humidity")
     private Float humidity;
+    @JsonProperty("particulate") //Change to correct name when 'fijnstof' is added
+    private Float particulate;
     private Boolean is_public = false;
     private Long userId;
 }

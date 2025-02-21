@@ -180,4 +180,48 @@ public class EmailSenderService {
 
         System.out.print("Mail Sent");
     }
+
+    public void sendEmailStationMeasurements(User user, Station station, Boolean hasTemp, Boolean hasHum, Boolean hasPart) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+        String body = "Het gedrag van een van je meetstations is veranderd. Het gaat om het volgende meetstation:"
+                + "<br>"
+                + "Nummer: " + station.getStationid()
+                + "<br>"
+                + "Naam: " + station.getName()
+                + "<br>"
+                + "<br>";
+        if (hasTemp != null) {
+            body += hasTemp
+                    ? "De Temperatuur measurement van uw meetstation werkt weer. <br>"
+                    : "De Temperatuur measurement van uw meetstation wordt niet meer doorgestuurd. <br>";
+        }
+        if (hasHum != null) {
+            body += hasHum
+                    ? "De Luchtvochtigheid measurement van uw meetstation werkt weer. <br>"
+                    : "De Luchtvochtigheid measurement van uw meetstation wordt niet meer doorgestuurd. <br>";
+        }
+        if (hasPart != null) {
+            body += hasPart
+                    ? "De Fijnstof measurement van uw meetstation werkt weer. <br>"
+                    : "De Fijnstof measurement van uw meetstation wordt niet meer doorgestuurd. <br>";
+        }
+        body +=
+                "<br>"
+                + "<br>"
+                + "Met vriendelijke groet,"
+                + "<br>"
+                + " Ontdekstation 013"
+                + "<br>"
+                + "<img src=\"cid:logo.png\"></img><br/>";
+
+        helper.setTo(user.getEmail());
+        helper.setSubject(String.format("Hallo %s", user.getFirstName() + " " + user.getLastName()));
+        helper.setText(body, true);
+
+        mailSender.send(message);
+
+        System.out.print("Mail Sent");
+    }
 }

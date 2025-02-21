@@ -14,17 +14,19 @@ public class Measurement {
     private float longitude;
     private Float temperature;
     private Float humidity;
+    private Float particulate;
     private Boolean is_public;
 
     public Measurement() {
     }
 
-    public Measurement(int id, Instant timestamp, float latitude, float longitude, Float temperature, Float humidity) {
+    public Measurement(int id, Instant timestamp, float latitude, float longitude, Float temperature, Float humidity, Float particulate) {
         this.id = id;
         this.timestamp = timestamp;
         this.latitude = latitude;
         this.longitude = longitude;
         this.temperature = temperature;
         this.humidity = humidity;
+        this.particulate = particulate;
     }
 }
