@@ -1,0 +1,32 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+      - "*"
+  pull_request:
+    branches:
+      - develop
+      - main
+      - "*"
+
+jobs:
+  build-test-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build & Test
+        run: |
+          ./gradlew build
+          ./gradlew test
+
+      - name: Run Lint Checks
+        run: |
+          ./gradlew spotlessCheck
+          ./gradlew checkstyleMain
+#tests
