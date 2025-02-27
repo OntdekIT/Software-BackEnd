@@ -81,6 +81,10 @@ public class StationController {
         try {
             Instant utcDateTime = Instant.parse(timestamp);
             List<StationDto> stationsWithMeasurements = stationService.getStationsWithMeasurements(utcDateTime);
+            for (StationDto stationDto : stationsWithMeasurements) {
+                System.out.println("Station ID: " + stationDto.stationid + " | Measurements: " + stationDto.measurementDtoList.size());
+            }
+
             return ResponseEntity.ok(stationsWithMeasurements);
         } catch (InvalidArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());

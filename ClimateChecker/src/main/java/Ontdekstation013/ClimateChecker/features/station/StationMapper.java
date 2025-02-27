@@ -22,7 +22,7 @@ public class StationMapper {
         );
     }
 
-    public static StationDto toStationDTOWithMeasurement(Station station, List<MeasurementDto> measurementDto) {
+    public static StationDto toStationDTOWithMeasurement(Station station, List<MeasurementDto> measurementDtos) {
         return new StationDto(
                 station.getStationid(),
                 station.getName(),
@@ -32,7 +32,7 @@ public class StationMapper {
                 station.getLocation_locationid(),
                 station.getUserid(),
                 station.getIsActive(),
-                measurementDto
+                measurementDtos
         );
     }
 

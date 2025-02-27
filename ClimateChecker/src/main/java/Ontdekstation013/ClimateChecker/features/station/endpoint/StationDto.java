@@ -18,6 +18,10 @@ public class StationDto {
     public Long registrationCode;
     @JsonProperty("location_locationid")
     public Long location_locationid;
+    @JsonProperty("latitude")
+    public float latitude;
+    @JsonProperty("longitude")
+    public float longitude;
     @JsonProperty("userid")
     public Long userid;
     @JsonProperty("isActive")
@@ -35,6 +39,7 @@ public class StationDto {
         this.location_locationid = location_locationid;
         this.userid = userid;
         this.isActive = isActive;
+        this.measurementDtoList = null;
     }
 
     public StationDto(Long stationid, String name, String database_tag, Boolean is_public, Long registrationCode, Long location_locationid, Long userid, Boolean isActive, List<MeasurementDto> measurementDtoList) {
@@ -44,6 +49,20 @@ public class StationDto {
         this.is_public = is_public;
         this.registrationCode = registrationCode;
         this.location_locationid = location_locationid;
+        this.userid = userid;
+        this.isActive = isActive;
+        this.measurementDtoList = measurementDtoList;
+    }
+
+    public StationDto(Long stationid, String name, String database_tag, Boolean is_public, Long registrationCode, Long location_locationid, float latitude, float longitude, Long userid, Boolean isActive, List<MeasurementDto> measurementDtoList) {
+        this.stationid = stationid;
+        this.name = name;
+        this.database_tag = database_tag;
+        this.is_public = is_public;
+        this.registrationCode = registrationCode;
+        this.location_locationid = location_locationid;
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.userid = userid;
         this.isActive = isActive;
         this.measurementDtoList = measurementDtoList;

@@ -39,6 +39,18 @@ public class  MeasurementService {
                 .toList();
     }
 
+    public List<MeasurementDto> getMeasurementsForStations(Instant dateTime) {
+        MeetJeStadParameters params = new MeetJeStadParameters();
+        params.StartDate = dateTime.minus(Duration.ofDays(30)); //30 dagen ofwel een maand
+        params.EndDate = dateTime;
+        params.includeFaultyMeasurements = false;
+        List<Measurement> allMeasurements = meetJeStadService.getMeasurements(params);
+
+        return allMeasurements.stream()
+                .map(this::convertToDTO)
+                .toList();
+    }
+
     public List<DayMeasurementResponse> getHistoricalMeasurements(int id, Instant startDate, Instant endDate) {
         MeetJeStadParameters params = new MeetJeStadParameters();
         params.StartDate = startDate;

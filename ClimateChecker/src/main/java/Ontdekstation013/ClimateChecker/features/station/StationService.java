@@ -9,10 +9,7 @@ import Ontdekstation013.ClimateChecker.features.user.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Collections;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -84,27 +81,45 @@ public class StationService {
     }
 
     public List<StationDto> getStationsWithMeasurements(Instant timestamp) {
-        List<Station> stations = stationRepository.findAll();
-        List<MeasurementDto> measurements = measurementService.getMeasurementsAtTime(timestamp);
+        List<Station> stations = stationRepository.findAll(); // Existing stations
+        List<MeasurementDto> measurements = measurementService.getMeasurementsForStations(timestamp);
 
-        List<StationDto> stationDtos = new ArrayList<>();
+        Map<Long, StationDto> stationMap = new HashMap<>();
 
+        // Convert existing stations to DTOs
         for (Station station : stations) {
-            // Filter measurements that belong to this station
-            List<MeasurementDto> stationMeasurements = new ArrayList<>();
-            for (MeasurementDto measurement : measurements) {
-                if (Long.valueOf(measurement.getId()).equals(station.getStationid())) {
-                    stationMeasurements.add(measurement);
-                }
-            }
-
-            // Convert station to DTO with measurements
-            StationDto stationDto = StationMapper.toStationDTOWithMeasurement(station, stationMeasurements);
-            stationDtos.add(stationDto);
+            stationMap.put(station.getStationid(), StationMapper.toStationDTOWithMeasurement(station, new ArrayList<>()));
         }
 
-        return stationDtos;
+        // Assign measurements to stations (existing and new)
+        for (MeasurementDto measurement : measurements) {
+            Long stationId = Long.valueOf(measurement.getId());
+
+            if (!stationMap.containsKey(stationId)) {
+                // Create a new StationDto with location data from the measurement
+                StationDto newStation = new StationDto(
+                        stationId, // ID from measurement
+                        "Onbekend Station " + stationId, // Placeholder name
+                        "Unknown",
+                        true, // Assume public
+                        null, // No registration code
+                        null,
+                        measurement.getLatitude(), // Use measurement's latitude
+                        measurement.getLongitude(), // Use measurement's longitude
+                        null, // No user ID
+                        true, // Assume active
+                        new ArrayList<>()
+                );
+                stationMap.put(stationId, newStation);
+            }
+
+            // Add measurement to corresponding station
+            stationMap.get(stationId).measurementDtoList.add(measurement);
+        }
+
+        return new ArrayList<>(stationMap.values()); // Return all stations (existing + new)
     }
+
 
 
 
