@@ -75,49 +75,59 @@ public class StationService {
                 return Collections.emptyList();
             }
             List<Long> userIds = users.stream().map(User::getUserId).collect(Collectors.toList());
-            filter.setUserIds(userIds);  // Modify filter to support multiple userIds
+            filter.setUserIds(userIds);
         }
         return stationRepository.findStationsByOptionalFilters(filter.getName(), filter.getDatabaseTag(), filter.getIsPublic(), filter.getRegistrationCode(), filter.getUserIds(), filter.getIsActive());
     }
 
     public List<StationDto> getStationsWithMeasurements(Instant timestamp) {
-        List<Station> stations = stationRepository.findAll(); // Existing stations
-        List<MeasurementDto> measurements = measurementService.getMeasurementsForStations(timestamp);
+        List<Station> stations = stationRepository.findAll();
+        List<MeasurementDto> measurements = measurementService.getMeasurementsAtTime(timestamp);
 
         Map<Long, StationDto> stationMap = new HashMap<>();
 
-        // Convert existing stations to DTOs
+        // Maak DTOs van Stations uit database
         for (Station station : stations) {
             stationMap.put(station.getStationid(), StationMapper.toStationDTOWithMeasurement(station, new ArrayList<>()));
         }
 
-        // Assign measurements to stations (existing and new)
+        // Informatie van measurement geven aan Stations
         for (MeasurementDto measurement : measurements) {
             Long stationId = Long.valueOf(measurement.getId());
 
+            if(stationMap.containsKey(stationId)) {
+                // Geef stations in onze database longitude en latitude
+                StationDto existingStation = stationMap.get(stationId);
+
+                // Extra check om te kijken of de station al geen latitude en longitude heeft
+                if (existingStation.latitude == 0 && existingStation.longitude == 0) {
+                    existingStation.latitude = measurement.getLatitude();
+                    existingStation.longitude = measurement.getLongitude();
+                }
+            }
             if (!stationMap.containsKey(stationId)) {
-                // Create a new StationDto with location data from the measurement
+                // Maak nieuwe stationDTO als er de station niet in onze database zit
                 StationDto newStation = new StationDto(
-                        stationId, // ID from measurement
-                        "Onbekend Station " + stationId, // Placeholder name
-                        "Unknown",
-                        true, // Assume public
-                        null, // No registration code
+                        stationId,
                         null,
-                        measurement.getLatitude(), // Use measurement's latitude
-                        measurement.getLongitude(), // Use measurement's longitude
-                        null, // No user ID
-                        true, // Assume active
+                        "Unknown",
+                        true,
+                        null,
+                        null,
+                        measurement.getLatitude(),
+                        measurement.getLongitude(),
+                        null,
+                        true,
                         new ArrayList<>()
                 );
                 stationMap.put(stationId, newStation);
             }
 
-            // Add measurement to corresponding station
+            // Voeg measurement toe aan station waar die bij hoort (zelfde ID)
             stationMap.get(stationId).measurementDtoList.add(measurement);
         }
 
-        return new ArrayList<>(stationMap.values()); // Return all stations (existing + new)
+        return new ArrayList<>(stationMap.values());
     }
 
 

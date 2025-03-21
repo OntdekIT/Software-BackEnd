@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -27,4 +29,6 @@ public class MeasurementDto {
     private Float humidity;
     private Boolean is_public = false;
     private Long userId;
+    @JsonProperty("measurements")
+    public List<MeasurementDto> measurementDtoList;
 }
