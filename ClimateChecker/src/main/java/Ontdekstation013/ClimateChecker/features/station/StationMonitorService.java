@@ -37,7 +37,7 @@ public class StationMonitorService {
     }
 
     private void scheduleCheck() {
-        scheduler.scheduleAtFixedRate(this::checkMeetstations, 0, 24, TimeUnit.HOURS);
+        scheduler.scheduleAtFixedRate(this::checkMeetstations, 0, 15, TimeUnit.SECONDS);
     }
 
     private void checkMeetstations() {
@@ -45,20 +45,78 @@ public class StationMonitorService {
 
         for (Station station : meetstations) {
             try{
-                if (station.getIsActive()){
-                    MeetJeStadParameters params = new MeetJeStadParameters();
-                    params.StationIds.add(station.getStationid().intValue());
-                    params.StartDate = Instant.now().minusSeconds(24 * 60 * 60);
+                MeetJeStadParameters params = new MeetJeStadParameters();
+                params.StationIds.add(station.getStationid().intValue());
+                params.StartDate = Instant.now().minusSeconds(24 * 60 * 60);
+                params.includeFaultyMeasurements = true;
 
-                    List<Measurement> measurements = meetJeStadService.getMeasurements(params);
-                    if (measurements.isEmpty()){
+                List<Measurement> measurements = meetJeStadService.getMeasurements(params);
+                if (measurements.isEmpty()){
+
+                    if (station.getIsActive()){
+                        station.setIsActive(false);
+                        stationService.UpdateMeetstation(station);
+
                         User user = station.getUser();
 
                         if (user != null) {
                             emailSenderService.sendEmailStationDown(user, station);
                         }
-                        station.setIsActive(false);
+                    }
+                }
+                else{
+                    if (!station.getIsActive()){
+                        station.setIsActive(true);
                         stationService.UpdateMeetstation(station);
+                    }
+                }
+                if (station.getIsActive()){
+
+                    Boolean hasTemp = false;
+                    Boolean hasHum = false;
+                    Boolean hasStof = false;
+                    Boolean hasLoc = false;
+                    for (Measurement measurement : measurements) {
+                        if (measurement.getTemperature() != null){
+                            hasTemp = true;
+                        }
+                        if (measurement.getHumidity() != null){
+                            hasHum = true;
+                        }
+                        if (measurement.getParticulate() != null){
+                            hasStof = true;
+                        }
+                        if (!Float.isNaN(measurement.getLatitude()) && !Float.isNaN(measurement.getLongitude())) {
+                            hasLoc = true;
+                        }
+                    }
+
+                    Boolean sendEmailTemp = null;
+                    Boolean sendEmailHum = null;
+                    Boolean sendEmailStof = null;
+                    Boolean sendEmailLoc = null;
+
+                    if (!(station.getTempError().equals(!hasTemp))) {
+                        station.setTempError(!hasTemp); // Update state
+                        sendEmailTemp = !hasTemp; // Return the new state if changed
+                    }
+                    if (!(station.getHumError().equals(!hasHum))) {
+                        station.setHumError(!hasHum); // Update state
+                        sendEmailHum = !hasHum; // Return the new state if changed
+                    }
+                    if (!(station.getStofError().equals(!hasStof))) {
+                        station.setStofError(!hasStof); // Update state
+                        sendEmailStof = !hasStof; // Return the new state if changed
+                    }
+                    if (!(station.getLocError().equals(!hasLoc))) {
+                        station.setLocError(!hasLoc); // Update state
+                        sendEmailLoc = !hasLoc; // Return the new state if changed
+                    }
+
+                    stationService.UpdateMeetstation(station);
+                    User user = station.getUser();
+                    if (sendEmailTemp != null || sendEmailHum != null || sendEmailStof != null || sendEmailLoc != null){ //Check if status of meetstation has been changed
+                        emailSenderService.sendEmailStationMeasurements(user, station, sendEmailTemp, sendEmailHum, sendEmailStof, sendEmailLoc);
                     }
                 }
             }
@@ -67,6 +125,9 @@ public class StationMonitorService {
             }
         }
     }
+
+
+
 
     public void shutdown() {
         scheduler.shutdown();

@@ -29,8 +29,16 @@ public class StationDto {
     @JsonProperty("measurements")
     public List<MeasurementDto> measurementDtoList;
 
+    @JsonProperty("tempError")
+    public Boolean tempError;
+    @JsonProperty("humError")
+    public Boolean humError;
+    @JsonProperty("stofError")
+    public Boolean stofError;
+    @JsonProperty("locError")
+    public Boolean locError;
 
-    public StationDto(Long stationid, String name, String database_tag, Boolean is_public, Long registrationCode, Long location_locationid, Long userid, Boolean isActive) {
+    public StationDto(Long stationid, String name, String database_tag, Boolean is_public, Long registrationCode, Long location_locationid, Long userid, Boolean isActive, Boolean tempError, Boolean humError, Boolean stofError, Boolean locError) {
         this.stationid = stationid;
         this.name = name;
         this.database_tag = database_tag;
@@ -66,6 +74,10 @@ public class StationDto {
         this.userid = userid;
         this.isActive = isActive;
         this.measurementDtoList = measurementDtoList;
+        this.tempError = tempError;
+        this.humError = humError;
+        this.stofError = stofError;
+        this.locError = locError;
     }
 
     public StationDto() {

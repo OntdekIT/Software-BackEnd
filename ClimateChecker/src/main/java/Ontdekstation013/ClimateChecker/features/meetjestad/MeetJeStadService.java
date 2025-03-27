@@ -83,6 +83,7 @@ public class MeetJeStadService {
             measurement.setLatitude(dto.getLatitude());
             measurement.setTemperature(dto.getTemperature());
             measurement.setHumidity(dto.getHumidity());
+            measurement.setParticulate(dto.getParticulate());
 
             TemporalAccessor temp = formatter.parse(dto.getTimestamp());
             measurement.setTimestamp(Instant.from(temp));

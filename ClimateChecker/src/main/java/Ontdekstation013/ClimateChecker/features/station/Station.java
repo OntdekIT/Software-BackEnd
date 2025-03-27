@@ -38,11 +38,23 @@ public class Station {
     @Column(name = "is_active") // Nieuwe kolom voor de status
     private Boolean isActive;
 
+    @Column(name = "temp_error")
+    private Boolean tempError;
+
+    @Column(name = "hum_error")
+    private Boolean humError;
+
+    @Column(name = "stof_error")
+    private Boolean stofError;
+
+    @Column(name = "loc_error")
+    private Boolean locError;
+
     @ManyToOne(optional = true)
     @JoinColumn(name = "user_id", nullable = true, insertable = false, updatable = false)
     private User user;
 
-    public Station(String name, String database_tag, Boolean is_public, Long registrationCode, Long location_locationid, Long userid, Boolean isActive) {
+    public Station(String name, String database_tag, Boolean is_public, Long registrationCode, Long location_locationid, Long userid, Boolean isActive, Boolean tempError, Boolean humError, Boolean stofError, Boolean locError) {
         this.name = name;
         this.database_tag = database_tag;
         this.is_public = is_public;
@@ -50,10 +62,14 @@ public class Station {
         this.location_locationid = location_locationid;
         this.userid = userid;
         this.isActive = isActive;
+        this.tempError = tempError;
+        this.humError = humError;
+        this.stofError = stofError;
+        this.locError = locError;
     }
 
     public StationDto toDto() {
-        return new StationDto(stationid, name, database_tag, is_public, registrationCode, location_locationid, userid , isActive);
+        return new StationDto(stationid, name, database_tag, is_public, registrationCode, location_locationid, userid , isActive, tempError, humError, stofError, locError);
     }
 
     public Station(StationDto stationDto) {
@@ -65,6 +81,10 @@ public class Station {
         this.location_locationid = stationDto.location_locationid;
         this.userid = stationDto.userid;
         this.isActive = stationDto.isActive;
+        this.tempError = stationDto.tempError;
+        this.humError = stationDto.humError;
+        this.stofError = stationDto.stofError;
+        this.locError = stationDto.locError;
     }
 }
 
