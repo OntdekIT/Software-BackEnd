@@ -23,35 +23,10 @@ jobs:
         run: mvn clean install -DskipTests
         working-directory: ClimateChecker
 
-      - name: Install SonarScanner 10.6
-        run: |
-          # Download SonarScanner 10.6
-          curl -L -o sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-10.6.0.31212-linux.zip
-          
-          # Check if the file was downloaded correctly
-          if [ ! -f sonar-scanner.zip ]; then
-            echo "Failed to download SonarScanner. Exiting."
-            exit 1
-          fi
-
-          # Unzip the downloaded file
-          unzip sonar-scanner.zip
-          
-          # Check if unzip was successful
-          if [ ! -d "sonar-scanner-10.6.0.31212-linux" ]; then
-            echo "Failed to unzip SonarScanner. Exiting."
-            exit 1
-          fi
-
-          # Move and create a symbolic link
-          sudo mv sonar-scanner-10.6.0.31212-linux /opt/sonar-scanner
-          sudo ln -s /opt/sonar-scanner/bin/sonar-scanner /usr/local/bin/sonar-scanner
-
-      - name: SonarQube Scan
-        run: |
-          cd ClimateChecker
-          sonar-scanner
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        with:
+          projectBaseDir: ClimateChecker
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: 'https://sonarcloud.io/'
-
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Only needed for PR decoration
