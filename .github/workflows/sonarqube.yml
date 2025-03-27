@@ -40,7 +40,19 @@ jobs:
             exit 1
           fi
 
-      - name: SonarQube Scan
+      - name: Install SonarScanner CLI
+        run: |
+          mkdir -p /home/runner/work/_temp/sonarscanner
+          cd /home/runner/work/_temp/sonarscanner
+          SCANNER_FILE_NAME=sonar-scanner-cli-4.6.2.2472-linux.zip
+          SCANNER_URI=https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip
+          wget --no-verbose --user-agent=sonarqube-scan-action $SCANNER_URI
+          unzip -q $SCANNER_FILE_NAME
+          SCANNER_FOLDER=sonar-scanner-4.6.2.2472-linux
+          mv $SCANNER_FOLDER /home/runner/work/_temp/sonar-scanner
+          echo "/home/runner/work/_temp/sonar-scanner/bin" >> $GITHUB_PATH
+
+      - name: Run SonarQube Scan
         run: |
           cd ClimateChecker
           sonar-scanner
