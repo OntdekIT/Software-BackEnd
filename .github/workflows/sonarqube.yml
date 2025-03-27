@@ -8,22 +8,27 @@ on:
 jobs:
   build-and-analyze:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Source
         uses: actions/checkout@v4
 
-      - name: Set up Java 21 for building the project
+      - name: Set up Java 21
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: List repository files (debugging)
-        run: ls -R
-
       - name: Build Project with Java 21
         run: mvn clean install -DskipTests
         working-directory: ClimateChecker
+
+      - name: Install SonarScanner 10.6
+        run: |
+          curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-10.6.0.31212-linux.zip
+          unzip sonar-scanner.zip
+          sudo mv sonar-scanner-10.6.0.31212-linux /opt/sonar-scanner
+          sudo ln -s /opt/sonar-scanner/bin/sonar-scanner /usr/local/bin/sonar-scanner
 
       - name: SonarQube Scan
         run: |
