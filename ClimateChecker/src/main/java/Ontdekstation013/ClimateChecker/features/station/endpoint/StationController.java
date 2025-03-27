@@ -1,7 +1,9 @@
 package Ontdekstation013.ClimateChecker.features.station.endpoint;
 
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
+import Ontdekstation013.ClimateChecker.features.measurement.Measurement;
 import Ontdekstation013.ClimateChecker.features.measurement.MeasurementService;
+import Ontdekstation013.ClimateChecker.features.measurement.endpoint.MeasurementDto;
 import Ontdekstation013.ClimateChecker.features.station.Station;
 import Ontdekstation013.ClimateChecker.features.station.StationMapper;
 import Ontdekstation013.ClimateChecker.features.station.StationService;
@@ -61,11 +63,29 @@ public class StationController {
             List<Station> stations = stationService.getAllStations(StationMapper.toStationFilter(request));
             List<StationDto> responses = new ArrayList<>();
 
+
             for (Station station : stations) {
                 responses.add(StationMapper.toStationDTO(station));
             }
 
             return ResponseEntity.ok(responses);
+        } catch (InvalidArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Er is een onverwachte fout opgetreden.");
+        }
+    }
+
+    @GetMapping("/stationsMetMeasurements")
+    public ResponseEntity<?> getMeetstationWithMeasurement(@RequestParam(value = "timestamp") String timestamp) {
+        try {
+            Instant utcDateTime = Instant.parse(timestamp);
+            List<StationDto> stationsWithMeasurements = stationService.getStationsWithMeasurements(utcDateTime);
+            for (StationDto stationDto : stationsWithMeasurements) {
+                System.out.println("Station ID: " + stationDto.stationid + " | Measurements: " + stationDto.measurementDtoList.size());
+            }
+
+            return ResponseEntity.ok(stationsWithMeasurements);
         } catch (InvalidArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {

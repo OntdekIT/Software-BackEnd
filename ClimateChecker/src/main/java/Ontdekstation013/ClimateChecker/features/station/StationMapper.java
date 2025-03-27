@@ -1,9 +1,12 @@
 package Ontdekstation013.ClimateChecker.features.station;
 
+import Ontdekstation013.ClimateChecker.features.measurement.endpoint.MeasurementDto;
 import Ontdekstation013.ClimateChecker.features.station.endpoint.StationDto;
 import Ontdekstation013.ClimateChecker.features.station.endpoint.dto.GetAllStationsRequest;
 import Ontdekstation013.ClimateChecker.features.user.UserFilter;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.GetAllUsersRequest;
+
+import java.util.List;
 
 public class StationMapper {
     public static StationDto toStationDTO(Station station) {
@@ -16,6 +19,20 @@ public class StationMapper {
                 station.getLocation_locationid(),
                 station.getUserid(),
                 station.getIsActive()
+        );
+    }
+
+    public static StationDto toStationDTOWithMeasurement(Station station, List<MeasurementDto> measurementDtos) {
+        return new StationDto(
+                station.getStationid(),
+                station.getName(),
+                station.getDatabase_tag(),
+                station.getIs_public(),
+                station.getRegistrationCode(),
+                station.getLocation_locationid(),
+                station.getUserid(),
+                station.getIsActive(),
+                measurementDtos
         );
     }
 

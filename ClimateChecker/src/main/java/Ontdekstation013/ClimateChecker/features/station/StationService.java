@@ -1,23 +1,26 @@
 package Ontdekstation013.ClimateChecker.features.station;
 
 import Ontdekstation013.ClimateChecker.exception.NotFoundException;
+import Ontdekstation013.ClimateChecker.features.measurement.MeasurementService;
+import Ontdekstation013.ClimateChecker.features.measurement.endpoint.MeasurementDto;
 import Ontdekstation013.ClimateChecker.features.station.endpoint.StationDto;
 import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.UserRepository;
 import org.springframework.stereotype.Service;
-import java.util.List;
-import java.util.Optional;
-import java.util.Collections;
+
+import java.time.Instant;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class StationService {
     private final StationRepository stationRepository;
     private final UserRepository userRepository;
-
-    public StationService(StationRepository stationRepository, UserRepository userRepository) {
+    private final MeasurementService measurementService;
+    public StationService(StationRepository stationRepository, UserRepository userRepository, MeasurementService measurementService) {
         this.stationRepository = stationRepository;
         this.userRepository = userRepository;
+        this.measurementService = measurementService;
     }
 
     public Station addStation(Station station) {
@@ -72,10 +75,62 @@ public class StationService {
                 return Collections.emptyList();
             }
             List<Long> userIds = users.stream().map(User::getUserId).collect(Collectors.toList());
-            filter.setUserIds(userIds);  // Modify filter to support multiple userIds
+            filter.setUserIds(userIds);
         }
         return stationRepository.findStationsByOptionalFilters(filter.getName(), filter.getDatabaseTag(), filter.getIsPublic(), filter.getRegistrationCode(), filter.getUserIds(), filter.getIsActive());
     }
+
+    public List<StationDto> getStationsWithMeasurements(Instant timestamp) {
+        List<Station> stations = stationRepository.findAll();
+        List<MeasurementDto> measurements = measurementService.getMeasurementsAtTime(timestamp);
+
+        Map<Long, StationDto> stationMap = new HashMap<>();
+
+        // Maak DTOs van Stations uit database
+        for (Station station : stations) {
+            stationMap.put(station.getStationid(), StationMapper.toStationDTOWithMeasurement(station, new ArrayList<>()));
+        }
+
+        // Informatie van measurement geven aan Stations
+        for (MeasurementDto measurement : measurements) {
+            Long stationId = Long.valueOf(measurement.getId());
+
+            if(stationMap.containsKey(stationId)) {
+                // Geef stations in onze database longitude en latitude
+                StationDto existingStation = stationMap.get(stationId);
+
+                // Extra check om te kijken of de station al geen latitude en longitude heeft
+                if (existingStation.latitude == 0 && existingStation.longitude == 0) {
+                    existingStation.latitude = measurement.getLatitude();
+                    existingStation.longitude = measurement.getLongitude();
+                }
+            }
+            if (!stationMap.containsKey(stationId)) {
+                // Maak nieuwe stationDTO als er de station niet in onze database zit
+                StationDto newStation = new StationDto(
+                        stationId,
+                        null,
+                        "Unknown",
+                        true,
+                        null,
+                        null,
+                        measurement.getLatitude(),
+                        measurement.getLongitude(),
+                        null,
+                        true,
+                        new ArrayList<>()
+                );
+                stationMap.put(stationId, newStation);
+            }
+
+            // Voeg measurement toe aan station waar die bij hoort (zelfde ID)
+            stationMap.get(stationId).measurementDtoList.add(measurement);
+        }
+
+        return new ArrayList<>(stationMap.values());
+    }
+
+
 
 
     public void editstation(long id, Station newstation) {
