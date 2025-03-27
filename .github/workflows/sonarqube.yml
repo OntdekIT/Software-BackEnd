@@ -7,25 +7,43 @@ on:
 
 jobs:
   build-and-analyze:
-    runs-on: [ ubuntu-latest ]
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout Source
         uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: list files in repository
+      - name: List repository files (debugging)
         run: ls -R
 
       - name: Build Project
         run: mvn clean install -DskipTests
-        working-directory: "ClimateChecker"
+        working-directory: ClimateChecker
+
+      - name: Debug SonarQube Configuration
+        run: |
+          cd ClimateChecker
+          echo "Current Directory:"
+          pwd
+          echo "Listing Files:"
+          ls -la
+          if [ -f sonar-project.properties ]; then
+            echo "✅ sonar-project.properties found"
+            cat sonar-project.properties
+          else
+            echo "❌ sonar-project.properties NOT found!"
+            exit 1
+          fi
 
       - name: SonarQube Scan
-        uses: sonarsource/sonarqube-scan-action@master
-
+        run: |
+          cd ClimateChecker
+          sonar-scanner
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: 'https://sonarcloud.io/'
