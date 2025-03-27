@@ -1,4 +1,4 @@
-name: SonarQube Analysis
+name: Sonar Scan
 
 on:
   push:
@@ -32,7 +32,7 @@ jobs:
           unzip /home/runner/work/_temp/sonarscanner/sonar-scanner-cli-10.5-linux.zip -d /home/runner/work/_temp/sonarscanner
           export PATH=$PATH:/home/runner/work/_temp/sonarscanner/sonar-scanner-10.5/bin
 
-      - name: Run SonarQube Scan
+      - name: SonarQube Scan
         run: |
           cd ClimateChecker
           sonar-scanner
