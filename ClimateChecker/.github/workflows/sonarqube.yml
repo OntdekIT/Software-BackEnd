@@ -16,6 +16,9 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
+      - name: list files in repository
+        run: ls -R
+
       - name: Build Project
         run: mvn clean install -DskipTests
 
