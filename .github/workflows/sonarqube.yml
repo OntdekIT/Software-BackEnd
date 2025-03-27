@@ -27,10 +27,12 @@ jobs:
 
       - name: Install SonarScanner 10.5
         run: |
-          mkdir -p /home/runner/work/_temp/sonarscanner
-          curl -L https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-10.5-linux.zip -o /home/runner/work/_temp/sonarscanner/sonar-scanner-cli-10.5-linux.zip
-          unzip /home/runner/work/_temp/sonarscanner/sonar-scanner-cli-10.5-linux.zip -d /home/runner/work/_temp/sonarscanner
-          export PATH=$PATH:/home/runner/work/_temp/sonarscanner/sonar-scanner-10.5/bin
+         mkdir -p /home/runner/work/_temp/sonarscanner
+         curl -L https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-10.5-linux.zip -o /home/runner/work/_temp/sonarscanner/sonar-scanner-cli-10.5-linux.zip
+         ls -lh /home/runner/work/_temp/sonarscanner/sonar-scanner-cli-10.5-linux.zip
+         unzip /home/runner/work/_temp/sonarscanner/sonar-scanner-cli-10.5-linux.zip -d /home/runner/work/_temp/sonarscanner
+         export PATH=$PATH:/home/runner/work/_temp/sonarscanner/sonar-scanner-10.5/bin
+
 
       - name: SonarQube Scan
         run: |
