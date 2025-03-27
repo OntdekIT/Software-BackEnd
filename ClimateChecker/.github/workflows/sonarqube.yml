@@ -21,7 +21,7 @@ jobs:
 
       - name: Build Project
         run: mvn clean install -DskipTests
-        working-directory: "ClimateChecker"
+        working-directory: ClimateChecker
 
       - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@master
