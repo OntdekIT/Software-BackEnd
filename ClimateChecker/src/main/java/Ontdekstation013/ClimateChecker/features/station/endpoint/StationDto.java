@@ -25,10 +25,12 @@ public class StationDto {
     public Boolean tempError;
     @JsonProperty("humError")
     public Boolean humError;
-    @JsonProperty("partError")
-    public Boolean partError;
+    @JsonProperty("stofError")
+    public Boolean stofError;
+    @JsonProperty("locError")
+    public Boolean locError;
 
-    public StationDto(Long stationid, String name, String database_tag, Boolean is_public, Long registrationCode, Long location_locationid, Long userid, Boolean isActive, Boolean tempError, Boolean humError, Boolean partError) {
+    public StationDto(Long stationid, String name, String database_tag, Boolean is_public, Long registrationCode, Long location_locationid, Long userid, Boolean isActive, Boolean tempError, Boolean humError, Boolean stofError, Boolean locError) {
         this.stationid = stationid;
         this.name = name;
         this.database_tag = database_tag;
@@ -37,6 +39,10 @@ public class StationDto {
         this.location_locationid = location_locationid;
         this.userid = userid;
         this.isActive = isActive;
+        this.tempError = tempError;
+        this.humError = humError;
+        this.stofError = stofError;
+        this.locError = locError;
     }
 
     public StationDto() {

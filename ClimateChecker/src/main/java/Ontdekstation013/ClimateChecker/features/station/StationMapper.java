@@ -2,8 +2,6 @@ package Ontdekstation013.ClimateChecker.features.station;
 
 import Ontdekstation013.ClimateChecker.features.station.endpoint.StationDto;
 import Ontdekstation013.ClimateChecker.features.station.endpoint.dto.GetAllStationsRequest;
-import Ontdekstation013.ClimateChecker.features.user.UserFilter;
-import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.GetAllUsersRequest;
 
 public class StationMapper {
     public static StationDto toStationDTO(Station station) {
@@ -18,7 +16,8 @@ public class StationMapper {
                 station.getIsActive(),
                 station.getTempError(),
                 station.getHumError(),
-                station.getPartError()
+                station.getStofError(),
+                station.getLocError()
         );
     }
 

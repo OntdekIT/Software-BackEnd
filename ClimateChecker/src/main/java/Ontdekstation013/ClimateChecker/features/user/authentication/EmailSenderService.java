@@ -96,7 +96,7 @@ public class EmailSenderService {
 
         String body = "<p> Beste " + firstName + " " + lastName + ", </p>"
                 + "<p>Er is zojuist een verzoek gedaan om je wachtwoord te resetten. Om dit te doen kun je de volgende link openen:</p>"
-                + "<a href=\"" + frontendHost + "/auth/reset-password?email=" + toEmail +"&token=" + code + "\">Wachtwoord resetten</a>"
+                + "<a href=\"" + frontendHost + "/auth/reset-password?email=" + toEmail + "&token=" + code + "\">Wachtwoord resetten</a>"
                 + "<p>Heb je dit verzoek niet gedaan? Dan kun je deze mail negeren.</p>"
                 + "<p>Met vriendelijke groet,"
                 + "<br>"
@@ -181,7 +181,7 @@ public class EmailSenderService {
         System.out.print("Mail Sent");
     }
 
-    public void sendEmailStationMeasurements(User user, Station station, Boolean hasTemp, Boolean hasHum, Boolean hasPart) throws MessagingException {
+    public void sendEmailStationMeasurements(User user, Station station, Boolean hasTemp, Boolean hasHum, Boolean hasStof, Boolean hasLoc) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
@@ -192,29 +192,39 @@ public class EmailSenderService {
                 + "Naam: " + station.getName()
                 + "<br>"
                 + "<br>";
+
         if (hasTemp != null) {
             body += hasTemp
                     ? "De Temperatuur measurement van uw meetstation werkt weer. <br>"
                     : "De Temperatuur measurement van uw meetstation wordt niet meer doorgestuurd. <br>";
         }
+
         if (hasHum != null) {
             body += hasHum
                     ? "De Luchtvochtigheid measurement van uw meetstation werkt weer. <br>"
                     : "De Luchtvochtigheid measurement van uw meetstation wordt niet meer doorgestuurd. <br>";
         }
-        if (hasPart != null) {
-            body += hasPart
+
+        if (hasStof != null) {
+            body += hasStof
                     ? "De Fijnstof measurement van uw meetstation werkt weer. <br>"
                     : "De Fijnstof measurement van uw meetstation wordt niet meer doorgestuurd. <br>";
         }
+
+        if (hasLoc != null) {
+            body += hasLoc
+                    ? "De Locatie measurement van uw meetstation werkt weer. <br>"
+                    : "De Locatie measurement van uw meetstation wordt niet meer doorgestuurd. <br>";
+        }
+
         body +=
                 "<br>"
-                + "<br>"
-                + "Met vriendelijke groet,"
-                + "<br>"
-                + " Ontdekstation 013"
-                + "<br>"
-                + "<img src=\"cid:logo.png\"></img><br/>";
+                        + "<br>"
+                        + "Met vriendelijke groet,"
+                        + "<br>"
+                        + " Ontdekstation 013"
+                        + "<br>"
+                        + "<img src=\"cid:logo.png\"></img><br/>";
 
         helper.setTo(user.getEmail());
         helper.setSubject(String.format("Hallo %s", user.getFirstName() + " " + user.getLastName()));
