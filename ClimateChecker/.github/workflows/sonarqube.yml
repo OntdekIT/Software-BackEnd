@@ -11,7 +11,9 @@ jobs:
     steps:
       - name: Checkout Source
         uses: actions/checkout@v4
-      
+        with:
+          path: Software-BackEnd
+
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
@@ -20,11 +22,12 @@ jobs:
       - name: Debug Repository Structure
         run: |
           pwd
-          ls -la
+          ls -R
 
       - name: Build Project
-        run: mvn clean install -DskipTests
-        working-directory: ${{ github.workspace }}
+        run: |
+          cd Software-BackEnd
+          mvn clean install -DskipTests
 
       - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@master
