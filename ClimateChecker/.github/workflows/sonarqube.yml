@@ -7,30 +7,25 @@ on:
 
 jobs:
   build-and-analyze:
-    runs-on: ubuntu-latest
+    runs-on: [ ubuntu-latest ]
     steps:
       - name: Checkout Source
         uses: actions/checkout@v4
-        with:
-          path: Software-BackEnd
-
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Debug Repository Structure
-        run: |
-          pwd
-          ls -R
+      - name: list files in repository
+        run: ls -R
 
       - name: Build Project
-        run: |
-          cd Software-BackEnd
-          mvn clean install -DskipTests
+        run: mvn clean install -DskipTests
+        working-directory: "ClimateChecker"
 
       - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@master
+
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: 'https://sonarcloud.io/'
