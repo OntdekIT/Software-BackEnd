@@ -7,35 +7,25 @@ on:
 
 jobs:
   build-and-analyze:
-    runs-on: ubuntu-latest
+    runs-on: [ ubuntu-latest ]
     steps:
       - name: Checkout Source
         uses: actions/checkout@v4
-
-      - name: Set up Java 21 for building the project
-        uses: actions/setup-java@v4
+      - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '21'
+          java-version: '23'
 
-      - name: List repository files (debugging)
+      - name: list files in repository
         run: ls -R
 
-      - name: Build Project with Java 21
+      - name: Build Project
         run: mvn clean install -DskipTests
         working-directory: ClimateChecker
 
-      - name: Install SonarScanner 10.5
-        run: |
-          mkdir -p /home/runner/work/_temp/sonarscanner
-          curl -L https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-10.5-linux.zip -o /home/runner/work/_temp/sonarscanner/sonar-scanner-cli-10.5-linux.zip
-          unzip /home/runner/work/_temp/sonarscanner/sonar-scanner-cli-10.5-linux.zip -d /home/runner/work/_temp/sonarscanner
-          export PATH=$PATH:/home/runner/work/_temp/sonarscanner/sonar-scanner-10.5/bin
-
       - name: SonarQube Scan
-        run: |
-          cd ClimateChecker
-          sonar-scanner
+        uses: sonarsource/sonarqube-scan-action@master
+
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: 'https://sonarcloud.io/'
