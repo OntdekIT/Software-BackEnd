@@ -48,6 +48,10 @@ public class StationDto {
         this.userid = userid;
         this.isActive = isActive;
         this.measurementDtoList = null;
+        this.tempError = tempError;
+        this.humError = humError;
+        this.stofError = stofError;
+        this.locError = locError;
     }
 
     public StationDto(Long stationid, String name, String database_tag, Boolean is_public, Long registrationCode, Long location_locationid, Long userid, Boolean isActive, List<MeasurementDto> measurementDtoList) {
@@ -62,7 +66,7 @@ public class StationDto {
         this.measurementDtoList = measurementDtoList;
     }
 
-    public StationDto(Long stationid, String name, String database_tag, Boolean is_public, Long registrationCode, Long location_locationid, float latitude, float longitude, Long userid, Boolean isActive, List<MeasurementDto> measurementDtoList) {
+    public StationDto(Long stationid, String name, String database_tag, Boolean is_public, Long registrationCode, Long location_locationid, float latitude, float longitude, Long userid, Boolean isActive, List<MeasurementDto> measurementDtoList, Boolean tempError, Boolean humError, Boolean stofError, Boolean locError) {
         this.stationid = stationid;
         this.name = name;
         this.database_tag = database_tag;

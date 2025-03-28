@@ -118,7 +118,11 @@ public class StationService {
                         measurement.getLongitude(),
                         null,
                         true,
-                        new ArrayList<>()
+                        new ArrayList<>(),
+                        null,
+                        null,
+                        null,
+                        null
                 );
                 stationMap.put(stationId, newStation);
             }
