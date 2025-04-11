@@ -33,7 +33,6 @@ jobs:
             echo "Failed to download SonarScanner. Exiting."
             exit 1
           fi
-
           # Unzip the downloaded file
           unzip sonar-scanner.zip
           
@@ -42,11 +41,9 @@ jobs:
             echo "Failed to unzip SonarScanner. Exiting."
             exit 1
           fi
-
           # Move and create a symbolic link
           sudo mv sonar-scanner-10.6.0.31212-linux /opt/sonar-scanner
           sudo ln -s /opt/sonar-scanner/bin/sonar-scanner /usr/local/bin/sonar-scanner
-
       - name: SonarQube Scan
         run: |
           cd ClimateChecker
