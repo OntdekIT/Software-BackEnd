@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
 
 @Service
 public class WorkshopService {
@@ -28,7 +27,7 @@ public class WorkshopService {
         return workshopRepository.findAll()
                 .stream()
                 .filter(code -> code.getExpirationDate().isAfter(now))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public List<Workshop> getAllExpiredWorkshops() {
