@@ -84,7 +84,7 @@ public class NeighbourhoodService {
             return new ArrayList<>();
 
         MeetJeStadParameters params = new MeetJeStadParameters();
-        params.StartDate = endDate.minusSeconds(60 * 60);
+        params.StartDate = endDate.minusSeconds(60 * 60 * 10);
         params.EndDate = endDate;
         params.includeFaultyMeasurements = false;
         List<Measurement> measurements = meetJeStadService.getMeasurements(params);
