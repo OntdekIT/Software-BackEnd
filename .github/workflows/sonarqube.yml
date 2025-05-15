@@ -23,7 +23,7 @@ jobs:
         run: ls -R
 
       - name: Build Project
-        run: mvn clean install -DskipTests
+        run: mvn clean install
         working-directory: ClimateChecker
 
       - name: Run SonarQube Scan
