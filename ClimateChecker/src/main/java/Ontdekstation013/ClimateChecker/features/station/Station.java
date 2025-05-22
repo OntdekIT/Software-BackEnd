@@ -1,11 +1,15 @@
 package Ontdekstation013.ClimateChecker.features.station;
 
+import Ontdekstation013.ClimateChecker.features.measurement.Measurement;
 import Ontdekstation013.ClimateChecker.features.station.endpoint.StationDto;
 import Ontdekstation013.ClimateChecker.features.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "station")
@@ -53,6 +57,10 @@ public class Station {
     @ManyToOne(optional = true)
     @JoinColumn(name = "user_id", nullable = true, insertable = false, updatable = false)
     private User user;
+
+    @OneToMany(mappedBy = "station", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Measurement> measurementList = new ArrayList<>();
+
 
     public Station(String name, String database_tag, Boolean is_public, Long registrationCode, Long location_locationid, Long userid, Boolean isActive, Boolean tempError, Boolean humError, Boolean stofError, Boolean locError) {
         this.name = name;

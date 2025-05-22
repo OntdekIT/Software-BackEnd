@@ -28,6 +28,4 @@ public interface StationRepository extends JpaRepository <Station, Long> {
                                                 @Param("registrationCode") Long registrationCode,
                                                 @Param("userIds") List<Long> userIds,
                                                 @Param("isActive") Boolean isActive);
-
-
 }

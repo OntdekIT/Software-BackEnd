@@ -21,7 +21,7 @@ import java.util.List;
 public class MeetJeStadService {
     private final String baseUrl = "https://meetjestad.net/data/?type=sensors&format=json";
     @Getter
-    private final int minuteLimit = 35;
+    private final int minuteLimit = 9000;
     private final float[][] cityLimits = {
             {51.65156373065635f, 5.217787919413907f},
             {51.51818572766462f, 5.227145728754213f},

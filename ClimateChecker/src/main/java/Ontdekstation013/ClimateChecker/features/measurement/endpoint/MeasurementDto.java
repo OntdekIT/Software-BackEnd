@@ -16,21 +16,32 @@ import java.util.List;
 public class MeasurementDto {
     @JsonProperty("id")
     private int id;
-    // notation is "dd-mm-yyyy hh:mm:ss" in CET (12-11-2023 06:57:27 voor 7 uur s'ochtends nederlandse tijd)
-    @JsonProperty("timestamp")
+
+    @JsonProperty("stationId")
+    private int stationId;
+
+    @JsonProperty("timestamp")  // notation is "dd-mm-yyyy hh:mm:ss" in CET (12-11-2023 06:57:27 voor 7 uur s'ochtends nederlandse tijd)
     private String timestamp;
-    @JsonProperty("longitude")
-    private float longitude;
+
     @JsonProperty("latitude")
     private float latitude;
+
+    @JsonProperty("longitude")
+    private float longitude;
+
     @JsonProperty("temperature")
     private Float temperature;
+
     @JsonProperty("humidity")
     private Float humidity;
-    @JsonProperty("particulate") //Change to correct name when 'fijnstof' is added
+
+    @JsonProperty("particulate")
     private Float particulate;
-    private Boolean is_public = false;
+
+    @JsonProperty("is_public")
+    private Boolean is_public;
+
+    //dit kan weg?? weet niet zeker
+    @JsonProperty("userId")
     private Long userId;
-    @JsonProperty("measurements")
-    public List<MeasurementDto> measurementDtoList;
 }

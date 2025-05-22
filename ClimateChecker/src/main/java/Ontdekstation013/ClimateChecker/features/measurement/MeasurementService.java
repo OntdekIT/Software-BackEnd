@@ -42,6 +42,21 @@ public class  MeasurementService {
                 .toList();
     }
 
+    public List<MeasurementDto> GetDailyMeasurements(Instant dateTime) {
+        int minuteMargin = 1440;
+        MeetJeStadParameters params = new MeetJeStadParameters();
+        params.StartDate = dateTime.minus(Duration.ofMinutes(minuteMargin));
+        params.EndDate = dateTime;
+        params.includeFaultyMeasurements = false;
+        List<Measurement> allMeasurements = meetJeStadService.getMeasurements(params);
+
+        List<Measurement> closestMeasurements = MeasurementLogic.filterClosestMeasurements(allMeasurements, dateTime);
+
+        return closestMeasurements.stream()
+                .map(this::convertToDTO)
+                .toList();
+    }
+
 
     public List<DayMeasurementResponse> getHistoricalMeasurements(int id, Instant startDate, Instant endDate) {
         MeetJeStadParameters params = new MeetJeStadParameters();

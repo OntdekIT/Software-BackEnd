@@ -1,5 +1,6 @@
 package Ontdekstation013.ClimateChecker.features.station;
 
+import Ontdekstation013.ClimateChecker.features.measurement.MeasurementService;
 import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.authentication.EmailSenderService;
 import jakarta.annotation.PostConstruct;
@@ -22,14 +23,16 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class StationMonitorService {
     private final StationService stationService;
+    private final MeasurementService measurementService;
     private final MeetJeStadService meetJeStadService;
     private final EmailSenderService emailSenderService;
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
 
     @Autowired
-    public StationMonitorService(StationService stationService, MeetJeStadService meetJeStadService, EmailSenderService emailSenderService) {
+    public StationMonitorService(StationService stationService, MeasurementService measurementService, MeetJeStadService meetJeStadService, EmailSenderService emailSenderService) {
         this.stationService = stationService;
+        this.measurementService = measurementService;
         this.meetJeStadService = meetJeStadService;
         this.emailSenderService = emailSenderService;
     }
@@ -41,6 +44,11 @@ public class StationMonitorService {
 
     private void scheduleCheck() {
         scheduler.scheduleAtFixedRate(this::checkMeetstations, 0, 15, TimeUnit.SECONDS); //The actual check interval should be longer, To be discussed with stakeholders.
+        scheduler.scheduleAtFixedRate(this::checkMeasurements, 0, 60, TimeUnit.SECONDS);
+    }
+
+    public void checkMeasurements() {
+        stationService.UpdateStationsInDatabase(Instant.now());
     }
 
     public void checkMeetstations() {
