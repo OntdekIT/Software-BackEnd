@@ -2,6 +2,8 @@ package Ontdekstation013.ClimateChecker.features.meetjestad;
 
 import Ontdekstation013.ClimateChecker.features.measurement.Measurement;
 import Ontdekstation013.ClimateChecker.features.measurement.endpoint.MeasurementDto;
+import Ontdekstation013.ClimateChecker.features.station.Station;
+import Ontdekstation013.ClimateChecker.features.station.StationRepository;
 import Ontdekstation013.ClimateChecker.utility.GpsTriangulation;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -28,6 +30,11 @@ public class MeetJeStadService {
             {51.52666590649518f, 4.911805911309284f},
             {51.65077670571181f, 4.957086656750303f}
     };
+    private final StationRepository stationRepository;
+
+    public MeetJeStadService(StationRepository stationRepository) {
+        this.stationRepository = stationRepository;
+    }
 
     public List<Measurement> getMeasurements(MeetJeStadParameters params) {
         StringBuilder url = new StringBuilder(baseUrl);
@@ -77,8 +84,24 @@ public class MeetJeStadService {
             if (!GpsTriangulation.pointInPolygon(cityLimits, point))
                 continue;
 
+            Station station = stationRepository.getMeetstationByStationid((long) dto.getId());
+
+            if (station == null) {
+                System.err.println("ℹ️ Station not found for ID: " + dto.getId() + " → creating dummy");
+
+                station = new Station();
+                station.setStationid((long) dto.getId()); // of dto.getStationId() als je dat hebt
+                station.setName("Unknown Station " + dto.getId());
+                station.setIsActive(false);
+                station.setIs_public(false);
+                station.setRegistrationCode(0L); // tijdelijke unieke code
+                station.setMeasurementList(new ArrayList<>());
+
+                // andere velden instellen met defaults indien nodig
+            }
+
             Measurement measurement = new Measurement();
-            measurement.setId(dto.getId());
+            measurement.setStation(station);
             measurement.setLongitude(dto.getLongitude());
             measurement.setLatitude(dto.getLatitude());
             measurement.setTemperature(dto.getTemperature());

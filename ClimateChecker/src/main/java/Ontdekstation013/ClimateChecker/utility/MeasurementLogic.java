@@ -81,18 +81,23 @@ public class MeasurementLogic {
      * @return closest measurement to given dateTime for each unique station in given collection
      */
     public static List<Measurement> filterClosestMeasurements(Collection<Measurement> measurements, Instant dateTime) {
-        Map<Integer, Measurement> measurementHashMap = new HashMap<>();
+        Map<Long, Measurement> measurementMapByStation = new HashMap<>();
+
         for (Measurement measurement : measurements) {
-            int id = measurement.getId();
-            if (!measurementHashMap.containsKey(id))
-                measurementHashMap.put(id, measurement);
-            else {
-                Duration existingDifference = Duration.between(dateTime, measurementHashMap.get(id).getTimestamp()).abs();
+            Long stationId = measurement.getStation().getStationid();
+
+            if (!measurementMapByStation.containsKey(stationId)) {
+                measurementMapByStation.put(stationId, measurement);
+            } else {
+                Duration existingDifference = Duration.between(dateTime, measurementMapByStation.get(stationId).getTimestamp()).abs();
                 Duration newDifference = Duration.between(dateTime, measurement.getTimestamp()).abs();
-                if (existingDifference.toSeconds() > newDifference.toSeconds())
-                    measurementHashMap.put(id, measurement);
+
+                if (newDifference.compareTo(existingDifference) < 0) {
+                    measurementMapByStation.put(stationId, measurement);
+                }
             }
         }
-        return new ArrayList<>(measurementHashMap.values());
+
+        return new ArrayList<>(measurementMapByStation.values());
     }
 }

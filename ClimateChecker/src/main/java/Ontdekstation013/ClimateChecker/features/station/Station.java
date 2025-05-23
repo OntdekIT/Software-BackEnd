@@ -19,7 +19,6 @@ import java.util.List;
 public class Station {
     @Id
     @Column(name = "stationid")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long stationid;
 
     @Column(name = "name")

@@ -94,7 +94,7 @@ public class NeighbourhoodService {
         for (Measurement measurement : measurements) {
             float[] point = { measurement.getLatitude(), measurement.getLongitude() };
             if (GpsTriangulation.pointInPolygon(neighbourhoodCoords, point) && !stations.contains(measurement.getId()))
-                stations.add(measurement.getId());
+                stations.add(Math.toIntExact(measurement.getStation().getStationid()));
         }
 
         if (stations.isEmpty())

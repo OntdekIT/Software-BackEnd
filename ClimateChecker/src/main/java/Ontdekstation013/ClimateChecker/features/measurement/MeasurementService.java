@@ -17,10 +17,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -47,12 +44,11 @@ public class  MeasurementService {
         MeetJeStadParameters params = new MeetJeStadParameters();
         params.StartDate = dateTime.minus(Duration.ofMinutes(minuteMargin));
         params.EndDate = dateTime;
-        params.includeFaultyMeasurements = false;
+        params.includeFaultyMeasurements = true;
+        params.StationIds.clear();
         List<Measurement> allMeasurements = meetJeStadService.getMeasurements(params);
 
-        List<Measurement> closestMeasurements = MeasurementLogic.filterClosestMeasurements(allMeasurements, dateTime);
-
-        return closestMeasurements.stream()
+        return allMeasurements.stream()
                 .map(this::convertToDTO)
                 .toList();
     }
@@ -112,7 +108,7 @@ public class  MeasurementService {
 
     private MeasurementDto convertToDTO(Measurement entity) {
         MeasurementDto dto = new MeasurementDto();
-        dto.setId(entity.getId());
+        dto.setId(Math.toIntExact(entity.getStation().getStationid()));
         dto.setLongitude(entity.getLongitude());
         dto.setLatitude(entity.getLatitude());
         dto.setTemperature(entity.getTemperature());

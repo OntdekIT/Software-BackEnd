@@ -7,18 +7,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 public class MeasurementDto {
+
+    private Long measurementId;
+
     @JsonProperty("id")
     private int id;
-
-    @JsonProperty("stationId")
-    private int stationId;
 
     @JsonProperty("timestamp")  // notation is "dd-mm-yyyy hh:mm:ss" in CET (12-11-2023 06:57:27 voor 7 uur s'ochtends nederlandse tijd)
     private String timestamp;

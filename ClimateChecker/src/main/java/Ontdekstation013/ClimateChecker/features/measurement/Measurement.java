@@ -11,6 +11,10 @@ import java.time.Instant;
 @Getter
 @Setter
 public class Measurement {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Lob
     private Instant timestamp;
     private float latitude;
     private float longitude;
@@ -18,8 +22,6 @@ public class Measurement {
     private Float humidity;
     private Float particulate;
     private Boolean is_public;
-    @Id
-    private int id;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stationid") // <-- moet verwijzen naar de PK van Station
     private Station station; //
@@ -27,8 +29,8 @@ public class Measurement {
     public Measurement() {
     }
 
-    public Measurement(int id, Instant timestamp, float latitude, float longitude, Float temperature, Float humidity, Float particulate) {
-        this.id = id;
+    public Measurement(int stationId, Instant timestamp, float latitude, float longitude, Float temperature, Float humidity, Float particulate) {
+        this.station.setStationid((long) stationId);
         this.timestamp = timestamp;
         this.latitude = latitude;
         this.longitude = longitude;

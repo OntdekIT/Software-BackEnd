@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -142,9 +141,9 @@ public class StationService {
     public void UpdateStationsInDatabase(Instant timestamp) {
         //Haal measurements op
         List<MeasurementDto> measurements = measurementService.GetDailyMeasurements(timestamp);
-        //Groepeer measurements op ID
+        //Groepeer measurements op StationID
         Map<Long, List<MeasurementDto>> measurementsById = measurements.stream().collect(Collectors.groupingBy(m -> Long.valueOf(m.getId())));
-        //Maak lijst aan uniekeIds van alle measurements
+        //Maak lijst aan unieke StationIDs van alle measurements
         List<Long> uniqueIds = measurements.stream().map(MeasurementDto::getId).map(Long::valueOf).distinct().toList();
         //Haal alle stations uit database op en maak er DTOs van
         List<StationDto> stationsDB = new ArrayList<>();
@@ -154,7 +153,7 @@ public class StationService {
         }
         //Haal alle Ids op van stations die al bestaan
         Set<Long> existingStationIds = stationsDB.stream().map(stationDto -> stationDto.stationid).collect(Collectors.toSet());
-        //Maak stationDTOs voor elke unieke measurement ID die nog geen stationDTO heeft en voeg toe aan lijst alle stationDTOs
+        //Maak stationDTOs voor elke unieke measurement StationID die nog geen stationDTO heeft en voeg toe aan lijst alle stationDTOs
         uniqueIds.stream()
                 .filter(id -> !existingStationIds.contains(id))
                 .map(id -> new StationDto(
@@ -167,7 +166,7 @@ public class StationService {
                         0f, // tijdelijke dummy coords
                         0f, // tijdelijke dummy coords
                         null,
-                        null,
+                        false,
                         new ArrayList<>(),
                         false,
                         false,
@@ -188,14 +187,15 @@ public class StationService {
 
             for (MeasurementDto measurementDto : relatedMeasurements) {
                 //Check of dat de station de measurement al heeft
-                boolean alreadyExists = station.measurementDtoList.stream().anyMatch(m -> m.getId() == measurementDto.getId());
-
+                boolean alreadyExists = station.measurementDtoList.stream().anyMatch(m -> m.getTimestamp().equals(measurementDto.getTimestamp()));
+                //Als de station die niet heeft voeg je die measurementdto toe aan die stationdto
                 if (!alreadyExists) {
                     station.measurementDtoList.add(measurementDto);
                 }
             }
         }
 
+        //Zet alle stationdtos om naar station entities
         List<Station> stationEntities = stationsDB.stream()
                 .map(dto -> {
                     Station station = new Station();
@@ -214,11 +214,12 @@ public class StationService {
 
                     List<Measurement> measurementsEntityList = new ArrayList<>();
 
+                    //Zet ook measurementDtolist om naar measurementList in de station
                     if (dto.measurementDtoList != null) {
                         for (MeasurementDto measurementDto : dto.measurementDtoList) {
                             try {
                                 Measurement measurement = new Measurement();
-                                measurement.setId(measurementDto.getId()); // ← voorlopig laten staan
+                                measurement.setStation(station); // ← voorlopig laten staan
                                 measurement.setTimestamp(parseTimestamp(measurementDto.getTimestamp()));
                                 measurement.setLatitude(measurementDto.getLatitude());
                                 measurement.setLongitude(measurementDto.getLongitude());
@@ -226,13 +227,12 @@ public class StationService {
                                 measurement.setHumidity(measurementDto.getHumidity());
                                 measurement.setParticulate(measurementDto.getParticulate());
                                 measurement.setIs_public(measurementDto.getIs_public());
-                                measurement.setStation(station);
 
                                 measurementsEntityList.add(measurement);
                             } catch (Exception e) {
-                                System.err.println("❌ Fout bij converteren van MeasurementDto (stationId: "
+                                System.err.println("Fout bij converteren van MeasurementDto (stationId: "
                                         + dto.stationid + "): " + e.getMessage());
-                                e.printStackTrace(); // zo zie je in je IDE of console waar het fout gaat
+                                e.printStackTrace(); //Try catch omdat het hier steeds fout ging
                             }
                         }
                     }
@@ -242,9 +242,15 @@ public class StationService {
                 })
                 .toList();
 
+        //Sla de stations met measurements op in de lokale DB
+        try {
+            stationRepository.saveAll(stationEntities);
+            System.out.println("✅ Stations and measurements saved successfully: " + stationEntities.size());
+        } catch (Exception e) {
+            System.err.println("❌ Error during saveAll:");
+            e.printStackTrace();
+        }
 
-
-        stationRepository.saveAll(stationEntities);
     }
 
 
