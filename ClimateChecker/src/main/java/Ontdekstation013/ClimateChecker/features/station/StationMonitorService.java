@@ -44,7 +44,7 @@ public class StationMonitorService {
 
     private void scheduleCheck() {
         scheduler.scheduleAtFixedRate(this::checkMeetstations, 0, 15, TimeUnit.SECONDS); //The actual check interval should be longer, To be discussed with stakeholders.
-        scheduler.scheduleAtFixedRate(this::checkMeasurements, 0, 60, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(this::checkMeasurements, 0, 6, TimeUnit.HOURS); //Dit staat nu op elke 6 uur maar voor debugging kun je het op elke 10 secondes ofzo zetten
     }
 
     public void checkMeasurements() {
