@@ -15,7 +15,7 @@ public class Neighbourhood {
     @Id
     private long id;
     private String name;
-
+    //test
     @OneToMany(mappedBy = "neighbourhood")
     private List<NeighbourhoodCoords> coordinates;
 
