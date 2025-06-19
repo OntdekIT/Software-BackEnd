@@ -23,7 +23,7 @@ import java.util.List;
 public class MeetJeStadService {
     private final String baseUrl = "https://meetjestad.net/data/?type=sensors&format=json";
     @Getter
-    private final int minuteLimit = 9000;
+    private final int minuteLimit = 1440; //Dit hoort 9000 minuten te zijn (voor debug naar beneden gehaald)
     private final float[][] cityLimits = {
             {51.65156373065635f, 5.217787919413907f},
             {51.51818572766462f, 5.227145728754213f},
@@ -87,7 +87,7 @@ public class MeetJeStadService {
             Station station = stationRepository.getMeetstationByStationid((long) dto.getId());
 
             if (station == null) {
-                System.err.println("ℹ️ Station not found for ID: " + dto.getId() + " → creating dummy");
+                //System.err.println("ℹ️ Station not found for ID: " + dto.getId() + " → creating dummy");
 
                 station = new Station();
                 station.setStationid((long) dto.getId()); // of dto.getStationId() als je dat hebt
