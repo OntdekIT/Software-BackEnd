@@ -29,8 +29,7 @@ public class Measurement {
     public Measurement() {
     }
 
-    public Measurement(int stationId, Instant timestamp, float latitude, float longitude, Float temperature, Float humidity, Float particulate) {
-        this.station.setStationid((long) stationId);
+    public Measurement(Instant timestamp, float latitude, float longitude, Float temperature, Float humidity, Float particulate) {
         this.timestamp = timestamp;
         this.latitude = latitude;
         this.longitude = longitude;
