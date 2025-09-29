@@ -11,10 +11,25 @@ services:
     ports:
       - "3306:3306"
 
-  app:
+  smtp:
+    image: mailserver/docker-mailserver:latest
+    container_name: climatechecker-dev-smtp
+    hostname: mail
+    domainname: example.com
+    environment:
+      MAILSERVER_RELAY_HOST: ${MAILSERVER_RELAY_HOST}
+      MAILSERVER_RELAY_PORT: ${MAILSERVER_RELAY_PORT}
+      MAILSERVER_RELAY_USER: ${MAILSERVER_RELAY_USER}
+      MAILSERVER_RELAY_PASSWORD: ${MAILSERVER_RELAY_PASSWORD}
+    ports:
+      - "25:25"
+      - "587:587"
+      - "993:993"
+
+  backend:
     build: .
     image: climatechecker-springboot:dev
-    container_name: climatechecker-dev-springboot
+    container_name: climatechecker-dev-backend
     environment:
       SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
@@ -23,3 +38,14 @@ services:
       - "8082:8082"
     depends_on:
       - db
+
+  frontend:
+    build:
+      context: ../../Software-FrontEnd/
+      dockerfile: Dockerfile
+    image: climatechecker-frontend:dev
+    container_name: climatechecker-dev-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
