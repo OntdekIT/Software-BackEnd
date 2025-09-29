@@ -46,6 +46,8 @@ services:
       target: dev
     image: climatechecker-frontend:dev
     container_name: climatechecker-dev-frontend
+    environment:
+      VITE_BACKEND_API_URL: ${VITE_BACKEND_API_URL}
     ports:
       - "5173:5173"
     depends_on:
