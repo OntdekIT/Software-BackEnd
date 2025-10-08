@@ -40,3 +40,6 @@ build/
 ClimateChecker/Database/climateCheckerDB.mv.db
 ClimateChecker/src/main/resources/secrets.properties
 ClimateChecker/flyway.conf
+ClimateChecker/.env.development
+
+ClimateChecker/.env.production
