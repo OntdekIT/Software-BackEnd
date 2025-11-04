@@ -12,16 +12,12 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class NeighbourhoodService {
-    // Latitude = Y
-    // Longitude = X
-
     private final MeetJeStadService meetJeStadService;
     private final NeighbourhoodRepository neighbourhoodRepository;
 
@@ -33,28 +29,18 @@ public class NeighbourhoodService {
 
             dto.setId(neighbourhood.getId());
             dto.setName(neighbourhood.getName());
-            dto.setCoordinates(convertToFloatArray(neighbourhood.getCoordinates()));
+            float[][] coordinates = convertToFloatArray(neighbourhood.getCoordinates());
+            dto.setCoordinates(coordinates);
 
-            List<Measurement> tempMeasurements = new ArrayList<>();
-            for (Measurement measurement : measurements) {
-                float[] point = { measurement.getLatitude(), measurement.getLongitude() };
-                if (GpsTriangulation.pointInPolygon(dto.getCoordinates(), point)) {
-                    tempMeasurements.add(measurement);
-                }
-            }
+            List<Measurement> measurementsInNeighbourhood = filterMeasurementsInPolygon(measurements, coordinates);
 
-            float totalTemp = 0.0f;
-            int measurementCount = tempMeasurements.size();
-            for (Measurement measurement : tempMeasurements) {
-                if (measurement.getTemperature() != null) {
-                    totalTemp += measurement.getTemperature();
-                }
-                else {
-                    measurementCount--;
-                }
-            }
-            dto.setAvgTemp(totalTemp / measurementCount);
+            OptionalDouble avgTemp = measurementsInNeighbourhood.stream()
+                    .map(Measurement::getTemperature)
+                    .filter(Objects::nonNull)
+                    .mapToDouble(Float::doubleValue)
+                    .average();
 
+            dto.setAvgTemp(avgTemp.isPresent() ? (float) avgTemp.getAsDouble() : Float.NaN);
             neighbourhoodDtos.add(dto);
         }
         return neighbourhoodDtos;
@@ -77,42 +63,51 @@ public class NeighbourhoodService {
 
     public List<DayMeasurementResponse> getHistoricalNeighbourhoodData(Long id, Instant startDate, Instant endDate) {
         Optional<Neighbourhood> neighbourhoodOptional = neighbourhoodRepository.findById(id);
-        Neighbourhood neighbourhood;
-        if (neighbourhoodOptional.isPresent())
-              neighbourhood = neighbourhoodOptional.get();
-        else
+        if (neighbourhoodOptional.isEmpty()) {
             return new ArrayList<>();
-
-        MeetJeStadParameters params = new MeetJeStadParameters();
-        params.StartDate = endDate.minusSeconds(60 * 60 * 10);
-        params.EndDate = endDate;
-        params.includeFaultyMeasurements = false;
-        List<Measurement> measurements = meetJeStadService.getMeasurements(params);
-
-        float[][] neighbourhoodCoords = convertToFloatArray(neighbourhood.getCoordinates());
-        List<Integer> stations = new ArrayList<>();
-        for (Measurement measurement : measurements) {
-            float[] point = { measurement.getLatitude(), measurement.getLongitude() };
-            if (GpsTriangulation.pointInPolygon(neighbourhoodCoords, point) && !stations.contains(measurement.getId()))
-                stations.add(Math.toIntExact(measurement.getStation().getStationid()));
         }
 
-        if (stations.isEmpty())
-            return new ArrayList<DayMeasurementResponse>();
+        Neighbourhood neighbourhood = neighbourhoodOptional.get();
+        float[][] neighbourhoodCoords = convertToFloatArray(neighbourhood.getCoordinates());
 
-        params = new MeetJeStadParameters();
-        params.StartDate = startDate;
-        params.EndDate = endDate;
-        params.StationIds = stations;
-        params.includeFaultyMeasurements = true;
-        measurements = meetJeStadService.getMeasurements(params);
+        MeetJeStadParameters historicalParams = new MeetJeStadParameters();
+        historicalParams.StartDate = startDate;
+        historicalParams.EndDate = endDate;
+        historicalParams.includeFaultyMeasurements = true;
+        List<Measurement> allMeasurements = meetJeStadService.getMeasurements(historicalParams);
 
-        return MeasurementLogic.splitIntoDayMeasurements(measurements);
+        Set<Integer> stationIds = allMeasurements.stream()
+                .filter(measurement -> {
+                    if (measurement.getStation() == null) {
+                        return false;
+                    }
+                    float[] point = { measurement.getLatitude(), measurement.getLongitude() };
+                    return GpsTriangulation.pointInPolygon(neighbourhoodCoords, point);
+                })
+                .map(measurement -> Math.toIntExact(measurement.getStation().getStationid()))
+                .collect(Collectors.toSet());
+
+        if (stationIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<Measurement> neighbourhoodMeasurements = allMeasurements.stream()
+                .filter(measurement -> measurement.getStation() != null &&
+                        stationIds.contains(Math.toIntExact(measurement.getStation().getStationid())))
+                .collect(Collectors.toList());
+
+        return MeasurementLogic.splitIntoDayMeasurements(neighbourhoodMeasurements);
     }
 
-    /**
-     * Converts list of {@link NeighbourhoodCoords} into format required for {@link NeighbourhoodDto} and {@link GpsTriangulation#pointInPolygon(float[][], float[]) pointInPolygon}
-     */
+    private List<Measurement> filterMeasurementsInPolygon(List<Measurement> measurements, float[][] polygon) {
+        return measurements.stream()
+                .filter(measurement -> {
+                    float[] point = { measurement.getLatitude(), measurement.getLongitude() };
+                    return GpsTriangulation.pointInPolygon(polygon, point);
+                })
+                .collect(Collectors.toList());
+    }
+
     private float[][] convertToFloatArray(List<NeighbourhoodCoords> coordinates) {
         return coordinates.stream()
                 .map(coord -> new float[]{ coord.getLatitude(), coord.getLongitude() })
