@@ -2,9 +2,9 @@ name: Backend CI to Docker Hub
 
 on:
   push:
-    branches: [ "main", "develop" ]
+    branches: [ "main", "develop", "s3nj25", "s3nj25_dev" ]
   pull_request:
-    branches: [ "main", "develop" ]
+    branches: [ "main", "develop", "s3nj25", "s3nj25_dev" ]
 
 jobs:
   build-test:
@@ -25,6 +25,10 @@ jobs:
           --health-timeout=5s
           --health-retries=5
 
+    defaults:
+      run:
+        working-directory: ClimateChecker
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -35,6 +39,7 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: 'maven'
+          cache-dependency-path: 'ClimateChecker/pom.xml'
 
       - name: Run unit tests
         run: |
@@ -121,4 +126,5 @@ jobs:
           docker tag climatechecker-backend ${{ secrets.DOCKER_USERNAME }}/climatechecker-backend:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/climatechecker-backend:${BRANCH_NAME}
           docker push ${{ secrets.DOCKER_USERNAME }}/climatechecker-backend:latest
+
 
