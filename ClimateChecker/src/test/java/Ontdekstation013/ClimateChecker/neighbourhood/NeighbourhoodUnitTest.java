@@ -55,9 +55,9 @@ public class NeighbourhoodUnitTest {
                 new NeighbourhoodCoords(5, 51.574809f, 4.986881f, lars)
         ));
         neighbourhoodList.add(lars);
-        measurementList.add(new Measurement(now, 51.578000f, 4.992980f, 22.0f, 50.0f, 12.5f));
+        measurementList.add(new Measurement(now, 51.578000f, 4.992980f, 22.0f, 50.0f, 10.0f, 12.5f));
         measurementList.get(0).setIs_public(true);
-        measurementList.add(new Measurement(now, 51.578000f, 40.992980f, 23.0f, 50.0f, 10.2f));
+        measurementList.add(new Measurement(now, 51.578000f, 40.992980f, 23.0f, 50.0f, 8.2f, 10.2f));
         measurementList.get(1).setIs_public(false);
 
 
@@ -80,10 +80,10 @@ public class NeighbourhoodUnitTest {
                 new NeighbourhoodCoords(20, 51.583977f, 4.985841f, niels)
         ));
         neighbourhoodList.add(niels);
-        measurementList.add(new Measurement(now, 51.5869f, 4.999210f, 23.0f, 50.0f, 15.0f));
+        measurementList.add(new Measurement(now, 51.5869f, 4.999210f, 23.0f, 50.0f, 12.0f, 15.0f));
         measurementList.get(2).setIs_public(true);
 
-        measurementList.add(new Measurement(now, 51.5869f, 4.999210f, 22.0f, 50.0f, 11.3f));
+        measurementList.add(new Measurement(now, 51.5869f, 4.999210f, 22.0f, 50.0f, 9.3f, 11.3f));
         measurementList.get(3).setIs_public(false);
     }
 
