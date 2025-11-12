@@ -23,7 +23,7 @@ import java.util.List;
 public class MeetJeStadService {
     private final String baseUrl = "https://meetjestad.net/data/?type=sensors&format=json";
     @Getter
-    private final int minuteLimit = 1440; //Dit hoort 9000 minuten te zijn (voor debug naar beneden gehaald)
+    private final int minuteLimit = 1440;
     private final float[][] cityLimits = {
             {51.65156373065635f, 5.217787919413907f},
             {51.51818572766462f, 5.227145728754213f},
@@ -77,7 +77,6 @@ public class MeetJeStadService {
                 .ofPattern("yyyy-MM-dd HH:mm:ss")
                 .withZone(ZoneOffset.UTC);
 
-
         List<Measurement> measurements = new ArrayList<>();
         for (MeasurementDto dto : measurementsDto) {
             float[] point = {dto.getLatitude(), dto.getLongitude()};
@@ -87,17 +86,13 @@ public class MeetJeStadService {
             Station station = stationRepository.getMeetstationByStationid((long) dto.getId());
 
             if (station == null) {
-                //System.err.println("ℹ️ Station not found for ID: " + dto.getId() + " → creating dummy");
-
                 station = new Station();
-                station.setStationid((long) dto.getId()); // of dto.getStationId() als je dat hebt
+                station.setStationid((long) dto.getId());
                 station.setName("Unknown Station " + dto.getId());
                 station.setIsActive(false);
                 station.setIs_public(false);
-                station.setRegistrationCode(0L); // tijdelijke unieke code
+                station.setRegistrationCode(0L);
                 station.setMeasurementList(new ArrayList<>());
-
-                // andere velden instellen met defaults indien nodig
             }
 
             Measurement measurement = new Measurement();
@@ -106,7 +101,8 @@ public class MeetJeStadService {
             measurement.setLatitude(dto.getLatitude());
             measurement.setTemperature(dto.getTemperature());
             measurement.setHumidity(dto.getHumidity());
-            measurement.setParticulate(dto.getParticulate());
+            measurement.setPm25(dto.getPm25());
+            measurement.setPm10(dto.getPm10());
 
             TemporalAccessor temp = formatter.parse(dto.getTimestamp());
             measurement.setTimestamp(Instant.from(temp));
@@ -156,4 +152,4 @@ public class MeetJeStadService {
         }
         return measurements;
     }
-    }
+}

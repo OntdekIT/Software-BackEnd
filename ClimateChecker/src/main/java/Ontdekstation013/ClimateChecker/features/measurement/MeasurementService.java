@@ -113,6 +113,8 @@ public class  MeasurementService {
         dto.setLatitude(entity.getLatitude());
         dto.setTemperature(entity.getTemperature());
         dto.setHumidity(entity.getHumidity());
+        dto.setPm10(entity.getPm10());
+        dto.setPm25(entity.getPm25());
 
         DateTimeFormatter formatter = DateTimeFormatter
                 .ofPattern("dd-MM-yyyy HH:mm:ss")
