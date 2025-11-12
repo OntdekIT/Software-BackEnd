@@ -7,6 +7,7 @@ import Ontdekstation013.ClimateChecker.features.measurement.endpoint.Measurement
 import Ontdekstation013.ClimateChecker.features.station.endpoint.StationDto;
 import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -195,11 +196,16 @@ public class StationService {
             }
         }
 
-        //Zet alle stationdtos om naar station entities
+
         List<Station> stationEntities = stationsDB.stream()
                 .map(dto -> {
-                    Station station = new Station();
-                    station.setStationid(dto.stationid);
+                    Station station = stationRepository.findById(dto.stationid)
+                            .orElseGet(() -> {
+                                Station newStation = new Station();
+                                newStation.setStationid(dto.stationid);
+                                return newStation;
+                            });
+
                     station.setName(dto.name);
                     station.setDatabase_tag(dto.database_tag);
                     station.setIs_public(dto.is_public);
@@ -214,25 +220,25 @@ public class StationService {
 
                     List<Measurement> measurementsEntityList = new ArrayList<>();
 
-                    //Zet ook measurementDtolist om naar measurementList in de station
                     if (dto.measurementDtoList != null) {
                         for (MeasurementDto measurementDto : dto.measurementDtoList) {
                             try {
                                 Measurement measurement = new Measurement();
-                                measurement.setStation(station); // ← voorlopig laten staan
+                                measurement.setStation(station); 
                                 measurement.setTimestamp(parseTimestamp(measurementDto.getTimestamp()));
                                 measurement.setLatitude(measurementDto.getLatitude());
                                 measurement.setLongitude(measurementDto.getLongitude());
                                 measurement.setTemperature(measurementDto.getTemperature());
                                 measurement.setHumidity(measurementDto.getHumidity());
-                                measurement.setParticulate(measurementDto.getParticulate());
+                                measurement.setPm25(measurementDto.getPm25());
+                                measurement.setPm10(measurementDto.getPm10());
                                 measurement.setIs_public(measurementDto.getIs_public());
 
                                 measurementsEntityList.add(measurement);
                             } catch (Exception e) {
                                 System.err.println("Fout bij converteren van MeasurementDto (stationId: "
                                         + dto.stationid + "): " + e.getMessage());
-                                e.printStackTrace(); //Try catch omdat het hier steeds fout ging
+                                e.printStackTrace();
                             }
                         }
                     }
@@ -250,9 +256,7 @@ public class StationService {
             System.err.println("❌ Error during saveAll:");
             e.printStackTrace();
         }
-
     }
-
 
     public void editstation(long id, Station newstation) {
         Optional<Station> getStationResult = stationRepository.findById(id);

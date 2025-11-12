@@ -7,7 +7,7 @@ EXPOSE 3306
 # ---- Dependencies ----
 # Install Maven
 FROM base AS dependencies
-ENV MAVEN_VERSION="3.9.4"
+ENV MAVEN_VERSION="3.9.11"
 ENV M2_HOME=/opt/maven
 ENV PATH=$M2_HOME/bin/:$PATH
 RUN cd /opt \

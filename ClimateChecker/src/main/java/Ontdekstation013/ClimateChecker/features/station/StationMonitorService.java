@@ -134,7 +134,7 @@ public class StationMonitorService {
         for (Measurement m : measurements) {
             if (m.getTemperature() != null) hasTemp = true;
             if (m.getHumidity() != null) hasHum = true;
-            if (m.getParticulate() != null) hasStof = true;
+            if (m.getPm25() != null || m.getPm10() != null) hasStof = true;
             if (!Float.isNaN(m.getLatitude()) && !Float.isNaN(m.getLongitude())) hasLoc = true;
         }
 
@@ -145,6 +145,7 @@ public class StationMonitorService {
         result.put("loc", hasLoc);
         return result;
     }
+
 
     private Boolean updateErrorStatus(Station station, String type, boolean hasMeasurement) {
         switch (type.toLowerCase()) {
