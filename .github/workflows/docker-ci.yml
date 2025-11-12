@@ -69,6 +69,15 @@ jobs:
                 SPRING_DATASOURCE_PASSWORD: test
                 SPRING_JPA_HIBERNATE_DDL_AUTO: update
                 SPRING_FLYWAY_ENABLED: false
+                MAILSERVER_RELAY_HOST: smtp.test.local
+                MAILSERVER_RELAY_PORT: 587
+                MAILSERVER_RELAY_USER: test@test.local
+                MAILSERVER_RELAY_PASSWORD: testpassword
+                MAIL_USERNAME: test@test.local
+                MAIL_PASSWORD: testpassword
+                ROOT_USER_FIRSTNAME: Test
+                ROOT_USER_LASTNAME: User
+                ROOT_USER_EMAIL: test@test.local
               depends_on:
                 db:
                   condition: service_healthy
