@@ -41,9 +41,6 @@ jobs:
           cache: 'maven'
           cache-dependency-path: 'ClimateChecker/pom.xml'
 
-      - name: Run unit tests
-        run: |
-          ./mvnw clean test --no-transfer-progress \
             -Dspring.datasource.url=jdbc:mariadb://localhost:3306/climatechecker_test \
             -Dspring.datasource.username=root \
             -Dspring.datasource.password=test
@@ -82,7 +79,7 @@ jobs:
                 timeout: 5s
                 retries: 5
           EOF
-
+          docker compose -f docker-compose.test.yml up -d
       - name: Start Docker containers
         run: |
           docker-compose -f docker-compose.test.yml up -d
@@ -99,7 +96,7 @@ jobs:
             sleep 2
           done
           echo "Backend health check failed"
-          docker-compose -f docker-compose.test.yml logs backend
+          docker compose -f docker-compose.test.yml logs backend
           exit 1
 
       - name: Test API endpoints
@@ -112,7 +109,7 @@ jobs:
         run: docker-compose -f docker-compose.test.yml down -v
 
       - name: Login to Docker Hub
-        if: github.event_name == 'push'
+        run: docker compose -f docker-compose.test.yml down -v
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
