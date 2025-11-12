@@ -110,7 +110,8 @@ public class StationMonitorServiceTest {
         Measurement m = new Measurement();
         m.setTemperature(22.5f);
         m.setHumidity(55.0f);
-        m.setParticulate(10.0f);
+        m.setPm25(8.0f);
+        m.setPm10(10.0f);
         m.setLatitude(52.0f);
         m.setLongitude(5.0f);
 
