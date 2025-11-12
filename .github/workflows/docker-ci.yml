@@ -78,6 +78,7 @@ jobs:
                 ROOT_USER_FIRSTNAME: Test
                 ROOT_USER_LASTNAME: User
                 ROOT_USER_EMAIL: test@test.local
+                ROOT_USER_PASSWORD: TestPassword123!
               depends_on:
                 db:
                   condition: service_healthy
