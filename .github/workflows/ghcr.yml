@@ -143,4 +143,3 @@ jobs:
           docker tag climatechecker-backend ${IMAGE_NAME_LOWER}:latest
           docker push ${IMAGE_NAME_LOWER}:${BRANCH_NAME}
           docker push ${IMAGE_NAME_LOWER}:latest
-
