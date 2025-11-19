@@ -35,6 +35,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up JDK 21
         uses: actions/setup-java@v4
@@ -54,8 +56,25 @@ jobs:
             -Dspring.datasource.username=root \
             -Dspring.datasource.password=test
 
+      - name: Get previous Git tag
+        id: previoustag
+        uses: WyriHaximus/github-action-get-previous-tag@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get next release version
+        id: next
+        uses: WyriHaximus/github-action-next-release-version@1.0.0
+        with:
+          version: ${{ steps.previoustag.outputs.tag }}
+
       - name: Build Docker image
-        run: docker build -t climatechecker-backend .
+        run: |
+          docker build -t climatechecker-backend \
+            --label "org.opencontainers.image.version=${{ steps.next.outputs.version }}" \
+            --label "org.opencontainers.image.revision=${{ github.sha }}" \
+            --label "org.opencontainers.image.created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
+            .
 
       - name: Create docker-compose for testing
         run: |
@@ -84,7 +103,7 @@ jobs:
               depends_on:
                 db:
                   condition: service_healthy
-          
+
             db:
               image: mariadb:11
               environment:
@@ -124,7 +143,7 @@ jobs:
         if: always()
         run: docker compose -f docker-compose.test.yml down -v
 
-      - name: Login to GitHub Container Registry
+      - name: Log in to GitHub Container Registry
         if: github.event_name == 'push'
         uses: docker/login-action@v3
         with:
@@ -132,14 +151,17 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Push to GitHub Container Registry
+      - name: Push Docker image
         if: github.event_name == 'push'
-        run: |
-          BRANCH_NAME=${GITHUB_REF##*/}
-          IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/climatechecker-backend
-          IMAGE_NAME_LOWER=$(echo "$IMAGE_NAME" | tr '[:upper:]' '[:lower:]')
-          
-          docker tag climatechecker-backend ${IMAGE_NAME_LOWER}:${BRANCH_NAME}
-          docker tag climatechecker-backend ${IMAGE_NAME_LOWER}:latest
-          docker push ${IMAGE_NAME_LOWER}:${BRANCH_NAME}
-          docker push ${IMAGE_NAME_LOWER}:latest
+        uses: docker/build-push-action@v5
+        with:
+          context: ClimateChecker
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/climatechecker-backend:latest
+            ghcr.io/${{ github.repository_owner }}/climatechecker-backend:${{ steps.next.outputs.version }}
+            ghcr.io/${{ github.repository_owner }}/climatechecker-backend:${GITHUB_SHA}
+          labels: |
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+            org.opencontainers.image.source=${{ github.repository }}
