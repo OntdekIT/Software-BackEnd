@@ -6,8 +6,6 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
       MYSQL_DATABASE: ${SPRING_DATASOURCE_SCHEME}
-    volumes:
-      - "./res/dump-ontdekstation013-202506121529.sql:/docker-entrypoint-initdb.d/1.sql"
     ports:
       - "3306:3306"
     healthcheck:
