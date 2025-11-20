@@ -164,8 +164,6 @@ jobs:
           tags: |
             ghcr.io/${{ steps.owner.outputs.owner }}/climatechecker-backend:latest
             ghcr.io/${{ steps.owner.outputs.owner }}/climatechecker-backend:${{ steps.next.outputs.version }}
-            ghcr.io/${{ steps.owner.outputs.owner }}/climatechecker-backend:${GITHUB_SHA}
           labels: |
-            org.opencontainers.image.revision=${{ github.sha }}
             org.opencontainers.image.created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
             org.opencontainers.image.source=${{ github.repository }}
