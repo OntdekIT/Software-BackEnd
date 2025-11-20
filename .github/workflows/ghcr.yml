@@ -62,11 +62,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Get next release version
+      - name: Get next semantic version
         id: next
-        uses: WyriHaximus/github-action-next-release-version@1.0.0
+        uses: WyriHaximus/github-action-next-semvers@v1
         with:
           version: ${{ steps.previoustag.outputs.tag }}
+          bump: patch
 
       - name: Set lowercase owner
         id: owner
@@ -75,7 +76,7 @@ jobs:
       - name: Build Docker image
         run: |
           docker build -t climatechecker-backend \
-            --label "org.opencontainers.image.version=${{ steps.next.outputs.version }}" \
+            --label "org.opencontainers.image.version=${{ steps.next.outputs.next }}" \
             --label "org.opencontainers.image.revision=${{ github.sha }}" \
             --label "org.opencontainers.image.created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
             .
@@ -157,13 +158,8 @@ jobs:
 
       - name: Push Docker image
         if: github.event_name == 'push'
-        uses: docker/build-push-action@v5
-        with:
-          context: ClimateChecker
-          push: true
-          tags: |
-            ghcr.io/${{ steps.owner.outputs.owner }}/climatechecker-backend:latest
-            ghcr.io/${{ steps.owner.outputs.owner }}/climatechecker-backend:${{ steps.next.outputs.version }}
-          labels: |
-            org.opencontainers.image.created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
-            org.opencontainers.image.source=${{ github.repository }}
+        run: |
+          docker tag climatechecker-backend ghcr.io/${{ steps.owner.outputs.owner }}/climatechecker-backend:${{ steps.next.outputs.next }}
+          docker tag climatechecker-backend ghcr.io/${{ steps.owner.outputs.owner }}/climatechecker-backend:latest
+          docker push ghcr.io/${{ steps.owner.outputs.owner }}/climatechecker-backend:${{ steps.next.outputs.next }}
+          docker push ghcr.io/${{ steps.owner.outputs.owner }}/climatechecker-backend:latest
