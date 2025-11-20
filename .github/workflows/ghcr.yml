@@ -68,6 +68,10 @@ jobs:
         with:
           version: ${{ steps.previoustag.outputs.tag }}
 
+      - name: Set lowercase owner
+        id: owner
+        run: echo "owner=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+
       - name: Build Docker image
         run: |
           docker build -t climatechecker-backend \
@@ -158,9 +162,9 @@ jobs:
           context: ClimateChecker
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/climatechecker-backend:latest
-            ghcr.io/${{ github.repository_owner }}/climatechecker-backend:${{ steps.next.outputs.version }}
-            ghcr.io/${{ github.repository_owner }}/climatechecker-backend:${GITHUB_SHA}
+            ghcr.io/${{ steps.owner.outputs.owner }}/climatechecker-backend:latest
+            ghcr.io/${{ steps.owner.outputs.owner }}/climatechecker-backend:${{ steps.next.outputs.version }}
+            ghcr.io/${{ steps.owner.outputs.owner }}/climatechecker-backend:${GITHUB_SHA}
           labels: |
             org.opencontainers.image.revision=${{ github.sha }}
             org.opencontainers.image.created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
