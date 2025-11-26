@@ -11,7 +11,7 @@ jobs:
     name: Build and Deploy Backend
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       packages: write
 
     services:
@@ -153,6 +153,12 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+              
+      - name: Create and push new Git tag
+        run: |
+          git config user.name "${{ github.actor }}"
+          git tag ${{ steps.next.outputs.patch }}
+          git push origin ${{ steps.next.outputs.patch }}
 
       - name: Push Docker image
         if: github.event_name == 'push'
