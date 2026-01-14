@@ -2,18 +2,11 @@
 FROM eclipse-temurin:21-jdk AS base
 ENV APP_PATH=app/climatechecker/api-server
 EXPOSE 8082
-EXPOSE 3306
 
 # ---- Dependencies ----
-# Install Maven
-FROM base AS dependencies
-ENV MAVEN_VERSION="3.9.11"
-ENV M2_HOME=/opt/maven
-ENV PATH=$M2_HOME/bin/:$PATH
-RUN cd /opt \
-    && wget https://dlcdn.apache.org/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz \
-    && tar -zxvf apache-maven-${MAVEN_VERSION}-bin.tar.gz \
-    && mv apache-maven-${MAVEN_VERSION} maven
+# Use official Maven image with JDK 21
+FROM maven:3.9-eclipse-temurin-21 AS dependencies
+ENV APP_PATH=app/climatechecker/api-server
 
 # Copy application source and install maven dependencies
 WORKDIR /${APP_PATH}
