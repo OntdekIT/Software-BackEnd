@@ -1,3 +1,4 @@
+
 package Ontdekstation013.ClimateChecker.features.neighbourhood;
 
 import lombok.AllArgsConstructor;
@@ -21,3 +22,4 @@ public class NeighbourhoodCoords {
     @JoinColumn(name = "region_id")
     private Neighbourhood neighbourhood;
 }
+

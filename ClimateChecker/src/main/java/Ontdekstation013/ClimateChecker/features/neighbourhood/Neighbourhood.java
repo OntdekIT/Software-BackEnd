@@ -1,3 +1,4 @@
+
 package Ontdekstation013.ClimateChecker.features.neighbourhood;
 
 import lombok.*;
@@ -24,3 +25,4 @@ public class Neighbourhood {
         this.name = name;
     }
 }
+
