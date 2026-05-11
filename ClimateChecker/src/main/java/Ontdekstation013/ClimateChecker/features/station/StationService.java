@@ -8,6 +8,8 @@ import Ontdekstation013.ClimateChecker.features.station.endpoint.StationDto;
 import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.UserRepository;
 import jakarta.transaction.Transactional;
+
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -15,6 +17,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -85,7 +88,8 @@ public class StationService {
         return stationRepository.findStationsByOptionalFilters(filter.getName(), filter.getDatabaseTag(), filter.getIsPublic(), filter.getRegistrationCode(), filter.getUserIds(), filter.getIsActive());
     }
 
-    public List<StationDto> getStationsWithMeasurements(Instant timestamp) {
+    @Async
+    public CompletableFuture<List<StationDto>> getStationsWithMeasurements(Instant timestamp) {
         List<Station> stations = stationRepository.findAll();
         List<MeasurementDto> measurements = measurementService.getMeasurementsAtTime(timestamp);
 
@@ -136,7 +140,7 @@ public class StationService {
             stationMap.get(stationId).measurementDtoList.add(measurement);
         }
 
-        return new ArrayList<>(stationMap.values());
+        return CompletableFuture.completedFuture(new ArrayList<>(stationMap.values()));
     }
 
     public void UpdateStationsInDatabase(Instant timestamp) {
