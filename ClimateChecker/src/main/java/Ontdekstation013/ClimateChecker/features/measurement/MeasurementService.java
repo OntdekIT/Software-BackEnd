@@ -53,7 +53,6 @@ public class  MeasurementService {
                 .toList();
     }
 
-
     public List<DayMeasurementResponse> getHistoricalMeasurements(int id, Instant startDate, Instant endDate) {
         MeetJeStadParameters params = new MeetJeStadParameters();
         params.StartDate = startDate;
