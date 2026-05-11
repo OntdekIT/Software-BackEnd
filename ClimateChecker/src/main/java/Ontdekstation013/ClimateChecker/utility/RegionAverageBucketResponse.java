@@ -24,4 +24,10 @@ public class RegionAverageBucketResponse {
 
     @JsonProperty("avg")
     private float avg;
+
+    @JsonProperty("pm25")
+    private Float pm25;
+
+    @JsonProperty("pm10")
+    private Float pm10;
 }

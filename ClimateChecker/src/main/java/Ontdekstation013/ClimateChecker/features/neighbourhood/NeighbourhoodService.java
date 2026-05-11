@@ -23,7 +23,7 @@ public class NeighbourhoodService {
     private final MeetJeStadService meetJeStadService;
     private final NeighbourhoodRepository neighbourhoodRepository;
 
-    private List<NeighbourhoodDto> getNeighbourhoodsAverageTemp(List<Neighbourhood> neighbourhoods, List<Measurement> measurements){
+    private List<NeighbourhoodDto> getNeighbourhoodsAverageTemp(List<Neighbourhood> neighbourhoods, List<Measurement> measurements) {
         List<NeighbourhoodDto> neighbourhoodDtos = new ArrayList<>();
 
         for (Neighbourhood neighbourhood : neighbourhoods) {
@@ -43,12 +43,21 @@ public class NeighbourhoodService {
                     .average();
 
             dto.setAvgTemp(avgTemp.isPresent() ? (float) avgTemp.getAsDouble() : Float.NaN);
+
+            OptionalDouble avgPm25 = measurementsInNeighbourhood.stream()
+                    .map(Measurement::getPm25)
+                    .filter(Objects::nonNull)
+                    .mapToDouble(Float::doubleValue)
+                    .average();
+
+            dto.setAvgPm25(avgPm25.isPresent() ? (float) avgPm25.getAsDouble() : null);
+
             neighbourhoodDtos.add(dto);
         }
         return neighbourhoodDtos;
     }
 
-    public List<NeighbourhoodDto> getNeighbourhoodsAtTime(Instant dateTime){
+    public List<NeighbourhoodDto> getNeighbourhoodsAtTime(Instant dateTime) {
         List<Neighbourhood> neighbourhoods = neighbourhoodRepository.findAll();
 
         int minuteMargin = meetJeStadService.getMinuteLimit();
@@ -101,15 +110,6 @@ public class NeighbourhoodService {
         return MeasurementLogic.splitIntoDayMeasurements(neighbourhoodMeasurements);
     }
 
-    /**
-     * Returns aggregated temperature buckets (min/max/avg) for all stations within a region.
-     *
-     * @param regionId    ID of the neighbourhood/region
-     * @param from        start of the time window (inclusive)
-     * @param to          end of the time window (inclusive)
-     * @param granularity "hour" or "day"
-     * @throws NotFoundException if no neighbourhood with the given ID exists
-     */
     public List<RegionAverageBucketResponse> getRegionAverageHistory(Long regionId, Instant from, Instant to, String granularity) {
         Neighbourhood neighbourhood = neighbourhoodRepository.findById(regionId)
                 .orElseThrow(() -> new NotFoundException("Region not found: " + regionId));
