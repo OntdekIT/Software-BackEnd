@@ -4,6 +4,7 @@ import Ontdekstation013.ClimateChecker.features.measurement.endpoint.Measurement
 import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadParameters;
 import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadService;
 import Ontdekstation013.ClimateChecker.utility.DayMeasurementResponse;
+import Ontdekstation013.ClimateChecker.utility.HourMeasurementResponse;
 import Ontdekstation013.ClimateChecker.utility.MeasurementLogic;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
@@ -63,6 +64,17 @@ public class  MeasurementService {
         List<Measurement> measurements = meetJeStadService.getMeasurements(params);
 
         return MeasurementLogic.splitIntoDayMeasurements(measurements);
+    }
+
+    public List<HourMeasurementResponse> getHourlyMeasurements(int id, Instant startDate, Instant endDate) {
+        MeetJeStadParameters params = new MeetJeStadParameters();
+        params.StartDate = startDate;
+        params.EndDate = endDate;
+        params.StationIds.add(id);
+        params.includeFaultyMeasurements = true;
+
+        List<Measurement> measurements = meetJeStadService.getMeasurements(params);
+        return MeasurementLogic.splitIntoHourMeasurements(measurements);
     }
 
     public byte[] getMeasurementsAsPDF(int id, Instant startDate, Instant endDate){

@@ -25,4 +25,6 @@ public class DayMeasurementResponse {
     private float minHum;
     @JsonProperty("maxHum")
     private float maxHum;
+    @JsonProperty("avgStof")
+    private float avgStof;
 }

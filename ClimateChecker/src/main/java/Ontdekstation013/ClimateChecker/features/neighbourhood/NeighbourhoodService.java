@@ -1,5 +1,6 @@
 package Ontdekstation013.ClimateChecker.features.neighbourhood;
 
+import Ontdekstation013.ClimateChecker.exception.NotFoundException;
 import Ontdekstation013.ClimateChecker.features.measurement.Measurement;
 import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadParameters;
 import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadService;
@@ -7,6 +8,7 @@ import Ontdekstation013.ClimateChecker.features.neighbourhood.endpoint.Neighbour
 import Ontdekstation013.ClimateChecker.utility.DayMeasurementResponse;
 import Ontdekstation013.ClimateChecker.utility.GpsTriangulation;
 import Ontdekstation013.ClimateChecker.utility.MeasurementLogic;
+import Ontdekstation013.ClimateChecker.utility.RegionAverageBucketResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -97,6 +99,48 @@ public class NeighbourhoodService {
                 .collect(Collectors.toList());
 
         return MeasurementLogic.splitIntoDayMeasurements(neighbourhoodMeasurements);
+    }
+
+    /**
+     * Returns aggregated temperature buckets (min/max/avg) for all stations within a region.
+     *
+     * @param regionId    ID of the neighbourhood/region
+     * @param from        start of the time window (inclusive)
+     * @param to          end of the time window (inclusive)
+     * @param granularity "hour" or "day"
+     * @throws NotFoundException if no neighbourhood with the given ID exists
+     */
+    public List<RegionAverageBucketResponse> getRegionAverageHistory(Long regionId, Instant from, Instant to, String granularity) {
+        Neighbourhood neighbourhood = neighbourhoodRepository.findById(regionId)
+                .orElseThrow(() -> new NotFoundException("Region not found: " + regionId));
+
+        float[][] neighbourhoodCoords = convertToFloatArray(neighbourhood.getCoordinates());
+
+        MeetJeStadParameters params = new MeetJeStadParameters();
+        params.StartDate = from;
+        params.EndDate = to;
+        params.includeFaultyMeasurements = true;
+        List<Measurement> allMeasurements = meetJeStadService.getMeasurements(params);
+
+        Set<Integer> stationIds = allMeasurements.stream()
+                .filter(m -> m.getStation() != null)
+                .filter(m -> {
+                    float[] point = { m.getLatitude(), m.getLongitude() };
+                    return GpsTriangulation.pointInPolygon(neighbourhoodCoords, point);
+                })
+                .map(m -> Math.toIntExact(m.getStation().getStationid()))
+                .collect(Collectors.toSet());
+
+        if (stationIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<Measurement> regionMeasurements = allMeasurements.stream()
+                .filter(m -> m.getStation() != null &&
+                        stationIds.contains(Math.toIntExact(m.getStation().getStationid())))
+                .collect(Collectors.toList());
+
+        return MeasurementLogic.splitIntoRegionBuckets(regionMeasurements, granularity);
     }
 
     private List<Measurement> filterMeasurementsInPolygon(List<Measurement> measurements, float[][] polygon) {
