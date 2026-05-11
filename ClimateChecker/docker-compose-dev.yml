@@ -1,4 +1,5 @@
 name: climatechecker-dev
+
 services:
   db:
     image: mariadb:11
@@ -13,7 +14,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
-
 
   smtp:
     image: mailserver/docker-mailserver:latest
@@ -64,12 +64,7 @@ services:
     container_name: climatechecker-dev-frontend
     environment:
       VITE_BACKEND_API_URL: ${VITE_BACKEND_API_URL}
-      CHOKIDAR_USEPOLLING: "true"
-    volumes:
-      - ../../Software-FrontEnd/:/app
-      - /app/node_modules
     ports:
       - "5173:5173"
-    command: npm run dev -- --host
     depends_on:
       - backend

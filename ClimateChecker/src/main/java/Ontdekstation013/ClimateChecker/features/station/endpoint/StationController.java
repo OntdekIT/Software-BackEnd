@@ -29,6 +29,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/api/Meetstation")
@@ -76,22 +77,21 @@ public class StationController {
         }
     }
 
-    @GetMapping("/stationsMetMeasurements")
-    public ResponseEntity<?> getMeetstationWithMeasurement(@RequestParam(value = "timestamp") String timestamp) {
-        try {
-            Instant utcDateTime = Instant.parse(timestamp);
-            List<StationDto> stationsWithMeasurements = stationService.getStationsWithMeasurements(utcDateTime);
-            for (StationDto stationDto : stationsWithMeasurements) {
-                System.out.println("Station ID: " + stationDto.stationid + " | Measurements: " + stationDto.measurementDtoList.size());
-            }
-
-            return ResponseEntity.ok(stationsWithMeasurements);
-        } catch (InvalidArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Er is een onverwachte fout opgetreden.");
-        }
+// Controller
+@GetMapping("/stationsMetMeasurements")
+public CompletableFuture<ResponseEntity<List<StationDto>>> getMeetstationWithMeasurement(
+        @RequestParam(value = "timestamp") String timestamp) {
+    try {
+        Instant utcDateTime = Instant.parse(timestamp);
+        return stationService.getStationsWithMeasurements(utcDateTime)
+            .thenApply(ResponseEntity::ok)
+            .exceptionally(ex -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(null));
+    } catch (Exception e) {
+        return CompletableFuture.completedFuture(
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null));
     }
+}
 
     @PutMapping("/edit/{id}")
     public ResponseEntity<?> updateMeetstation(@PathVariable long id, @RequestBody UpdateStationRequest updaterequest) throws Exception {
