@@ -1,5 +1,5 @@
 package Ontdekstation013.ClimateChecker.features.neighbourhood;
-
+import Ontdekstation013.ClimateChecker.exception.NotFoundException;
 import Ontdekstation013.ClimateChecker.features.measurement.Measurement;
 import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadParameters;
 import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadService;
@@ -112,5 +112,18 @@ public class NeighbourhoodService {
         return coordinates.stream()
                 .map(coord -> new float[]{ coord.getLatitude(), coord.getLongitude() })
                 .toArray(float[][]::new);
+    }
+
+    public NeighbourhoodDto getNeighbourhoodById(Long id)
+    {
+        Neighbourhood neighbourhood = neighbourhoodRepository.findById(id).orElseThrow(() -> new NotFoundException("Neighbourhood not found"));
+
+        NeighbourhoodDto dto = new NeighbourhoodDto();
+        dto.setId(neighbourhood.getId());
+        dto.setName(neighbourhood.getName());
+        dto.setCoordinates(convertToFloatArray(neighbourhood.getCoordinates()));
+        dto.setAvgTemp(Float.NaN);
+
+        return dto;
     }
 }

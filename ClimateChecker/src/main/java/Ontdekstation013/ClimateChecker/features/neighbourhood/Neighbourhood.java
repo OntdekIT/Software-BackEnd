@@ -11,7 +11,8 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Neighbourhood {
+public class Neighbourhood
+{
     @Id
     private long id;
     private String name;
