@@ -66,6 +66,10 @@ public class NeighbourhoodController {
         }
     }
 
+    @GetMapping("/search")
+    public List<NeighbourhoodSearchDto> searchNeighbourhoods(@RequestParam String query) {
+        return neighbourhoodService.searchNeighbourhoods(query);
+    }
     @GetMapping("/{id}")
     public NeighbourhoodDto getNeighbourhoodById(@PathVariable Long id) {
         return neighbourhoodService.getNeighbourhoodById(id);
