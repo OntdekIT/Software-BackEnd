@@ -31,7 +31,7 @@ services:
       - "993:993"
 
   backend:
-    build: .
+    build: src/main/resources
     image: climatechecker-springboot:dev
     container_name: climatechecker-dev-backend
     environment:

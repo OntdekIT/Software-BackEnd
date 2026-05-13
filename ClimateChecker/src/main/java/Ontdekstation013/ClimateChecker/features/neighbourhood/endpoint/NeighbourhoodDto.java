@@ -16,4 +16,6 @@ public class NeighbourhoodDto {
     private float[][] coordinates;
     @JsonProperty("avgTemp")
     private float avgTemp;
+    @JsonProperty("avgPm25")
+    private Float avgPm25;
 }
