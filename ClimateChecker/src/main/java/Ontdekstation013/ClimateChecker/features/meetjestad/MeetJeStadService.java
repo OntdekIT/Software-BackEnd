@@ -1,6 +1,7 @@
 package Ontdekstation013.ClimateChecker.features.meetjestad;
 
 import Ontdekstation013.ClimateChecker.features.measurement.Measurement;
+import Ontdekstation013.ClimateChecker.features.measurement.MeasurementService;
 import Ontdekstation013.ClimateChecker.features.measurement.endpoint.MeasurementDto;
 import Ontdekstation013.ClimateChecker.features.station.Station;
 import Ontdekstation013.ClimateChecker.features.station.StationRepository;
@@ -110,10 +111,12 @@ public class MeetJeStadService {
             measurements.add(measurement);
         }
 
+        List<Measurement> correctedmeasurements = MeasurementService.outlierdatacheck(measurements);
+
         if (params.includeFaultyMeasurements)
             return measurements;
         else
-            return IncorrectValueFilter(measurements);
+            return IncorrectValueFilter(correctedmeasurements);
     }
 
     public List<Measurement> IncorrectValueFilter(List<Measurement> measurements) {

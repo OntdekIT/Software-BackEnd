@@ -123,5 +123,24 @@ public class  MeasurementService {
 
         return dto;
     }
+
+    public static List<Measurement> outlierdatacheck(List<Measurement> measurements){
+        float gemiddelde = (float) measurements.stream()
+                .mapToDouble(Measurement::getTemperature)
+                .average()
+                .orElse(0);
+
+        float bovengrens = gemiddelde * 1.20f;
+        float ondergrens = gemiddelde * 0.80f;
+
+        for(Measurement m : measurements)
+        {
+            if(m.getTemperature() != null && ( m.getTemperature() > bovengrens || m.getTemperature() < ondergrens))
+            {
+                m.setTemperature(gemiddelde);
+            }
+        }
+        return measurements;
+    }
 }
 
