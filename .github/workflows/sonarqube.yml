@@ -28,7 +28,7 @@ jobs:
         working-directory: ClimateChecker
 
       - name: Run SonarCloud Scan
-        uses: sonarsource/sonarcloud-scan-action@v2.1.1
+        uses: SonarSource/sonarcloud-github-action@v2
         with:
           projectBaseDir: ClimateChecker
         env:
