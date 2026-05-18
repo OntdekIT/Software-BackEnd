@@ -6,6 +6,4 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface NeighbourhoodRepository extends JpaRepository<Neighbourhood, Long> {
-    List<Neighbourhood> findByNameContainingIgnoreCase(String name);
-}
+public interface NeighbourhoodRepository extends JpaRepository<Neighbourhood, Long> { }
