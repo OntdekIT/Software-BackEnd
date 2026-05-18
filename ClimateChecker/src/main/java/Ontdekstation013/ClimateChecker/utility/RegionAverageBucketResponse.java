@@ -5,10 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * A single time-bucket of aggregated temperature statistics for a region.
- * Timestamp is formatted as ISO 8601 (yyyy-MM-dd'T'HH:mm:ss).
- */
 @NoArgsConstructor
 @Getter
 @Setter

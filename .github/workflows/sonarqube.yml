@@ -1,6 +1,7 @@
 name: Sonar Scan
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - "*"
@@ -12,24 +13,23 @@ jobs:
     steps:
       - name: Checkout Source
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '21'
-
-      - name: List files in repository (for debugging)
-        run: ls -R
+          cache: 'maven'
 
       - name: Build Project
-        run: mvn clean install
+        run: mvn -B clean verify -DskipTests
         working-directory: ClimateChecker
 
-      - name: Run SonarQube Scan
-        uses: sonarsource/sonarqube-scan-action@master
+      - name: Run SonarCloud Scan
+        uses: sonarsource/sonarcloud-scan-action@v2.1.1
         with:
           projectBaseDir: ClimateChecker
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: 'https://sonarcloud.io'
