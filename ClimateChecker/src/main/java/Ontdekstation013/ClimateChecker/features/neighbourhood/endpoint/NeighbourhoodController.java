@@ -21,6 +21,7 @@ import java.util.List;
 @RequestMapping("/api/neighbourhood")
 @RequiredArgsConstructor
 public class NeighbourhoodController {
+
     private final NeighbourhoodService neighbourhoodService;
 
     /**
@@ -32,8 +33,7 @@ public class NeighbourhoodController {
     public List<NeighbourhoodDto> getNeighbourhoodsAtTime(@RequestParam(value = "timestamp") String timestamp) {
         try {
             Instant utcDateTime = Instant.parse(timestamp);
-            List<NeighbourhoodDto> neighbourhoods = neighbourhoodService.getNeighbourhoodsAtTime(utcDateTime);
-            return neighbourhoods;
+            return neighbourhoodService.getNeighbourhoodsAtTime(utcDateTime);
         } catch (DateTimeParseException e) {
             throw new InvalidArgumentException("Timestamp must be in ISO 8601 format");
         }
@@ -46,8 +46,12 @@ public class NeighbourhoodController {
      * @param endDate - dd-MM-yyyy HH:mm format
      */
     @GetMapping("/history/average/{id}")
-    public List<DayMeasurementResponse> getNeighbourhoodData(@PathVariable Long id, @RequestParam String startDate, @RequestParam String endDate) {
-        try{
+    public List<DayMeasurementResponse> getNeighbourhoodData(
+            @PathVariable Long id,
+            @RequestParam String startDate,
+            @RequestParam String endDate
+    ) {
+        try {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
 
             LocalDateTime localDateTimeStart = LocalDateTime.parse(startDate, formatter);
@@ -57,9 +61,17 @@ public class NeighbourhoodController {
             Instant endInstant = localDateTimeEnd.atZone(ZoneId.systemDefault()).toInstant();
 
             return neighbourhoodService.getHistoricalNeighbourhoodData(id, startInstant, endInstant);
+        } catch (DateTimeParseException e) {
+            throw new InvalidArgumentException("Date must be in format dd-MM-yyyy HH:mm");
         }
-        catch (Exception ex){
-            throw ex;
-        }
+    }
+
+    @GetMapping("/search")
+    public List<NeighbourhoodSearchDto> searchNeighbourhoods(@RequestParam String query) {
+        return neighbourhoodService.searchNeighbourhoods(query);
+    }
+    @GetMapping("/{id}")
+    public NeighbourhoodDto getNeighbourhoodById(@PathVariable Long id) {
+        return neighbourhoodService.getNeighbourhoodById(id);
     }
 }

@@ -1,5 +1,5 @@
 package Ontdekstation013.ClimateChecker.features.neighbourhood;
-
+import Ontdekstation013.ClimateChecker.features.neighbourhood.endpoint.NeighbourhoodSearchDto;
 import Ontdekstation013.ClimateChecker.exception.NotFoundException;
 import Ontdekstation013.ClimateChecker.features.measurement.Measurement;
 import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadParameters;
@@ -156,5 +156,34 @@ public class NeighbourhoodService {
         return coordinates.stream()
                 .map(coord -> new float[]{ coord.getLatitude(), coord.getLongitude() })
                 .toArray(float[][]::new);
+    }
+
+    public NeighbourhoodDto getNeighbourhoodById(Long id)
+    {
+        Neighbourhood neighbourhood = neighbourhoodRepository.findById(id).orElseThrow(() -> new NotFoundException("Neighbourhood not found"));
+
+        NeighbourhoodDto dto = new NeighbourhoodDto();
+        dto.setId(neighbourhood.getId());
+        dto.setName(neighbourhood.getName());
+        dto.setCoordinates(convertToFloatArray(neighbourhood.getCoordinates()));
+        dto.setAvgTemp(Float.NaN);
+
+        return dto;
+    }
+
+    public List<NeighbourhoodSearchDto> searchNeighbourhoods(String query) {
+        if (query == null || query.trim().length() < 3) {
+            return new ArrayList<>();
+        }
+
+        return neighbourhoodRepository.findByNameContainingIgnoreCase(query.trim())
+                .stream()
+                .map(neighbourhood -> {
+                    NeighbourhoodSearchDto dto = new NeighbourhoodSearchDto();
+                    dto.setId(neighbourhood.getId());
+                    dto.setName(neighbourhood.getName());
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 }
