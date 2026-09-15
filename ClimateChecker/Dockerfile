@@ -1,5 +1,5 @@
 # ---- Base JDK ----
-FROM eclipse-temurin:21-jdk AS base
+FROM eclipse-temurin:21-jre AS base
 ENV APP_PATH=app/climatechecker/api-server
 EXPOSE 8082
 

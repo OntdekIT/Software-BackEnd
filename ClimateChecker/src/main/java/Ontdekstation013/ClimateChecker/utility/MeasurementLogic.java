@@ -5,8 +5,10 @@ import Ontdekstation013.ClimateChecker.features.measurement.Measurement;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 /**
@@ -22,15 +24,9 @@ public class MeasurementLogic {
                 if (!dayMeasurements.containsKey(date)) {
                     dayMeasurements.put(date, new HashSet<>());
                 }
-
                 dayMeasurements.get(date).add(measurement);
             }
         }
-
-        // process into DayMeasurementResponses
-        //TODO make it give the ISO back
-        //the entry key is the date in yyyy-MM-dd format
-        //the response is an average over multiple days dus individual measurements are in correct times but they are grouped by day
 
         DateTimeFormatter pattern = DateTimeFormatter.ofPattern("dd-MM");
         List<DayMeasurementResponse> responseList = new ArrayList<>();
@@ -68,11 +64,103 @@ public class MeasurementLogic {
                     .map(Measurement::getHumidity)
                     .max(Float::compare)
                     .orElse(Float.NaN));
+            response.setAvgStof((float) entry.getValue()
+                    .stream()
+                    .filter(m -> m.getPm25() != null)
+                    .mapToDouble(Measurement::getPm25)
+                    .average()
+                    .orElse(Double.NaN));
 
             responseList.add(response);
         }
 
         return responseList;
+    }
+
+    public static List<HourMeasurementResponse> splitIntoHourMeasurements(Collection<Measurement> measurements) {
+        LinkedHashMap<LocalDateTime, Set<Measurement>> hourMeasurements = new LinkedHashMap<>();
+
+        for (Measurement measurement : measurements) {
+            LocalDateTime hour = LocalDateTime.ofInstant(measurement.getTimestamp(), ZoneId.systemDefault())
+                    .truncatedTo(ChronoUnit.HOURS);
+
+            if (!hourMeasurements.containsKey(hour)) {
+                hourMeasurements.put(hour, new HashSet<>());
+            }
+            hourMeasurements.get(hour).add(measurement);
+        }
+
+        DateTimeFormatter pattern = DateTimeFormatter.ofPattern("HH:mm");
+        List<HourMeasurementResponse> responseList = new ArrayList<>();
+
+        for (Map.Entry<LocalDateTime, Set<Measurement>> entry : hourMeasurements.entrySet()) {
+            HourMeasurementResponse response = new HourMeasurementResponse();
+            response.setTimestamp(entry.getKey().format(pattern));
+
+            response.setAvgTemp((float) entry.getValue().stream()
+                    .filter(m -> m.getTemperature() != null)
+                    .mapToDouble(Measurement::getTemperature)
+                    .average()
+                    .orElse(Double.NaN));
+
+            response.setAvgPm25((float) entry.getValue().stream()
+                    .filter(m -> m.getPm25() != null)
+                    .mapToDouble(Measurement::getPm25)
+                    .average()
+                    .orElse(Double.NaN));
+
+            responseList.add(response);
+        }
+
+        return responseList;
+    }
+
+    /**
+     * Groups measurements into time buckets (hour or day) and returns min/max/avg temperature
+     * and average pm25/pm10 per bucket.
+     * Results are ordered by timestamp ascending.
+     *
+     * @param measurements source measurements (temperature nulls are skipped)
+     * @param granularity  "hour" or "day" — anything else defaults to "hour"
+     */
+    public static List<RegionAverageBucketResponse> splitIntoRegionBuckets(Collection<Measurement> measurements, String granularity) {
+        ChronoUnit bucketUnit = "day".equalsIgnoreCase(granularity) ? ChronoUnit.DAYS : ChronoUnit.HOURS;
+        DateTimeFormatter isoFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+
+        LinkedHashMap<LocalDateTime, List<Float>> tempBuckets = new LinkedHashMap<>();
+        LinkedHashMap<LocalDateTime, List<Float>> pm25Buckets = new LinkedHashMap<>();
+        LinkedHashMap<LocalDateTime, List<Float>> pm10Buckets = new LinkedHashMap<>();
+
+        measurements.stream()
+                .sorted(Comparator.comparing(Measurement::getTimestamp))
+                .forEach(m -> {
+                    LocalDateTime bucket = LocalDateTime.ofInstant(m.getTimestamp(), ZoneId.systemDefault())
+                            .truncatedTo(bucketUnit);
+
+                    if (m.getTemperature() != null)
+                        tempBuckets.computeIfAbsent(bucket, k -> new ArrayList<>()).add(m.getTemperature());
+                    if (m.getPm25() != null)
+                        pm25Buckets.computeIfAbsent(bucket, k -> new ArrayList<>()).add(m.getPm25());
+                    if (m.getPm10() != null)
+                        pm10Buckets.computeIfAbsent(bucket, k -> new ArrayList<>()).add(m.getPm10());
+                });
+
+        List<RegionAverageBucketResponse> result = new ArrayList<>();
+        for (Map.Entry<LocalDateTime, List<Float>> entry : tempBuckets.entrySet()) {
+            List<Float> temps = entry.getValue();
+            List<Float> pm25s = pm25Buckets.getOrDefault(entry.getKey(), List.of());
+            List<Float> pm10s = pm10Buckets.getOrDefault(entry.getKey(), List.of());
+
+            RegionAverageBucketResponse response = new RegionAverageBucketResponse();
+            response.setTimestamp(entry.getKey().format(isoFormatter));
+            response.setMin(temps.stream().min(Float::compare).orElse(Float.NaN));
+            response.setMax(temps.stream().max(Float::compare).orElse(Float.NaN));
+            response.setAvg((float) temps.stream().mapToDouble(Float::doubleValue).average().orElse(Double.NaN));
+            response.setPm25(pm25s.isEmpty() ? null : (float) pm25s.stream().mapToDouble(Float::doubleValue).average().orElse(Double.NaN));
+            response.setPm10(pm10s.isEmpty() ? null : (float) pm10s.stream().mapToDouble(Float::doubleValue).average().orElse(Double.NaN));
+            result.add(response);
+        }
+        return result;
     }
 
     /**

@@ -1,14 +1,13 @@
 package Ontdekstation013.ClimateChecker.features.measurement.endpoint;
 
-import java.time.Instant;
+import java.time.*;
 import java.time.format.*;
 import java.util.List;
-import java.time.*;
-import java.time.format.DateTimeFormatter;
 
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.features.measurement.MeasurementService;
 import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadService;
+import Ontdekstation013.ClimateChecker.features.neighbourhood.NeighbourhoodService;
 import Ontdekstation013.ClimateChecker.features.station.StationService;
 import Ontdekstation013.ClimateChecker.features.station.endpoint.StationDto;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import Ontdekstation013.ClimateChecker.utility.DayMeasurementResponse;
+import Ontdekstation013.ClimateChecker.utility.HourMeasurementResponse;
+import Ontdekstation013.ClimateChecker.utility.RegionAverageBucketResponse;
 import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class MeasurementController {
 
     private final MeasurementService measurementService;
     private final StationService stationService;
+    private final NeighbourhoodService neighbourhoodService;
 
     /**
      * Gets the closest measurement to a given timestamp for each station.
@@ -81,6 +83,56 @@ public class MeasurementController {
         return measurementService.getHistoricalMeasurements(id, startInstant, endInstant);
         }
         catch (Exception ex){
+            throw ex;
+        }
+    }
+
+    /**
+     * Returns aggregated temperature buckets (min/max/avg) for all stations within a region.
+     *
+     * @param regionId    ID of the neighbourhood/region
+     * @param from        ISO 8601 start of time window (default: 24 h ago)
+     * @param to          ISO 8601 end of time window (default: now)
+     * @param granularity "hour" or "day" (default: "hour")
+     */
+    @GetMapping("/history/average/region/{regionId}")
+    public List<RegionAverageBucketResponse> getMeasurementsAverageForRegion(
+            @PathVariable Long regionId,
+            @RequestParam(required = false) String from,
+            @RequestParam(required = false) String to,
+            @RequestParam(required = false, defaultValue = "hour") String granularity) {
+
+        Instant toInstant = (to != null) ? parseIso8601(to) : Instant.now();
+        Instant fromInstant = (from != null) ? parseIso8601(from) : toInstant.minus(Duration.ofHours(24));
+
+        if (fromInstant.isAfter(toInstant)) {
+            throw new InvalidArgumentException("'from' must not be after 'to'");
+        }
+
+        return neighbourhoodService.getRegionAverageHistory(regionId, fromInstant, toInstant, granularity);
+    }
+
+    private Instant parseIso8601(String value) {
+        try {
+            return Instant.parse(value);
+        } catch (DateTimeParseException e) {
+            throw new InvalidArgumentException("Date must be in ISO 8601 format (e.g. 2025-05-10T14:00:00Z)");
+        }
+    }
+
+    /**
+     * Haalt uurlijkse gemiddeldes op (temp en PM2.5) van een specifiek station voor de huidige dag (tot nu).
+     * @param id - stationId
+     */
+    @GetMapping("/history/hourly/{id}")
+    public List<HourMeasurementResponse> getTodayHourlyMeasurements(@PathVariable int id) {
+        try {
+            LocalDate today = LocalDate.now(ZoneId.systemDefault());
+            Instant startOfDay = today.atStartOfDay(ZoneId.systemDefault()).toInstant();
+            Instant endOfCurrentHour = Instant.now();
+
+            return measurementService.getHourlyMeasurements(id, startOfDay, endOfCurrentHour);
+        } catch (Exception ex) {
             throw ex;
         }
     }

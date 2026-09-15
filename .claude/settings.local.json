@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find C:UsersmattnDocumentsGitHubSoftware-BackEnd -type f -name *neighbourhood* -o -name *region*)",
+      "Bash(grep -E \"\\\\.\\(java|kotlin|cs|py|js\\)$\")"
+    ]
+  }
+}

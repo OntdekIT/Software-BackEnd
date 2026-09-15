@@ -31,7 +31,7 @@ services:
       - "993:993"
 
   backend:
-    build: .
+    build: src/main/resources
     image: climatechecker-springboot:dev
     container_name: climatechecker-dev-backend
     environment:
@@ -59,17 +59,14 @@ services:
     build:
       context: ../../Software-FrontEnd/
       dockerfile: Dockerfile
-      target: dev
+      target: release
+      args:
+        VITE_BACKEND_API_URL: ${VITE_BACKEND_API_URL}
     image: climatechecker-frontend:dev
     container_name: climatechecker-dev-frontend
     environment:
       VITE_BACKEND_API_URL: ${VITE_BACKEND_API_URL}
-      CHOKIDAR_USEPOLLING: "true"
-    volumes:
-      - ../../Software-FrontEnd/:/app
-      - /app/node_modules
     ports:
-      - "5173:5173"
-    command: npm run dev -- --host
+      - "5173:80"
     depends_on:
       - backend
