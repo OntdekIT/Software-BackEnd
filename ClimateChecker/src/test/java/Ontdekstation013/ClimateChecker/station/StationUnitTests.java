@@ -1,11 +1,11 @@
 package Ontdekstation013.ClimateChecker.station;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import Ontdekstation013.ClimateChecker.features.station.Station;
 import Ontdekstation013.ClimateChecker.features.station.endpoint.StationDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 public class StationUnitTests {
 

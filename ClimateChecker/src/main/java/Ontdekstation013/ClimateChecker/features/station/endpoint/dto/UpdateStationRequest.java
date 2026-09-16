@@ -9,4 +9,3 @@ public record UpdateStationRequest(
         Boolean is_public
 ) {
 }
-

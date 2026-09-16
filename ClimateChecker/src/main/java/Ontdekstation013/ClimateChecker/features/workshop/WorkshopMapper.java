@@ -1,7 +1,6 @@
 package Ontdekstation013.ClimateChecker.features.workshop;
 
 import Ontdekstation013.ClimateChecker.features.workshop.endpoint.dto.WorkshopResponse;
-
 import java.time.ZoneOffset;
 
 public class WorkshopMapper {

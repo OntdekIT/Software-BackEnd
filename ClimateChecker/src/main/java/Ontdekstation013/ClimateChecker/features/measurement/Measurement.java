@@ -2,10 +2,9 @@ package Ontdekstation013.ClimateChecker.features.measurement;
 
 import Ontdekstation013.ClimateChecker.features.station.Station;
 import jakarta.persistence.*;
+import java.time.Instant;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.Instant;
 
 @Entity
 @Getter

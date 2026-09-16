@@ -2,7 +2,6 @@ package Ontdekstation013.ClimateChecker.features.station.endpoint;
 
 import Ontdekstation013.ClimateChecker.features.measurement.endpoint.MeasurementDto;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.List;
 
 public class StationDto {

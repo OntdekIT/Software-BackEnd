@@ -1,12 +1,9 @@
 package Ontdekstation013.ClimateChecker.features.station;
 
-import Ontdekstation013.ClimateChecker.features.user.User;
-import Ontdekstation013.ClimateChecker.features.user.UserRole;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
-import java.util.List;
 
 public interface StationRepository extends JpaRepository <Station, Long> {
     Station getByRegistrationCode(Long meetstationCode);

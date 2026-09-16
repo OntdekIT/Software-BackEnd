@@ -13,4 +13,3 @@ public class UserFilter {
     private String email;
     private UserRole role;
 }
-

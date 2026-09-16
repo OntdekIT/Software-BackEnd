@@ -1,10 +1,9 @@
 package Ontdekstation013.ClimateChecker.features.user.authentication;
 
 import Ontdekstation013.ClimateChecker.utility.StringGenerator;
-import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.stereotype.Service;
 
 @Service
 public class TokenService {

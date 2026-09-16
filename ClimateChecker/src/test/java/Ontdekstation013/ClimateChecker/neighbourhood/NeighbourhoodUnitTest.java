@@ -1,30 +1,23 @@
 package Ontdekstation013.ClimateChecker.neighbourhood;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
+
 import Ontdekstation013.ClimateChecker.features.measurement.Measurement;
-import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadParameters;
 import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadService;
 import Ontdekstation013.ClimateChecker.features.neighbourhood.Neighbourhood;
 import Ontdekstation013.ClimateChecker.features.neighbourhood.NeighbourhoodCoords;
 import Ontdekstation013.ClimateChecker.features.neighbourhood.NeighbourhoodRepository;
 import Ontdekstation013.ClimateChecker.features.neighbourhood.NeighbourhoodService;
-import Ontdekstation013.ClimateChecker.utility.DayMeasurementResponse;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 public class NeighbourhoodUnitTest {
