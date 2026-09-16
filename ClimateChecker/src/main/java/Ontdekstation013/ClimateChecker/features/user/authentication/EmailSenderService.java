@@ -17,220 +17,247 @@ public class EmailSenderService {
     @Value("${frontend.host}")
     private String frontendHost;
 
-    public EmailSenderService(JavaMailSender mailSender) {
+    private final boolean useRealMailserver;
+
+    public EmailSenderService(JavaMailSender mailSender, @Value("${use.real.mailserver:false}") boolean useRealMailserver) {
         this.mailSender = mailSender;
+        this.useRealMailserver = useRealMailserver;
+    }
+
+    private boolean shouldSendEmail() {
+        if (!useRealMailserver) {
+            System.out.println("[WARN] Skipping email sending because use.real.mailserver is false");
+            return false;
+        }
+        return true;
     }
 
     public void sendEmail(String toEmail, String firstName, String lastName, String body) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("kayletmail@gmail.com");
-        message.setTo(toEmail);
-        message.setSubject(String.format("Welcome %s", firstName + " " + lastName));
-        message.setText(String.format("Welcome %s", body));
+        if (shouldSendEmail()) {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom("kayletmail@gmail.com");
+            message.setTo(toEmail);
+            message.setSubject(String.format("Welcome %s", firstName + " " + lastName));
+            message.setText(String.format("Welcome %s", body));
 
 
-        mailSender.send(message);
+            mailSender.send(message);
 
-        System.out.print("Mail Send");
+            System.out.print("Mail Send");
+        }
     }
 
     public void sendSignupMail(String toEmail, String firstName, String lastName, String code) throws MessagingException {
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        if (shouldSendEmail()) {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-        String body = "Je hebt net je account aangemaakt bij Ontdekstation 013,"
-                + "<br>"
-                + "<br>"
-                + "<br>"
-                + code
-                + "<br>"
-                + "<br>"
-                + "Met vriendelijke groet,"
-                + "<br>"
-                + " Ontdekstation 013"
-                + "<br>"
-                + "<img src=\"cid:logo.png\"></img><br/>";
+            String body = "Je hebt net je account aangemaakt bij Ontdekstation 013,"
+                    + "<br>"
+                    + "<br>"
+                    + "<br>"
+                    + code
+                    + "<br>"
+                    + "<br>"
+                    + "Met vriendelijke groet,"
+                    + "<br>"
+                    + " Ontdekstation 013"
+                    + "<br>"
+                    + "<img src=\"cid:logo.png\"></img><br/>";
 
-        helper.setTo("kayletmail@host.com");
-        helper.setTo(toEmail);
-        helper.setSubject(String.format("Welkom %s", firstName + " " + lastName));
-        helper.setText(body, true);
+            helper.setTo("kayletmail@host.com");
+            helper.setTo(toEmail);
+            helper.setSubject(String.format("Welkom %s", firstName + " " + lastName));
+            helper.setText(body, true);
 
-        mailSender.send(message);
+            mailSender.send(message);
 
-        System.out.print("Mail Sent");
+            System.out.print("Mail Sent");
+        }
     }
 
     public void sendLoginMail(String toEmail, String firstName, String lastName, String code) throws MessagingException {
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        if (shouldSendEmail()) {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-        String body = "Gebruik deze code bij het inloggen op MB Ontdekt: "
-                + "<br>"
-                + "<h1>"
-                + code
-                + "</h1>"
-                + "<br>"
-                + "<br>"
-                + "Met vriendelijke groet,"
-                + "<br>"
-                + " Ontdekstation 013"
-                + "<br>"
-                + "<img src=\"cid:logo.png\"></img><br/>";
+            String body = "Gebruik deze code bij het inloggen op MB Ontdekt: "
+                    + "<br>"
+                    + "<h1>"
+                    + code
+                    + "</h1>"
+                    + "<br>"
+                    + "<br>"
+                    + "Met vriendelijke groet,"
+                    + "<br>"
+                    + " Ontdekstation 013"
+                    + "<br>"
+                    + "<img src=\"cid:logo.png\"></img><br/>";
 
-        helper.setTo("kayletmail@host.com");
-        helper.setTo(toEmail);
-        helper.setFrom("local@gmail.com");
-        helper.setSubject(String.format("Welkom %s", firstName + " " + lastName));
-        helper.setText(body, true);
+            helper.setTo("kayletmail@host.com");
+            helper.setTo(toEmail);
+            helper.setFrom("local@gmail.com");
+            helper.setSubject(String.format("Welkom %s", firstName + " " + lastName));
+            helper.setText(body, true);
 
-        mailSender.send(message);
+            mailSender.send(message);
 
-        System.out.print("Mail Sent");
+            System.out.print("Mail Sent");
+        }
     }
 
     public void sendForgotPasswordMail(String toEmail, String firstName, String lastName, String code) throws MessagingException {
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        if (shouldSendEmail()) {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-        String body = "<p> Beste " + firstName + " " + lastName + ", </p>"
-                + "<p>Er is zojuist een verzoek gedaan om je wachtwoord te resetten. Om dit te doen kun je de volgende link openen:</p>"
-                + "<a href=\"" + frontendHost + "/auth/reset-password?email=" + toEmail + "&token=" + code + "\">Wachtwoord resetten</a>"
-                + "<p>Heb je dit verzoek niet gedaan? Dan kun je deze mail negeren.</p>"
-                + "<p>Met vriendelijke groet,"
-                + "<br>"
-                + " Ontdekstation 013"
-                + "<br>"
-                + "<img src=\"cid:logo.png\"></img><br/></p>";
+            String body = "<p> Beste " + firstName + " " + lastName + ", </p>"
+                    + "<p>Er is zojuist een verzoek gedaan om je wachtwoord te resetten. Om dit te doen kun je de volgende link openen:</p>"
+                    + "<a href=\"" + frontendHost + "/auth/reset-password?email=" + toEmail + "&token=" + code + "\">Wachtwoord resetten</a>"
+                    + "<p>Heb je dit verzoek niet gedaan? Dan kun je deze mail negeren.</p>"
+                    + "<p>Met vriendelijke groet,"
+                    + "<br>"
+                    + " Ontdekstation 013"
+                    + "<br>"
+                    + "<img src=\"cid:logo.png\"></img><br/></p>";
 
-        helper.setTo("kayletmail@host.com");
-        helper.setTo(toEmail);
-        helper.setSubject("Wachtwoord resetten");
-        helper.setText(body, true);
+            helper.setTo("kayletmail@host.com");
+            helper.setTo(toEmail);
+            helper.setSubject("Wachtwoord resetten");
+            helper.setText(body, true);
 
-        mailSender.send(message);
+            mailSender.send(message);
 
-        System.out.print("Mail Sent");
+            System.out.print("Mail Sent");
+        }
     }
 
     public void deleteUserMail(String toEmail, String firstName, String lastName) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        String body = "we're extremely utterly insanely incredibly sorry to see you go :( sadface";
-        message.setFrom("kayletmail@gmail.com");
-        message.setTo(toEmail);
-        message.setSubject(String.format("Welcome %s", firstName + " " + lastName));
-        message.setText(String.format("Welcome %s", body));
+        if (shouldSendEmail()) {
+            SimpleMailMessage message = new SimpleMailMessage();
+            String body = "we're extremely utterly insanely incredibly sorry to see you go :( sadface";
+            message.setFrom("kayletmail@gmail.com");
+            message.setTo(toEmail);
+            message.setSubject(String.format("Welcome %s", firstName + " " + lastName));
+            message.setText(String.format("Welcome %s", body));
 
 
-        mailSender.send(message);
+            mailSender.send(message);
+        }
     }
 
     public void sendEmailEditMail(String toEmail, String firstName, String lastName, String code) throws MessagingException {
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        if (shouldSendEmail()) {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-        String body = "Je hebt net je 013 email aangepast,"
-                + "<br>"
-                + "<br>"
-                + "<br>"
-                + code
-                + "<br>"
-                + "<br>"
-                + "Met vriendelijke groet,"
-                + "<br>"
-                + " Ontdekstation 013"
-                + "<br>"
-                + "<img src=\"cid:logo.png\"></img><br/>";
+            String body = "Je hebt net je 013 email aangepast,"
+                    + "<br>"
+                    + "<br>"
+                    + "<br>"
+                    + code
+                    + "<br>"
+                    + "<br>"
+                    + "Met vriendelijke groet,"
+                    + "<br>"
+                    + " Ontdekstation 013"
+                    + "<br>"
+                    + "<img src=\"cid:logo.png\"></img><br/>";
 
-        helper.setTo("kayletmail@host.com");
-        helper.setTo(toEmail);
-        helper.setSubject(String.format("Welkom %s", firstName + " " + lastName));
-        helper.setText(body, true);
+            helper.setTo("kayletmail@host.com");
+            helper.setTo(toEmail);
+            helper.setSubject(String.format("Welkom %s", firstName + " " + lastName));
+            helper.setText(body, true);
 
-        mailSender.send(message);
+            mailSender.send(message);
 
-        System.out.print("Mail Sent");
+            System.out.print("Mail Sent");
+        }
     }
 
     public void sendEmailStationDown(User user, Station station) throws MessagingException {
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        if (shouldSendEmail()) {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-        String body = "Een van je meetstations heeft voor langer dan 24 geen informatie verstuurd. Het gaat om het volgende meetstation:"
-                + "<br>"
-                + "Nummer: " + station.getStationid()
-                + "<br>"
-                + "Naam: " + station.getName()
-                + "<br>"
-                + "<br>"
-                + "<br>"
-                + "<br>"
-                + "Met vriendelijke groet,"
-                + "<br>"
-                + " Ontdekstation 013"
-                + "<br>"
-                + "<img src=\"cid:logo.png\"></img><br/>";
+            String body = "Een van je meetstations heeft voor langer dan 24 geen informatie verstuurd. Het gaat om het volgende meetstation:"
+                    + "<br>"
+                    + "Nummer: " + station.getStationid()
+                    + "<br>"
+                    + "Naam: " + station.getName()
+                    + "<br>"
+                    + "<br>"
+                    + "<br>"
+                    + "<br>"
+                    + "Met vriendelijke groet,"
+                    + "<br>"
+                    + " Ontdekstation 013"
+                    + "<br>"
+                    + "<img src=\"cid:logo.png\"></img><br/>";
 
-        helper.setTo(user.getEmail());
-        helper.setSubject(String.format("Hallo %s", user.getFirstName() + " " + user.getLastName()));
-        helper.setText(body, true);
+            helper.setTo(user.getEmail());
+            helper.setSubject(String.format("Hallo %s", user.getFirstName() + " " + user.getLastName()));
+            helper.setText(body, true);
 
-        mailSender.send(message);
+            mailSender.send(message);
 
-        System.out.print("Mail Sent");
+            System.out.print("Mail Sent");
+        }
     }
 
     public void sendEmailStationMeasurements(User user, Station station, Boolean hasTemp, Boolean hasHum, Boolean hasStof, Boolean hasLoc) throws MessagingException {
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        if (shouldSendEmail()) {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-        String body = "Het gedrag van een van je meetstations is veranderd. Het gaat om het volgende meetstation:"
-                + "<br>"
-                + "Nummer: " + station.getStationid()
-                + "<br>"
-                + "Naam: " + station.getName()
-                + "<br>"
-                + "<br>";
+            String body = "Het gedrag van een van je meetstations is veranderd. Het gaat om het volgende meetstation:"
+                    + "<br>"
+                    + "Nummer: " + station.getStationid()
+                    + "<br>"
+                    + "Naam: " + station.getName()
+                    + "<br>"
+                    + "<br>";
 
-        if (hasTemp != null) {
-            body += hasTemp
-                    ? "De Temperatuur measurement van uw meetstation werkt weer. <br>"
-                    : "De Temperatuur measurement van uw meetstation wordt niet meer doorgestuurd. <br>";
+            if (hasTemp != null) {
+                body += hasTemp
+                        ? "De Temperatuur measurement van uw meetstation werkt weer. <br>"
+                        : "De Temperatuur measurement van uw meetstation wordt niet meer doorgestuurd. <br>";
+            }
+
+            if (hasHum != null) {
+                body += hasHum
+                        ? "De Luchtvochtigheid measurement van uw meetstation werkt weer. <br>"
+                        : "De Luchtvochtigheid measurement van uw meetstation wordt niet meer doorgestuurd. <br>";
+            }
+
+            if (hasStof != null) {
+                body += hasStof
+                        ? "De Fijnstof measurement van uw meetstation werkt weer. <br>"
+                        : "De Fijnstof measurement van uw meetstation wordt niet meer doorgestuurd. <br>";
+            }
+
+            if (hasLoc != null) {
+                body += hasLoc
+                        ? "De Locatie measurement van uw meetstation werkt weer. <br>"
+                        : "De Locatie measurement van uw meetstation wordt niet meer doorgestuurd. <br>";
+            }
+
+            body +=
+                    "<br>"
+                            + "<br>"
+                            + "Met vriendelijke groet,"
+                            + "<br>"
+                            + " Ontdekstation 013"
+                            + "<br>"
+                            + "<img src=\"cid:logo.png\"></img><br/>";
+
+            helper.setTo(user.getEmail());
+            helper.setSubject(String.format("Hallo %s", user.getFirstName() + " " + user.getLastName()));
+            helper.setText(body, true);
+
+            mailSender.send(message);
+
+            System.out.print("Mail Sent");
         }
-
-        if (hasHum != null) {
-            body += hasHum
-                    ? "De Luchtvochtigheid measurement van uw meetstation werkt weer. <br>"
-                    : "De Luchtvochtigheid measurement van uw meetstation wordt niet meer doorgestuurd. <br>";
-        }
-
-        if (hasStof != null) {
-            body += hasStof
-                    ? "De Fijnstof measurement van uw meetstation werkt weer. <br>"
-                    : "De Fijnstof measurement van uw meetstation wordt niet meer doorgestuurd. <br>";
-        }
-
-        if (hasLoc != null) {
-            body += hasLoc
-                    ? "De Locatie measurement van uw meetstation werkt weer. <br>"
-                    : "De Locatie measurement van uw meetstation wordt niet meer doorgestuurd. <br>";
-        }
-
-        body +=
-                "<br>"
-                        + "<br>"
-                        + "Met vriendelijke groet,"
-                        + "<br>"
-                        + " Ontdekstation 013"
-                        + "<br>"
-                        + "<img src=\"cid:logo.png\"></img><br/>";
-
-        helper.setTo(user.getEmail());
-        helper.setSubject(String.format("Hallo %s", user.getFirstName() + " " + user.getLastName()));
-        helper.setText(body, true);
-
-        mailSender.send(message);
-
-        System.out.print("Mail Sent");
     }
 }

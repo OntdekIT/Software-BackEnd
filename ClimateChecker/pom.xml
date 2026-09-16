@@ -115,6 +115,13 @@
 			<artifactId>bucket4j-core</artifactId>
 			<version>8.10.0</version>
 		</dependency>
+		<!-- GreenMail: in-memory mail server for end-to-end tests without a real mail server -->
+		<dependency>
+			<groupId>com.icegreen</groupId>
+			<artifactId>greenmail-junit5</artifactId>
+			<version>2.1.0</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>

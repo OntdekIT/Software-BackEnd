@@ -82,7 +82,12 @@ public class StationService {
             List<Long> userIds = users.stream().map(User::getUserId).collect(Collectors.toList());
             filter.setUserIds(userIds);
         }
-        return stationRepository.findStationsByOptionalFilters(filter.getName(), filter.getDatabaseTag(), filter.getIsPublic(), filter.getRegistrationCode(), filter.getUserIds(), filter.getIsActive());
+        // Avoid passing an empty list to the IN clause, which is invalid in some databases (e.g. H2)
+        List<Long> userIds = filter.getUserIds();
+        if (userIds != null && userIds.isEmpty()) {
+            userIds = null;
+        }
+        return stationRepository.findStationsByOptionalFilters(filter.getName(), filter.getDatabaseTag(), filter.getIsPublic(), filter.getRegistrationCode(), userIds, filter.getIsActive());
     }
 
     @Async

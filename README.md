@@ -6,3 +6,18 @@ Ontdekstation organiseert samen met Bibliotheek Midden-Brabant workshops voor jo
 
 ### Opstart instructies
 Voor meer informatie over het opzetten van het project wordt doorverwezen naar de wiki. Bekijk de [Getting Started](https://github.com/OntdekIT/Software-Documents/wiki/Getting-Started) page om zowel de backend als frontend te configureren.
+
+### Mailserver configuratie
+De backend kan e-mails versturen via een echte SMTP-server of de verzending onderdrukken (bijv. voor tests).
+
+| Variabele / property | Standaardwaarde | Beschrijving |
+|----------------------|-----------------|--------------|
+| `USE_REAL_MAILSERVER` / `use.real.mailserver` | `false` | Op `true` zetten om echt e-mails te versturen; `false` slaat verzending over en logt een waarschuwing. |
+| `MAILSERVER_RELAY_HOST` | `localhost` | Hostname van de SMTP-relay. |
+| `MAILSERVER_RELAY_PORT` | `3025` | Poort van de SMTP-relay. |
+| `MAIL_USERNAME` | `test@localhost` | Gebruikersnaam voor SMTP-authenticatie. |
+| `MAIL_PASSWORD` | `test` | Wachtwoord voor SMTP-authenticatie. |
+
+**Productie:** zet `USE_REAL_MAILSERVER=true` en vul de overige mail-variabelen in.
+
+**Tests:** de test-suite draait zonder echte mailserver. Voor end-to-end tests wordt automatisch een in-memory GreenMail SMTP-server opgestart; unit tests gebruiken Mockito voor de mail-afhankelijkheden.
