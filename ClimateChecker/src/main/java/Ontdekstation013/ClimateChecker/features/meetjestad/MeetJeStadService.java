@@ -9,9 +9,11 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import lombok.Getter;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -31,9 +33,17 @@ public class MeetJeStadService {
             {51.65077670571181f, 4.957086656750303f}
     };
     private final StationRepository stationRepository;
+    private final RestTemplate restTemplate;
 
     public MeetJeStadService(StationRepository stationRepository) {
         this.stationRepository = stationRepository;
+
+        // Bounded timeouts so a slow or hanging meetjestad.net cannot tie up
+        // request threads indefinitely.
+        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        requestFactory.setConnectTimeout((int) Duration.ofSeconds(10).toMillis());
+        requestFactory.setReadTimeout((int) Duration.ofSeconds(30).toMillis());
+        this.restTemplate = new RestTemplate(requestFactory);
     }
 
     public List<Measurement> getMeasurements(MeetJeStadParameters params) {
@@ -62,7 +72,6 @@ public class MeetJeStadService {
         if (params.Limit != 0)
             url.append("&limit=").append(params.Limit);
 
-        RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response = restTemplate.getForEntity(url.toString(), String.class);
         String responseBody = response.getBody();
 

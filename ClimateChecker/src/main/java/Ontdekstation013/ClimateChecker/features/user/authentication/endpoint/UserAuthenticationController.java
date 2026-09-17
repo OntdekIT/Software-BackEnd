@@ -12,7 +12,9 @@ import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserResponse;
 import Ontdekstation013.ClimateChecker.features.workshop.Workshop;
 import Ontdekstation013.ClimateChecker.features.workshop.WorkshopService;
+import Ontdekstation013.ClimateChecker.utility.RateLimiter;
 import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.hibernate.NonUniqueResultException;
@@ -39,6 +41,14 @@ public class UserAuthenticationController {
     private final WorkshopService workshopService;
     private final StationService stationService;
     private final PasswordEncodingService passwordEncodingService;
+    private final RateLimiter rateLimiter;
+
+    private static final String RATE_LIMIT_MESSAGE = "Te veel pogingen. Probeer het over een minuut opnieuw.";
+
+    private boolean isRateLimited(String action, HttpServletRequest request, String email) {
+        String key = action + ":" + request.getRemoteAddr() + ":" + (email == null ? "" : email.toLowerCase());
+        return !rateLimiter.isAllowed(key);
+    }
 
     @PostMapping("register")
     public ResponseEntity<?> createNewUser(@RequestBody RegisterUserRequest registerRequest) throws MessagingException {
@@ -82,7 +92,10 @@ public class UserAuthenticationController {
 
 
     @PostMapping("login")
-    public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) throws Exception {
+    public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest, HttpServletRequest request) throws Exception {
+        if (isRateLimited("login", request, loginRequest.email())) {
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(RATE_LIMIT_MESSAGE);
+        }
         try {
             User user = userService.getUserByEmail(loginRequest.email());
             if (user != null && passwordEncodingService.verifyPassword(loginRequest.password(), user.getPassword())) {
@@ -101,7 +114,10 @@ public class UserAuthenticationController {
     }
 
     @PostMapping("verify")
-    public ResponseEntity<?> verifyEmailCode(@RequestBody VerifyLoginRequest verifyLoginRequest) {
+    public ResponseEntity<?> verifyEmailCode(@RequestBody VerifyLoginRequest verifyLoginRequest, HttpServletRequest request) {
+        if (isRateLimited("verify", request, verifyLoginRequest.email())) {
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(RATE_LIMIT_MESSAGE);
+        }
         try {
             ResponseEntity<AuthenticationResponse> responseEntity = ResponseEntity.badRequest().build();
             User user = userService.getUserByEmail(verifyLoginRequest.email());
@@ -120,7 +136,10 @@ public class UserAuthenticationController {
     }
 
     @PostMapping("reset-password")
-    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest resetPasswordRequest) {
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest resetPasswordRequest, HttpServletRequest request) {
+        if (isRateLimited("reset-password", request, resetPasswordRequest.email())) {
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(RATE_LIMIT_MESSAGE);
+        }
         try {
             User user = userService.getUserByEmail(resetPasswordRequest.email());
             if (user != null && tokenService.verifyToken(resetPasswordRequest.token(), user.getUserId(), TokenType.PASSWORD_RESET)) {
@@ -139,7 +158,10 @@ public class UserAuthenticationController {
     }
 
     @PostMapping("forgot-password")
-    public ResponseEntity<?> createForgotPasswordRequest(@RequestBody ForgotPasswordRequest forgotPasswordRequest) throws Exception {
+    public ResponseEntity<?> createForgotPasswordRequest(@RequestBody ForgotPasswordRequest forgotPasswordRequest, HttpServletRequest request) throws Exception {
+        if (isRateLimited("forgot-password", request, forgotPasswordRequest.email())) {
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(RATE_LIMIT_MESSAGE);
+        }
         try {
             User user = userService.getUserByEmail(forgotPasswordRequest.email());
 

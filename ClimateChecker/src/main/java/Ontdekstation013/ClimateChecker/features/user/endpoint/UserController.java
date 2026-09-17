@@ -8,21 +8,21 @@ import Ontdekstation013.ClimateChecker.features.user.UserService;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.GetAllUsersRequest;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UpdateUserRequest;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
+    private static final int MAX_PAGE_SIZE = 100;
+
     private final UserService userService;
 
     public UserController(UserService userService) {
@@ -32,9 +32,6 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(@PathVariable long id, @RequestParam(defaultValue = "false") boolean includeStations) {
         try {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            System.out.println("Gebruikersnaam: " + auth.getName());
-            System.out.println("Authorities: " + auth.getAuthorities());
             User user = userService.getUserById(id);
             UserResponse response = UserMapper.toUserResponse(user, includeStations);
             return ResponseEntity.ok(response);
@@ -45,17 +42,13 @@ public class UserController {
         }
     }
 
-    //TODO: Re-add pagination
     //TODO: Remove stations from response
     @GetMapping()
     public ResponseEntity<?> getAllUsers(GetAllUsersRequest request) {
         try {
-            List<User> users = userService.getAllUsers(UserMapper.toUserFilter(request));
-            List<UserResponse> responses = new ArrayList<>();
-
-            for (User user : users) {
-                responses.add(UserMapper.toUserResponse(user, false));
-            }
+            Pageable pageable = PageRequest.of(request.page(), Math.min(request.pageSize(), MAX_PAGE_SIZE));
+            Page<UserResponse> responses = userService.getAllUsers(UserMapper.toUserFilter(request), pageable)
+                    .map(user -> UserMapper.toUserResponse(user, false));
 
             return ResponseEntity.ok(responses);
         } catch (InvalidArgumentException e) {

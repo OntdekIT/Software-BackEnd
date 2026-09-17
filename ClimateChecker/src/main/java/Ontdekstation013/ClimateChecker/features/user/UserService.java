@@ -4,7 +4,10 @@ import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.exception.NotFoundException;
 import Ontdekstation013.ClimateChecker.features.workshop.Workshop;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,8 +32,8 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public List<User> getAllUsers(UserFilter filter) {
-        return userRepository.findUsersByOptionalFilters(filter.getFirstName(), filter.getLastName(), filter.getEmail(), filter.getRole());
+    public Page<User> getAllUsers(UserFilter filter, Pageable pageable) {
+        return userRepository.findUsersByOptionalFilters(filter.getFirstName(), filter.getLastName(), filter.getEmail(), filter.getRole(), pageable);
     }
 
     public List<User> getUsersByWorkshop(Workshop workshop) {
@@ -46,6 +49,7 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
+    @Transactional
     public void updateUser(long id, User newUser) {
         Optional<User> getUserResult = userRepository.findById(id);
 
