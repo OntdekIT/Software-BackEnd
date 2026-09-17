@@ -2,6 +2,7 @@ package Ontdekstation013.ClimateChecker.features.user.authentication;
 
 import Ontdekstation013.ClimateChecker.utility.StringGenerator;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,6 +25,7 @@ public class TokenService {
         return token;
     }
 
+    @Transactional
     public void saveToken(Token token) {
         List<Token> tokensToRemove = tokenRepository.findAllByUserIdAndTokenType(token.getUserId(), token.getTokenType());
         tokenRepository.deleteAll(tokensToRemove);
