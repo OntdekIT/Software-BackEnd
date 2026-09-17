@@ -10,9 +10,7 @@ import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UpdateUserRequ
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,9 +30,6 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(@PathVariable long id, @RequestParam(defaultValue = "false") boolean includeStations) {
         try {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            System.out.println("Gebruikersnaam: " + auth.getName());
-            System.out.println("Authorities: " + auth.getAuthorities());
             User user = userService.getUserById(id);
             UserResponse response = UserMapper.toUserResponse(user, includeStations);
             return ResponseEntity.ok(response);
