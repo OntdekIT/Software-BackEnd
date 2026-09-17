@@ -27,6 +27,7 @@ public class SecurityConfiguration {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/actuator/health").permitAll()
                         .requestMatchers("/api/authentication/**").permitAll()
                         .requestMatchers("/api/users/**").hasAnyAuthority(UserRole.ADMIN.name(), UserRole.SUPER_ADMIN.name())
                         .requestMatchers("/api/workshops/**").hasAnyAuthority(UserRole.ADMIN.name(), UserRole.SUPER_ADMIN.name())
