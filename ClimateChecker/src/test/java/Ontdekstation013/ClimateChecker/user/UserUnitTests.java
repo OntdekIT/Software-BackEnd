@@ -12,6 +12,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -65,27 +69,32 @@ public class UserUnitTests {
 
     @Test
     public void getUsersWithoutFilters() {
+        Pageable pageable = PageRequest.of(0, 20);
         List<User> users = Arrays.asList(user, new User(2L, "Jane", "Doe", "jane.doe@email.com", UserRole.USER, "AnotherPassword123"));
-        when(userRepository.findUsersByOptionalFilters(null, null, null, null)).thenReturn(users);
+        Page<User> page = new PageImpl<>(users, pageable, users.size());
+        when(userRepository.findUsersByOptionalFilters(null, null, null, null, pageable)).thenReturn(page);
 
-        List<User> result = userService.getAllUsers(new UserFilter());
+        Page<User> result = userService.getAllUsers(new UserFilter(), pageable);
 
         assertNotNull(result);
-        assertEquals(2, result.size());
-        verify(userRepository, times(1)).findUsersByOptionalFilters(null, null, null, null);
+        assertEquals(2, result.getTotalElements());
+        assertEquals(2, result.getContent().size());
+        verify(userRepository, times(1)).findUsersByOptionalFilters(null, null, null, null, pageable);
     }
 
     @Test
     public void getUsersWithOptionalFilters() {
+        Pageable pageable = PageRequest.of(0, 20);
         List<User> users = Collections.singletonList(user);
-        when(userRepository.findUsersByOptionalFilters("John", "Doe", "john.doe@email.com", UserRole.USER)).thenReturn(users);
+        Page<User> page = new PageImpl<>(users, pageable, users.size());
+        when(userRepository.findUsersByOptionalFilters("John", "Doe", "john.doe@email.com", UserRole.USER, pageable)).thenReturn(page);
 
         UserFilter filter = new UserFilter("John", "Doe", "john.doe@email.com", UserRole.USER);
-        List<User> result = userService.getAllUsers(filter);
+        Page<User> result = userService.getAllUsers(filter, pageable);
 
         assertNotNull(result);
-        assertEquals(1, result.size());
-        verify(userRepository, times(1)).findUsersByOptionalFilters("John", "Doe", "john.doe@email.com", UserRole.USER);
+        assertEquals(1, result.getTotalElements());
+        verify(userRepository, times(1)).findUsersByOptionalFilters("John", "Doe", "john.doe@email.com", UserRole.USER, pageable);
     }
 
     @Test
