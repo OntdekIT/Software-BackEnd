@@ -31,7 +31,7 @@ services:
       - "993:993"
 
   backend:
-    build: src/main/resources
+    build: .
     image: climatechecker-springboot:dev
     container_name: climatechecker-dev-backend
     environment:
@@ -39,6 +39,7 @@ services:
       SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
       MAILSERVER_RELAY_HOST: ${MAILSERVER_RELAY_HOST}
       MAILSERVER_RELAY_PORT: ${MAILSERVER_RELAY_PORT}
       MAILSERVER_RELAY_USER: ${MAILSERVER_RELAY_USER}
