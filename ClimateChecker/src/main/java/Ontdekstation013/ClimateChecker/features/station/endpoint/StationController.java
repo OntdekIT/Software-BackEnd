@@ -10,17 +10,18 @@ import Ontdekstation013.ClimateChecker.features.station.StationService;
 import Ontdekstation013.ClimateChecker.features.station.endpoint.dto.GetAllStationsRequest;
 import Ontdekstation013.ClimateChecker.features.station.endpoint.dto.UpdateStationRequest;
 import Ontdekstation013.ClimateChecker.features.user.User;
+import Ontdekstation013.ClimateChecker.features.user.UserRole;
 import Ontdekstation013.ClimateChecker.features.user.UserMapper;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.GetAllUsersRequest;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserResponse;
 import Ontdekstation013.ClimateChecker.features.workshop.WorkshopService;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
@@ -94,14 +95,25 @@ public CompletableFuture<ResponseEntity<List<StationDto>>> getMeetstationWithMea
 }
 
     @PutMapping("/edit/{id}")
-    public ResponseEntity<?> updateMeetstation(@PathVariable long id, @RequestBody UpdateStationRequest updaterequest) throws Exception {
+    public ResponseEntity<?> updateMeetstation(@PathVariable long id, @RequestBody UpdateStationRequest updaterequest, @AuthenticationPrincipal User currentUser) throws Exception {
         Station station = stationService.GetStationById(id);
+        if (!isOwnerOrAdmin(currentUser, station.getUserid())) {
+            throw new AccessDeniedException("You are not allowed to edit this station");
+        }
         station.setIs_public(updaterequest.is_public());
         if (updaterequest.name() != null && !updaterequest.name().isEmpty()) {
             station.setName(updaterequest.name());
         }
         stationService.editstation(id, station);
         return ResponseEntity.status(HttpStatus.OK).body("OK");
+    }
+
+    private boolean isOwnerOrAdmin(User currentUser, Long ownerId) {
+        if (currentUser == null) {
+            return false;
+        }
+        boolean isAdmin = currentUser.getRole() == UserRole.ADMIN || currentUser.getRole() == UserRole.SUPER_ADMIN;
+        return isAdmin || currentUser.getUserId().equals(ownerId);
     }
 
     @GetMapping("/measurements/{id}")
@@ -144,15 +156,11 @@ public CompletableFuture<ResponseEntity<List<StationDto>>> getMeetstationWithMea
     }
 
     @PutMapping("/Claim")
-    public ResponseEntity<String> ClaimStation(@RequestBody StationDto stationDto, HttpServletRequest request) {
+    public ResponseEntity<String> ClaimStation(@RequestBody StationDto stationDto, @AuthenticationPrincipal User currentUser) {
         try {
-            Cookie[] cookies;
-            if (request.getCookies() != null) {
-                cookies = request.getCookies();
-                Long userID = Long.parseLong(cookies[0].getValue());
-                stationDto.userid = userID;
-                stationService.ClaimMeetstation(new Station(stationDto));
-            }
+            // Bind the claim to the authenticated user, never to a client-supplied id.
+            stationDto.userid = currentUser.getUserId();
+            stationService.ClaimMeetstation(new Station(stationDto));
             return ResponseEntity.status(HttpStatus.OK).body(null);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
