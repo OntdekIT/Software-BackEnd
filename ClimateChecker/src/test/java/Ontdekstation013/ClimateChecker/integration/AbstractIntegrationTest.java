@@ -22,7 +22,7 @@ public abstract class AbstractIntegrationTest {
     // SUPER-rechten vereist die alleen root heeft. Daarom draaien we als root,
     // net als de docker-compose in productie.
     @Container
-    static final MariaDBContainer<?> mariaDb =
+    static final MariaDBContainer<?> MARIA_DB =
             new MariaDBContainer<>("mariadb:11.2")
                     .withDatabaseName("ontdekstation013")
                     .withUsername("root")
@@ -31,11 +31,11 @@ public abstract class AbstractIntegrationTest {
     @DynamicPropertySource
     static void properties(DynamicPropertyRegistry registry) {
         // Datasource + Flyway naar de Testcontainers-database (als root).
-        registry.add("spring.datasource.url", mariaDb::getJdbcUrl);
+        registry.add("spring.datasource.url", MARIA_DB::getJdbcUrl);
         registry.add("spring.datasource.username", () -> "root");
         registry.add("spring.datasource.password", () -> "");
-        registry.add("SPRING_DATASOURCE_URL", mariaDb::getJdbcUrl);
-        registry.add("spring.flyway.url", mariaDb::getJdbcUrl);
+        registry.add("SPRING_DATASOURCE_URL", MARIA_DB::getJdbcUrl);
+        registry.add("spring.flyway.url", MARIA_DB::getJdbcUrl);
         registry.add("spring.flyway.user", () -> "root");
         registry.add("spring.flyway.password", () -> "");
 
