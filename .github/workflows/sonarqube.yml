@@ -23,13 +23,14 @@ jobs:
           java-version: '21'
           cache: 'maven'
 
-      - name: Build Project
-        run: mvn -B clean verify -DskipTests
+      # Analyse via de Maven-plugin i.p.v. de losse SonarSource-action. Die action
+      # draaide in een eigen Docker-container met Java 17, en de nieuwe
+      # scanner-engine eist Java 21+. Door de plugin in dezelfde build te draaien
+      # gebruikt de scan automatisch de Java 21 van de setup-java-stap.
+      # SONAR_TOKEN wordt automatisch uit de omgeving gelezen; projectKey en
+      # organization staan in ClimateChecker/sonar-project.properties.
+      - name: Build & SonarCloud analyse
+        run: mvn -B clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
         working-directory: ClimateChecker
-
-      - name: Run SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v2
-        with:
-          projectBaseDir: ClimateChecker
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

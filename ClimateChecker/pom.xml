@@ -15,6 +15,11 @@
 	<description>Application used to measure and display various attributes in the local environment</description>
 	<properties>
 		<java.version>21</java.version>
+		<!-- SonarCloud: gelezen door de sonar-maven-plugin tijdens `mvn sonar:sonar`.
+		     Sources/binaries leidt de plugin zelf af uit de build; alleen de
+		     project- en organisatiesleutel zijn nodig. -->
+		<sonar.projectKey>OntdekIT_Software-BackEnd</sonar.projectKey>
+		<sonar.organization>ontdekit</sonar.organization>
 	</properties>
 	<dependencies>
 
