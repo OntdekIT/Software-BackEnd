@@ -33,4 +33,12 @@ jobs:
           # Diff tegen de actieve semester-branch i.p.v. main (die ver
           # achterloopt), anders wordt bijna de hele repo als 'gewijzigd' gezien.
           DEFAULT_BRANCH: s3nj26
+          # Gebruik de projecteigen checkstyle-regels (.github/linters/checkstyle.xml)
+          # i.p.v. de standaard sun_checks.xml, die botst met onze conventies
+          # (hoofdletter-package, snake_case testmethodes, geen 80-kolom/Javadoc).
+          JAVA_FILE_NAME: checkstyle.xml
+          # google-java-format is een dwingende formatter zonder config: hij eist
+          # Google-stijl die dit project niet volgt. Niet te versoepelen, dus als
+          # enige linter uitgezet (een losse 'false' is een geldige denylist).
+          VALIDATE_GOOGLE_JAVA_FORMAT: false
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

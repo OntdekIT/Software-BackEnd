@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+        "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+        "https://checkstyle.org/dtds/configuration_1_3.dtd">
+<!--
+  Projecteigen checkstyle-config voor Super-Linter. De standaard sun_checks.xml
+  botst met de conventies van dit project (hoofdletter-package 'Ontdekstation013',
+  snake_case testmethodes, geen 80-kolom-/Javadoc-dwang). Deze config houdt de
+  zinvolle checks over en laat de stijlkeuzes van het project met rust.
+-->
+<module name="Checker">
+    <property name="severity" value="error"/>
+    <property name="charset" value="UTF-8"/>
+    <property name="fileExtensions" value="java"/>
+
+    <!-- Geen tab-tekens in de broncode. -->
+    <module name="FileTabCharacter"/>
+
+    <module name="TreeWalker">
+        <!-- Echte problemen, geen stijl-ruis. -->
+        <module name="UnusedImports"/>
+        <module name="RedundantImport"/>
+        <module name="EmptyStatement"/>
+        <module name="EqualsHashCode"/>
+        <module name="SimplifyBooleanExpression"/>
+        <module name="SimplifyBooleanReturn"/>
+        <module name="MissingOverride"/>
+        <module name="OneStatementPerLine"/>
+        <module name="UpperEll"/>
+        <module name="DefaultComesLast"/>
+        <module name="FallThrough"/>
+
+        <!--
+          Naamgeving: klassen en constanten conventioneel, maar methodenamen
+          staan snake_case toe (underscores) zoals de bestaande testsuite die
+          overal gebruikt.
+        -->
+        <module name="TypeName"/>
+        <module name="ConstantName"/>
+        <module name="MethodName">
+            <property name="format" value="^[a-z][a-zA-Z0-9_]*$"/>
+        </module>
+    </module>
+</module>
