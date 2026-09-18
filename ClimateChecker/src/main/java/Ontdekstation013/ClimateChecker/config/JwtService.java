@@ -17,9 +17,22 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
+    private static final int MIN_KEY_BITS = 256;
+
     private final String secretKey;
 
     public JwtService(@Value("${application.jwt.secret}") String secretKey) {
+        if (secretKey == null || secretKey.isBlank()) {
+            throw new IllegalStateException(
+                    "application.jwt.secret (env JWT_SECRET) is not set. Provide a Base64-encoded key of at least "
+                            + MIN_KEY_BITS + " bits.");
+        }
+        int keyBits = Decoders.BASE64.decode(secretKey).length * 8;
+        if (keyBits < MIN_KEY_BITS) {
+            throw new IllegalStateException(
+                    "application.jwt.secret is too short (" + keyBits + " bits); HS256 requires at least "
+                            + MIN_KEY_BITS + " bits.");
+        }
         this.secretKey = secretKey;
     }
 

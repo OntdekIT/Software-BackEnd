@@ -17,6 +17,7 @@ import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.NonUniqueResultException;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
+@Slf4j
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/authentication")
@@ -85,6 +87,7 @@ public class UserAuthenticationController {
         }  catch (IncorrectResultSizeDataAccessException e) {  // Catch database constraint violation
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email is al in gebruik");
         }  catch (Exception e) {
+            log.error("Unexpected error during user registration", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Er is een onverwachte fout opgetreden.");
         }
     }
@@ -109,6 +112,7 @@ public class UserAuthenticationController {
         }  catch (InvalidArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
+            log.error("Unexpected error during login", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Er is een onverwachte fout opgetreden.");
         }
     }
@@ -131,6 +135,7 @@ public class UserAuthenticationController {
         }  catch (InvalidArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
+            log.error("Unexpected error during code verification", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Er is een onverwachte fout opgetreden.");
         }
     }
@@ -153,6 +158,7 @@ public class UserAuthenticationController {
         }  catch (InvalidArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
+            log.error("Unexpected error during password reset", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Er is een onverwachte fout opgetreden.");
         }
     }
@@ -176,6 +182,7 @@ public class UserAuthenticationController {
         }  catch (InvalidArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
+            log.error("Unexpected error during forgot-password request", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Er is een onverwachte fout opgetreden.");
         }
     }

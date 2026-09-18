@@ -1,11 +1,17 @@
 name: climatechecker-dev
 services:
   db:
-    image: mariadb:11
+    # Pinned to 11.2: newer 11.x (e.g. 11.8) is not supported by Flyway 10.10
+    # and breaks the migration connection on startup.
+    image: mariadb:11.2
     container_name: climatechecker-dev-db
     environment:
       MYSQL_ROOT_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
       MYSQL_DATABASE: ${SPRING_DATASOURCE_SCHEME}
+      # Passwordless localhost/socket user so healthcheck.sh --connect can reach
+      # the server; without it the check is denied and the container never
+      # becomes healthy, blocking dependents from starting.
+      MARIADB_MYSQL_LOCALHOST_USER: "1"
     ports:
       - "3306:3306"
     healthcheck:
