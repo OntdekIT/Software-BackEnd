@@ -31,11 +31,10 @@ jobs:
           # niet haalbaar zijn zonder de hele package-structuur te hernoemen; dat
           # is alleen ruis en verbergt echte problemen. De backend-code wordt via
           # SonarCloud + de Maven-build/tests gecontroleerd.
+          #
+          # NB: Super-Linter staat geen mix van VALIDATE_*=true en =false toe.
+          # Daarom hier alléén een uitsluiting (false); alle overige talen
+          # (YAML/JSON/Actions/Dockerfile/Markdown/...) worden standaard gelint.
           VALIDATE_JAVA: false
-          VALIDATE_JSON: true
-          VALIDATE_YAML: true
-          VALIDATE_MARKDOWN: true
-          VALIDATE_DOCKERFILE: true
-          VALIDATE_GITHUB_ACTIONS: true
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
