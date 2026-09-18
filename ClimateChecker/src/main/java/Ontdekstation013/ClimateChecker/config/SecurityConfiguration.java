@@ -35,6 +35,7 @@ public class SecurityConfiguration {
                         // These must be listed before the blanket /api/Meetstation/** rule,
                         // since request matchers are evaluated top to bottom.
                         .requestMatchers(HttpMethod.PUT, "/api/Meetstation/edit/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/Meetstation/transfer/**").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/Meetstation/Claim").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/Meetstation/add").authenticated()
                         .requestMatchers("/api/Meetstation/**").permitAll()

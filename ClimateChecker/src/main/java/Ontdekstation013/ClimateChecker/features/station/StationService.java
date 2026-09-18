@@ -274,6 +274,26 @@ public class StationService {
         }
     }
 
+    /**
+     * Draagt een meetstation over aan een nieuwe eigenaar (op basis van diens
+     * e-mailadres). De meethistorie blijft behouden omdat metingen aan het
+     * station hangen, niet aan de gebruiker; alleen de eigenaar-verwijzing
+     * verandert.
+     */
+    @Transactional
+    public void transferOwnership(long stationId, String newOwnerEmail) {
+        Station station = stationRepository.findById(stationId)
+                .orElseThrow(() -> new NotFoundException("Station not found"));
+
+        User newOwner = userRepository.findByEmail(newOwnerEmail);
+        if (newOwner == null) {
+            throw new NotFoundException("Gebruiker met dit e-mailadres bestaat niet");
+        }
+
+        station.setUserid(newOwner.getUserId());
+        stationRepository.save(station);
+    }
+
     public List<Station> findAll(){
         return stationRepository.findAll();
     }

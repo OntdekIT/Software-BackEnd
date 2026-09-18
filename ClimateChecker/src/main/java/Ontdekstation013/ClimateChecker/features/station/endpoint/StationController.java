@@ -9,6 +9,8 @@ import Ontdekstation013.ClimateChecker.features.station.StationMapper;
 import Ontdekstation013.ClimateChecker.features.station.StationService;
 import Ontdekstation013.ClimateChecker.features.station.endpoint.dto.GetAllStationsRequest;
 import Ontdekstation013.ClimateChecker.features.station.endpoint.dto.UpdateStationRequest;
+import Ontdekstation013.ClimateChecker.features.station.endpoint.dto.TransferStationRequest;
+import jakarta.validation.Valid;
 import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.UserRole;
 import Ontdekstation013.ClimateChecker.features.user.UserMapper;
@@ -105,6 +107,16 @@ public CompletableFuture<ResponseEntity<List<StationDto>>> getMeetstationWithMea
             station.setName(updaterequest.name());
         }
         stationService.editstation(id, station);
+        return ResponseEntity.status(HttpStatus.OK).body("OK");
+    }
+
+    @PutMapping("/transfer/{id}")
+    public ResponseEntity<?> transferMeetstation(@PathVariable long id, @Valid @RequestBody TransferStationRequest request, @AuthenticationPrincipal User currentUser) {
+        Station station = stationService.GetStationById(id);
+        if (!isOwnerOrAdmin(currentUser, station.getUserid())) {
+            throw new AccessDeniedException("You are not allowed to transfer this station");
+        }
+        stationService.transferOwnership(id, request.newOwnerEmail());
         return ResponseEntity.status(HttpStatus.OK).body("OK");
     }
 
