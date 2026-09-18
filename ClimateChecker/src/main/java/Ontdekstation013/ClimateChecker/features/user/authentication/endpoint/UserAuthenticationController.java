@@ -9,6 +9,7 @@ import Ontdekstation013.ClimateChecker.features.user.UserMapper;
 import Ontdekstation013.ClimateChecker.features.user.UserService;
 import Ontdekstation013.ClimateChecker.features.user.authentication.*;
 import Ontdekstation013.ClimateChecker.features.user.authentication.endpoint.dto.*;
+import Ontdekstation013.ClimateChecker.features.user.authentication.trustedip.TrustedIpService;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserResponse;
 import Ontdekstation013.ClimateChecker.features.workshop.Workshop;
 import Ontdekstation013.ClimateChecker.features.workshop.WorkshopService;
@@ -44,12 +45,26 @@ public class UserAuthenticationController {
     private final StationService stationService;
     private final PasswordEncodingService passwordEncodingService;
     private final RateLimiter rateLimiter;
+    private final TrustedIpService trustedIpService;
 
     private static final String RATE_LIMIT_MESSAGE = "Te veel pogingen. Probeer het over een minuut opnieuw.";
 
     private boolean isRateLimited(String action, HttpServletRequest request, String email) {
-        String key = action + ":" + request.getRemoteAddr() + ":" + (email == null ? "" : email.toLowerCase());
+        String key = action + ":" + clientIp(request) + ":" + (email == null ? "" : email.toLowerCase());
         return !rateLimiter.isAllowed(key);
+    }
+
+    /**
+     * Bepaalt het client-IP. Achter een reverse proxy/load balancer staat het
+     * echte adres in de eerste waarde van X-Forwarded-For; anders het
+     * directe remote address.
+     */
+    private String clientIp(HttpServletRequest request) {
+        String forwarded = request.getHeader("X-Forwarded-For");
+        if (forwarded != null && !forwarded.isBlank()) {
+            return forwarded.split(",")[0].trim();
+        }
+        return request.getRemoteAddr();
     }
 
     @PostMapping("register")
@@ -101,14 +116,20 @@ public class UserAuthenticationController {
         }
         try {
             User user = userService.getUserByEmail(loginRequest.email());
-            if (user != null && passwordEncodingService.verifyPassword(loginRequest.password(), user.getPassword())) {
-                Token token = tokenService.createVerifyToken(user.getUserId(), TokenType.VERIFY_AUTH);
-                emailSenderService.sendLoginMail(user.getEmail(), user.getFirstName(), user.getLastName(), token.getNumericCode());
-            } else {
+            if (user == null || !passwordEncodingService.verifyPassword(loginRequest.password(), user.getPassword())) {
                 throw new InvalidArgumentException("Invalid email and/or password");
             }
 
-            return ResponseEntity.ok().build();
+            // Vertrouwd IP -> mailverificatie overslaan en direct een JWT geven.
+            if (trustedIpService.isTrusted(user.getUserId(), clientIp(request))) {
+                String token = authService.authenticate(user);
+                return ResponseEntity.ok(LoginResponse.authenticated(token));
+            }
+
+            // Onbekend IP -> code mailen; de gebruiker doorloopt de verify-stap.
+            Token token = tokenService.createVerifyToken(user.getUserId(), TokenType.VERIFY_AUTH);
+            emailSenderService.sendLoginMail(user.getEmail(), user.getFirstName(), user.getLastName(), token.getNumericCode());
+            return ResponseEntity.ok(LoginResponse.requiresVerification());
         }  catch (InvalidArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
@@ -128,6 +149,8 @@ public class UserAuthenticationController {
 
             if (user != null && tokenService.verifyToken(verifyLoginRequest.code(), user.getUserId(), TokenType.VERIFY_AUTH)) {
                 String token = authService.authenticate(user);
+                // Onthoud dit IP zodat de volgende login geen mailcode meer vraagt.
+                trustedIpService.remember(user.getUserId(), clientIp(request));
                 responseEntity = ResponseEntity.ok(new AuthenticationResponse(token));
             }
 
