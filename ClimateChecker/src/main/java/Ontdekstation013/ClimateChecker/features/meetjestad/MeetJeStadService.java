@@ -8,6 +8,7 @@ import Ontdekstation013.ClimateChecker.utility.GpsTriangulation;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import lombok.Getter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,10 @@ import java.util.List;
 
 @Service
 public class MeetJeStadService {
-    private final String baseUrl = "https://meetjestad.net/data/?type=sensors&format=json";
+    // Databron-URL komt uit de configuratie (property meetjestad.base-url /
+    // env MEETJESTAD_BASE_URL) zodat je zonder codewijziging naar een andere
+    // bron (demo/test/live) kunt wijzen. De default is de live-bron.
+    private final String baseUrl;
     @Getter
     private final int minuteLimit = 1440;
     private final float[][] cityLimits = {
@@ -35,8 +39,11 @@ public class MeetJeStadService {
     private final StationRepository stationRepository;
     private final RestTemplate restTemplate;
 
-    public MeetJeStadService(StationRepository stationRepository) {
+    public MeetJeStadService(
+            StationRepository stationRepository,
+            @Value("${meetjestad.base-url:https://meetjestad.net/data/?type=sensors&format=json}") String baseUrl) {
         this.stationRepository = stationRepository;
+        this.baseUrl = baseUrl;
 
         // Bounded timeouts so a slow or hanging meetjestad.net cannot tie up
         // request threads indefinitely.
