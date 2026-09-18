@@ -6,9 +6,12 @@ import Ontdekstation013.ClimateChecker.features.station.Station;
 import Ontdekstation013.ClimateChecker.features.station.StationRepository;
 import Ontdekstation013.ClimateChecker.features.station.StationService;
 import Ontdekstation013.ClimateChecker.features.station.endpoint.StationDto;
+import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.UserRepository;
+import Ontdekstation013.ClimateChecker.features.user.UserRole;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -108,5 +111,49 @@ public class StationServiceTest {
         when(stationRepository.getByRegistrationCode(123L)).thenReturn(station);
 
         assertSame(station, stationService.getByRegistrationCode(123L));
+    }
+
+    @Test
+    public void transferOwnership_setsStationToNewOwner_andKeepsHistory() {
+        Station station = new Station();
+        station.setStationid(1L);
+        station.setUserid(10L); // huidige eigenaar
+
+        User newOwner = new User(20L, "New", "Owner", "new@example.com", UserRole.USER, "pw");
+
+        when(stationRepository.findById(1L)).thenReturn(Optional.of(station));
+        when(userRepository.findByEmail("new@example.com")).thenReturn(newOwner);
+
+        stationService.transferOwnership(1L, "new@example.com");
+
+        ArgumentCaptor<Station> saved = ArgumentCaptor.forClass(Station.class);
+        verify(stationRepository).save(saved.capture());
+        // Eigenaar is gewijzigd; het station-object zelf (en dus de gekoppelde
+        // metingen) blijft hetzelfde -> historie blijft behouden.
+        assertEquals(20L, saved.getValue().getUserid());
+        assertEquals(1L, saved.getValue().getStationid());
+    }
+
+    @Test
+    public void transferOwnership_throwsWhenStationNotFound() {
+        when(stationRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class,
+                () -> stationService.transferOwnership(99L, "new@example.com"));
+        verify(stationRepository, never()).save(any());
+    }
+
+    @Test
+    public void transferOwnership_throwsWhenNewOwnerDoesNotExist() {
+        Station station = new Station();
+        station.setStationid(1L);
+        station.setUserid(10L);
+
+        when(stationRepository.findById(1L)).thenReturn(Optional.of(station));
+        when(userRepository.findByEmail("ghost@example.com")).thenReturn(null);
+
+        assertThrows(NotFoundException.class,
+                () -> stationService.transferOwnership(1L, "ghost@example.com"));
+        verify(stationRepository, never()).save(any());
     }
 }
