@@ -7,6 +7,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.mail.MessagingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import Ontdekstation013.ClimateChecker.features.measurement.Measurement;
 import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadParameters;
@@ -30,13 +31,22 @@ public class StationMonitorService {
     private final EmailSenderService emailSenderService;
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
+    // Controle-intervallen komen uit de configuratie zodat ze zonder codewijziging
+    // aangepast kunnen worden. Defaults: uitvalcontrole elke 5 minuten,
+    // dataophalen elke 6 uur. Nog af te stemmen met de opdrachtgever.
+    private final long uitvalControleIntervalSeconden;
+    private final long dataOphaalIntervalSeconden;
 
     @Autowired
-    public StationMonitorService(StationService stationService, MeasurementService measurementService, MeetJeStadService meetJeStadService, EmailSenderService emailSenderService) {
+    public StationMonitorService(StationService stationService, MeasurementService measurementService, MeetJeStadService meetJeStadService, EmailSenderService emailSenderService,
+                                 @Value("${station.monitor.downtime-check-interval-seconds:300}") long uitvalControleIntervalSeconden,
+                                 @Value("${station.monitor.measurement-fetch-interval-seconds:21600}") long dataOphaalIntervalSeconden) {
         this.stationService = stationService;
         this.measurementService = measurementService;
         this.meetJeStadService = meetJeStadService;
         this.emailSenderService = emailSenderService;
+        this.uitvalControleIntervalSeconden = uitvalControleIntervalSeconden;
+        this.dataOphaalIntervalSeconden = dataOphaalIntervalSeconden;
     }
 
     @PostConstruct
@@ -45,8 +55,8 @@ public class StationMonitorService {
     }
 
     private void scheduleCheck() {
-        scheduler.scheduleAtFixedRate(this::checkMeetstations, 0, 15, TimeUnit.SECONDS); //The actual check interval should be longer, To be discussed with stakeholders.
-        scheduler.scheduleAtFixedRate(this::checkMeasurements, 0, 6, TimeUnit.HOURS); //Dit staat nu op elke 6 uur maar voor debugging kun je het op elke 10 secondes ofzo zetten
+        scheduler.scheduleAtFixedRate(this::checkMeetstations, 0, uitvalControleIntervalSeconden, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(this::checkMeasurements, 0, dataOphaalIntervalSeconden, TimeUnit.SECONDS);
     }
 
     public void checkMeasurements() {
