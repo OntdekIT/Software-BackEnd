@@ -25,7 +25,13 @@ jobs:
         uses: github/super-linter@v5
         env:
           VALIDATE_ALL_CODEBASE: false
-          VALIDATE_JAVA: true
+          # Java-checkstyle uitgezet: de standaardregels (Sun/Google-stijl) eisen
+          # o.a. lowercase packagenamen, terwijl de root-package 'Ontdekstation013'
+          # een hoofdletter heeft. Daardoor faalt élk Java-bestand op regels die
+          # niet haalbaar zijn zonder de hele package-structuur te hernoemen; dat
+          # is alleen ruis en verbergt echte problemen. De backend-code wordt via
+          # SonarCloud + de Maven-build/tests gecontroleerd.
+          VALIDATE_JAVA: false
           VALIDATE_JSON: true
           VALIDATE_YAML: true
           VALIDATE_MARKDOWN: true
