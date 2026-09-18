@@ -20,21 +20,17 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          # Volledige historie zodat Super-Linter het verschil met de
+          # base-branch kan berekenen en ALLEEN gewijzigde bestanden lint.
+          # Zonder dit valt hij terug op de hele codebase.
+          fetch-depth: 0
 
       - name: Run Super-Linter
         uses: github/super-linter@v5
         env:
           VALIDATE_ALL_CODEBASE: false
-          # Java-checkstyle uitgezet: de standaardregels (Sun/Google-stijl) eisen
-          # o.a. lowercase packagenamen, terwijl de root-package 'Ontdekstation013'
-          # een hoofdletter heeft. Daardoor faalt élk Java-bestand op regels die
-          # niet haalbaar zijn zonder de hele package-structuur te hernoemen; dat
-          # is alleen ruis en verbergt echte problemen. De backend-code wordt via
-          # SonarCloud + de Maven-build/tests gecontroleerd.
-          #
-          # NB: Super-Linter staat geen mix van VALIDATE_*=true en =false toe.
-          # Daarom hier alléén een uitsluiting (false); alle overige talen
-          # (YAML/JSON/Actions/Dockerfile/Markdown/...) worden standaard gelint.
-          VALIDATE_JAVA: false
-          DEFAULT_BRANCH: main
+          # Diff tegen de actieve semester-branch i.p.v. main (die ver
+          # achterloopt), anders wordt bijna de hele repo als 'gewijzigd' gezien.
+          DEFAULT_BRANCH: s3nj26
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

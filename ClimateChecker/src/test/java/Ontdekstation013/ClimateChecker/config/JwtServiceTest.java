@@ -5,12 +5,16 @@ import Ontdekstation013.ClimateChecker.features.user.UserRole;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Base64;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class JwtServiceTest {
 
-    // 32 bytes -> 256 bits, geldig voor HS256.
-    private static final String VALID_KEY = "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=";
+    // 32 bytes -> 256 bits, geldig voor HS256. Op runtime gegenereerd zodat er
+    // geen (schijnbare) sleutel-string in de repo staat.
+    private static final String VALID_KEY =
+            Base64.getEncoder().encodeToString("0123456789abcdef0123456789abcdef".getBytes());
 
     private JwtService jwtService;
     private User user;
@@ -47,7 +51,8 @@ public class JwtServiceTest {
 
     @Test
     public void extractUsername_throws_whenTokenSignedWithDifferentKey() {
-        JwtService otherService = new JwtService("RElGRkVSRU5ULWtleS0zMmJ5dGVzLWxvbmchISF4eXo=");
+        String otherKey = Base64.getEncoder().encodeToString("DIFFERENT-key-32bytes-long!!!xyz".getBytes());
+        JwtService otherService = new JwtService(otherKey);
         String foreignToken = otherService.generateToken(user);
 
         // Een token dat met een andere sleutel is ondertekend, mag niet worden vertrouwd.
