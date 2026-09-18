@@ -9,6 +9,7 @@ import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.UserRepository;
 import jakarta.transaction.Transactional;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +21,7 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class StationService {
     private final StationRepository stationRepository;
@@ -240,9 +242,7 @@ public class StationService {
 
                                 measurementsEntityList.add(measurement);
                             } catch (Exception e) {
-                                System.err.println("Fout bij converteren van MeasurementDto (stationId: "
-                                        + dto.stationid + "): " + e.getMessage());
-                                e.printStackTrace();
+                                log.warn("Fout bij converteren van MeasurementDto (stationId: {})", dto.stationid, e);
                             }
                         }
                     }
@@ -255,10 +255,9 @@ public class StationService {
         //Sla de stations met measurements op in de lokale DB
         try {
             stationRepository.saveAll(stationEntities);
-            System.out.println("✅ Stations and measurements saved successfully: " + stationEntities.size());
+            log.info("Synchronisatie afgerond: {} station(s) met metingen opgeslagen", stationEntities.size());
         } catch (Exception e) {
-            System.err.println("❌ Error during saveAll:");
-            e.printStackTrace();
+            log.error("Fout bij het opslaan van stations tijdens de synchronisatie", e);
         }
     }
 
