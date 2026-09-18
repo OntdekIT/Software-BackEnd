@@ -5,6 +5,7 @@ import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.authentication.EmailSenderService;
 import jakarta.annotation.PostConstruct;
 import jakarta.mail.MessagingException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import Ontdekstation013.ClimateChecker.features.measurement.Measurement;
@@ -20,6 +21,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Service
 public class StationMonitorService {
     private final StationService stationService;
@@ -53,7 +55,9 @@ public class StationMonitorService {
 
     public void checkMeetstations() {
         List<Station> meetstations = stationService.findAll();
+        log.info("Uitvalcontrole gestart voor {} meetstation(s)", meetstations.size());
 
+        int failures = 0;
         for (Station station : meetstations) {
             try {
                 List<Measurement> measurements = fetchMeasurementsForStation(station);
@@ -65,9 +69,11 @@ public class StationMonitorService {
                 }
 
             } catch (Exception ex) {
-                System.out.print("Er is iets fout gegaan bij het checken van de meetstations. Exception: " + ex);
+                failures++;
+                log.error("Fout bij het controleren van meetstation {}", station.getStationid(), ex);
             }
         }
+        log.info("Uitvalcontrole afgerond ({} station(s), {} fout(en))", meetstations.size(), failures);
     }
 
     private List<Measurement> fetchMeasurementsForStation(Station station) {
