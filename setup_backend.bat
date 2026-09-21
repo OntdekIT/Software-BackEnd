@@ -69,6 +69,33 @@ if not exist "%BACKEND_DIR%\pom.xml" (
 if exist "%PROJECT_ROOT%\.env" (
     echo [INFO] Laad omgevingsvariabelen uit .env...
     call :LOAD_ENV "%PROJECT_ROOT%\.env"
+
+    :: Toon alle geladen configuratiepaden en waarden
+    call :PRINT_CONFIG
+
+    :: Voeg het pad naar de MariaDB bin-map toe aan PATH indien ingesteld
+    if defined MARIADB_BIN_PATH (
+        :: Verwijder eventuele trailing backslash zodat paden netjes worden gecombineerd
+        if "!MARIADB_BIN_PATH:~-1!"=="\" set "MARIADB_BIN_PATH=!MARIADB_BIN_PATH:~0,-1!"
+        if exist "!MARIADB_BIN_PATH!\mysql.exe" (
+            echo [INFO] MariaDB bin-map toegevoegd aan PATH: !MARIADB_BIN_PATH!
+            set "PATH=!MARIADB_BIN_PATH!;%PATH%"
+        ) else (
+            echo [WAARSCHUWING] MARIADB_BIN_PATH is ingesteld, maar '!MARIADB_BIN_PATH!\mysql.exe' bestaat niet.
+            echo [WAARSCHUWING] Controleer het pad in .env.
+        )
+    )
+
+    :: Valideer of het mysql-commando beschikbaar is
+    echo [INFO] Zoek mysql executable...
+    where mysql 2>nul
+    mysql --version >nul 2>&1
+    if !ERRORLEVEL! neq 0 (
+        echo [WAARSCHUWING] mysql-commando niet gevonden. De database kan niet automatisch worden gecontroleerd/aangemaakt.
+    ) else (
+        for /f "usebackq tokens=*" %%i in (`where mysql`) do echo [INFO] mysql executable gevonden: %%i
+        echo [INFO] mysql-commando is beschikbaar.
+    )
 )
 
 netstat -ano | findstr ":%BACKEND_PORT%" | findstr "LISTENING" >nul
@@ -113,9 +140,12 @@ if exist "%PROJECT_ROOT%\.env" (
 )
 
 echo [INFO] Backend bouwen en starten met Maven...
+echo [INFO] Werkdirectory: %BACKEND_DIR%
+echo [INFO] MISE executable: %MISE_EXE%
+echo [INFO] Maven commando: "%MISE_EXE%" exec maven -- mvn -f "%BACKEND_DIR%\pom.xml" spring-boot:run -Dspring-boot.run.profiles=%SPRING_PROFILES_ACTIVE%
 cd /d "%BACKEND_DIR%"
 set "SPRING_PROFILES_ACTIVE=%SPRING_PROFILES_ACTIVE%"
-"%MISE_EXE%" exec maven -- mvn spring-boot:run
+"%MISE_EXE%" exec maven -- mvn -f "%BACKEND_DIR%\pom.xml" spring-boot:run -Dspring-boot.run.profiles=%SPRING_PROFILES_ACTIVE%
 
 if !ERRORLEVEL! neq 0 (
     echo [FOUT] Backend kon niet worden gestart. Controleer de foutmeldingen hierboven.
@@ -157,7 +187,11 @@ if not exist "%PROJECT_ROOT%\.tool-versions" (
 
 cd /d "%PROJECT_ROOT%"
 echo [INFO] Installeer/actualiseer Java 21, Maven en Node LTS via mise...
+echo [INFO] MISE executable: %MISE_EXE%
+echo [INFO] .tool-versions pad: %PROJECT_ROOT%.tool-versions
+echo [INFO] Command: "%MISE_EXE%" trust "%PROJECT_ROOT%\.tool-versions"
 "%MISE_EXE%" trust "%PROJECT_ROOT%\.tool-versions" >nul 2>&1
+echo [INFO] Command: "%MISE_EXE%" install --yes
 "%MISE_EXE%" install --yes
 
 if !ERRORLEVEL! neq 0 (
@@ -167,13 +201,17 @@ if !ERRORLEVEL! neq 0 (
 )
 
 echo [INFO] Java versie:
+echo [INFO] Command: "%MISE_EXE%" exec java -- java -version
 "%MISE_EXE%" exec java -- java -version
 echo.
 echo [INFO] Maven versie:
+echo [INFO] Command: "%MISE_EXE%" exec maven -- mvn -v
 "%MISE_EXE%" exec maven -- mvn -v
 echo.
 echo [INFO] Node/npm versie:
+echo [INFO] Command: "%MISE_EXE%" exec node -- node -v
 "%MISE_EXE%" exec node -- node -v
+echo [INFO] Command: "%MISE_EXE%" exec node -- npm -v
 "%MISE_EXE%" exec node -- npm -v
 
 echo.
@@ -189,14 +227,17 @@ echo.
 echo [INFO] Servers worden geinstalleerd...
 
 echo [INFO] Controleer MariaDB installatie...
+echo [INFO] Zoek mysql executable...
+where mysql 2>nul
 mysql --version >nul 2>&1
 if !ERRORLEVEL! equ 0 (
+    for /f "usebackq tokens=*" %%i in (`where mysql`) do echo [INFO] MariaDB/mysql executable gevonden: %%i
     echo [INFO] MariaDB is al geinstalleerd.
 ) else (
     echo [INFO] MariaDB is niet gevonden. Probeer te installeren via Chocolatey...
     where choco >nul 2>&1
     if !ERRORLEVEL! equ 0 (
-        echo [INFO] MariaDB wordt geinstalleerd via Chocolatey. Dit kan enkele minuten duren...
+        echo [INFO] Command: choco install mariadb -y --no-progress
         choco install mariadb -y --no-progress
         if !ERRORLEVEL! neq 0 (
             echo [FOUT] Installatie van MariaDB via Chocolatey mislukt.
@@ -231,10 +272,12 @@ echo.
 echo [INFO] Servers worden gestart...
 
 echo [INFO] Start MariaDB service...
+echo [INFO] Command: net start MariaDB
 net start MariaDB >nul 2>&1
 if !ERRORLEVEL! equ 0 (
     echo [INFO] MariaDB service is gestart.
 ) else (
+    echo [INFO] Command: net start MySQL
     net start MySQL >nul 2>&1
     if !ERRORLEVEL! equ 0 (
         echo [INFO] MySQL/MariaDB service is gestart.
@@ -291,6 +334,10 @@ if exist "%PROJECT_ROOT%\.env" (
     echo SPRING_DATASOURCE_PASSWORD=password
     echo SPRING_DATASOURCE_SCHEME=ontdekstation013
     echo.
+    echo # --- Pad naar MariaDB bin-map (bijv. C:\Program Files\MariaDB\MariaDB 11.4\bin) ---
+    echo # Laat dit leeg als mysql/mariadb al in je systeem-PATH staat.
+    echo MARIADB_BIN_PATH=
+    echo.
     echo # --- Mail server ---
     echo # false = gebruik in-memory GreenMail SMTP-server, true = gebruik echte SMTP relay
     echo USE_REAL_MAILSERVER=false
@@ -335,19 +382,47 @@ for /f "usebackq tokens=1* delims==" %%a in ("%~1") do (
 )
 exit /b 0
 
+:PRINT_CONFIG
+echo.
+echo ============================================================
+echo   Configuratie overzicht (uit .env en script)
+echo ============================================================
+echo [CONFIG] PROJECT_ROOT              = !PROJECT_ROOT!
+echo [CONFIG] BACKEND_DIR               = !BACKEND_DIR!
+echo [CONFIG] MISE_EXE                  = !MISE_EXE!
+echo [CONFIG] BACKEND_PORT              = !BACKEND_PORT!
+echo [CONFIG] SPRING_PROFILES_ACTIVE    = !SPRING_PROFILES_ACTIVE!
+echo [CONFIG] SPRING_DATASOURCE_URL     = !SPRING_DATASOURCE_URL!
+echo [CONFIG] SPRING_DATASOURCE_USERNAME= !SPRING_DATASOURCE_USERNAME!
+echo [CONFIG] SPRING_DATASOURCE_SCHEME  = !SPRING_DATASOURCE_SCHEME!
+echo [CONFIG] MARIADB_BIN_PATH          = !MARIADB_BIN_PATH!
+echo [CONFIG] USE_REAL_MAILSERVER       = !USE_REAL_MAILSERVER!
+echo [CONFIG] MAILSERVER_RELAY_HOST     = !MAILSERVER_RELAY_HOST!
+echo [CONFIG] MAILSERVER_RELAY_PORT     = !MAILSERVER_RELAY_PORT!
+echo [CONFIG] MAIL_USERNAME             = !MAIL_USERNAME!
+echo [CONFIG] FRONTEND_HOST             = !FRONTEND_HOST!
+echo [CONFIG] NODE_VERSION              = !NODE_VERSION!
+echo ============================================================
+echo.
+exit /b 0
+
 :ENSURE_DATABASE
 if not defined SPRING_DATASOURCE_SCHEME (
     echo [WAARSCHUWING] SPRING_DATASOURCE_SCHEME is niet gedefinieerd. Sla database-controle over.
     exit /b 0
 )
 
+echo [INFO] Zoek mysql executable voor database-controle...
+where mysql 2>nul
 mysql --version >nul 2>&1
+
 if !ERRORLEVEL! neq 0 (
     echo [WAARSCHUWING] mysql client niet gevonden. Kan database niet controleren/aanmaken.
     exit /b 0
 )
 
 echo [INFO] Controleer of database '%SPRING_DATASOURCE_SCHEME%' bestaat...
+echo [INFO] Command: mysql -u "%SPRING_DATASOURCE_USERNAME%" -p"%SPRING_DATASOURCE_PASSWORD%" -e "CREATE DATABASE IF NOT EXISTS %SPRING_DATASOURCE_SCHEME% CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 mysql -u "%SPRING_DATASOURCE_USERNAME%" -p"%SPRING_DATASOURCE_PASSWORD%" -e "CREATE DATABASE IF NOT EXISTS %SPRING_DATASOURCE_SCHEME% CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;" >nul 2>&1
 if !ERRORLEVEL! neq 0 (
     echo [WAARSCHUWING] Kon database '%SPRING_DATASOURCE_SCHEME%' niet aanmaken. Mogelijk ontbreekt de database of zijn de inloggegevens incorrect.
