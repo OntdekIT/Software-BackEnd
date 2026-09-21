@@ -1,17 +1,13 @@
 package Ontdekstation013.ClimateChecker.features.station;
 
+import Ontdekstation013.ClimateChecker.features.measurement.Measurement;
 import Ontdekstation013.ClimateChecker.features.measurement.MeasurementService;
+import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadParameters;
+import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadService;
 import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.authentication.EmailSenderService;
 import jakarta.annotation.PostConstruct;
 import jakarta.mail.MessagingException;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import Ontdekstation013.ClimateChecker.features.measurement.Measurement;
-import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadParameters;
-import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadService;
-import org.springframework.stereotype.Service;
-
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +15,8 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class StationMonitorService {

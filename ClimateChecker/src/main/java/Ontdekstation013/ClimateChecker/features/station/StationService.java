@@ -7,11 +7,6 @@ import Ontdekstation013.ClimateChecker.features.measurement.endpoint.Measurement
 import Ontdekstation013.ClimateChecker.features.station.endpoint.StationDto;
 import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.UserRepository;
-import jakarta.transaction.Transactional;
-
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
-
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -19,6 +14,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
 
 @Service
 public class StationService {
@@ -85,7 +82,12 @@ public class StationService {
             List<Long> userIds = users.stream().map(User::getUserId).collect(Collectors.toList());
             filter.setUserIds(userIds);
         }
-        return stationRepository.findStationsByOptionalFilters(filter.getName(), filter.getDatabaseTag(), filter.getIsPublic(), filter.getRegistrationCode(), filter.getUserIds(), filter.getIsActive());
+        // Avoid passing an empty list to the IN clause, which is invalid in some databases (e.g. H2)
+        List<Long> userIds = filter.getUserIds();
+        if (userIds != null && userIds.isEmpty()) {
+            userIds = null;
+        }
+        return stationRepository.findStationsByOptionalFilters(filter.getName(), filter.getDatabaseTag(), filter.getIsPublic(), filter.getRegistrationCode(), userIds, filter.getIsActive());
     }
 
     @Async

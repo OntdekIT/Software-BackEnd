@@ -1,9 +1,7 @@
 package Ontdekstation013.ClimateChecker.features.station;
 
-import Ontdekstation013.ClimateChecker.features.user.UserRole;
-import lombok.*;
-
 import java.util.List;
+import lombok.*;
 
 @Getter
 @Setter
@@ -19,5 +17,3 @@ public class StationFilter {
     private List<Long> userIds;
     private Boolean isActive;
 }
-
-

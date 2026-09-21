@@ -3,7 +3,6 @@ package Ontdekstation013.ClimateChecker.features.station;
 import Ontdekstation013.ClimateChecker.features.measurement.endpoint.MeasurementDto;
 import Ontdekstation013.ClimateChecker.features.station.endpoint.StationDto;
 import Ontdekstation013.ClimateChecker.features.station.endpoint.dto.GetAllStationsRequest;
-
 import java.util.List;
 
 public class StationMapper {

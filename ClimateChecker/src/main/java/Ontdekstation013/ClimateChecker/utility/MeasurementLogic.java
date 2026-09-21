@@ -1,7 +1,6 @@
 package Ontdekstation013.ClimateChecker.utility;
 
 import Ontdekstation013.ClimateChecker.features.measurement.Measurement;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;

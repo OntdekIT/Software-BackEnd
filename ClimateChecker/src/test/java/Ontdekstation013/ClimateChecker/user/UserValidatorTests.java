@@ -1,13 +1,13 @@
 package Ontdekstation013.ClimateChecker.user;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.UserRole;
 import Ontdekstation013.ClimateChecker.features.user.UserValidator;
 import Ontdekstation013.ClimateChecker.features.user.ValidationResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 public class UserValidatorTests {
 
