@@ -7,6 +7,8 @@ import Ontdekstation013.ClimateChecker.features.measurement.endpoint.Measurement
 import Ontdekstation013.ClimateChecker.features.station.endpoint.StationDto;
 import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.UserRepository;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 
 import lombok.extern.slf4j.Slf4j;
