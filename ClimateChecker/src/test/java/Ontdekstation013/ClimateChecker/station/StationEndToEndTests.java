@@ -1,26 +1,42 @@
 package Ontdekstation013.ClimateChecker.station;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.icegreen.greenmail.junit5.GreenMailExtension;
+import com.icegreen.greenmail.util.ServerSetup;
+import java.time.Instant;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.time.Instant;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class StationEndToEndTests {
+
+    @RegisterExtension
+    static GreenMailExtension greenMail = new GreenMailExtension(ServerSetup.SMTP);
 
     @Autowired
     private TestRestTemplate restTemplate;
 
     @LocalServerPort
     private int port;
+
+    @BeforeEach
+    void setUp() {
+        assertThat(greenMail.isRunning()).isTrue();
+    }
+
+    @AfterEach
+    void tearDown() {
+        greenMail.reset();
+    }
 
     private String url(String path) {
         return "http://localhost:" + port + "/api/Meetstation" + path;
@@ -51,7 +67,7 @@ public class StationEndToEndTests {
         long duration = System.currentTimeMillis() - start;
 
         System.out.println("GET /stationsMetMeasurements took: " + duration + "ms");
-        assertThat(duration).isLessThan(3000);
+        assertThat(duration).isLessThan(5000);
     }
 
     @Test

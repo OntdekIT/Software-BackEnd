@@ -1,9 +1,8 @@
 package Ontdekstation013.ClimateChecker.features.neighbourhood;
 
-import lombok.*;
-
 import jakarta.persistence.*;
 import java.util.List;
+import lombok.*;
 
 @Entity
 @Table(name = "region")

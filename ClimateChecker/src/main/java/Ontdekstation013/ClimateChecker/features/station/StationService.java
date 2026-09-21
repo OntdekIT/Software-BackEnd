@@ -10,9 +10,6 @@ import Ontdekstation013.ClimateChecker.features.user.UserRepository;
 import jakarta.transaction.Transactional;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
-
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -87,7 +84,12 @@ public class StationService {
             List<Long> userIds = users.stream().map(User::getUserId).collect(Collectors.toList());
             filter.setUserIds(userIds);
         }
-        return stationRepository.findStationsByOptionalFilters(filter.getName(), filter.getDatabaseTag(), filter.getIsPublic(), filter.getRegistrationCode(), filter.getUserIds(), filter.getIsActive());
+        // Avoid passing an empty list to the IN clause, which is invalid in some databases (e.g. H2)
+        List<Long> userIds = filter.getUserIds();
+        if (userIds != null && userIds.isEmpty()) {
+            userIds = null;
+        }
+        return stationRepository.findStationsByOptionalFilters(filter.getName(), filter.getDatabaseTag(), filter.getIsPublic(), filter.getRegistrationCode(), userIds, filter.getIsActive());
     }
 
     @Async

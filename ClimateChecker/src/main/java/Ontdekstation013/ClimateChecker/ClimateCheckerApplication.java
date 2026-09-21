@@ -1,14 +1,13 @@
 package Ontdekstation013.ClimateChecker;
 import Ontdekstation013.ClimateChecker.features.station.StationMonitorService;
 import jakarta.annotation.PostConstruct;
+import java.util.TimeZone;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-
-import java.util.TimeZone;
 
 @SpringBootApplication
 public class ClimateCheckerApplication {
@@ -32,4 +31,3 @@ public class ClimateCheckerApplication {
 		TimeZone.setDefault(TimeZone.getTimeZone(applicationTimezone));
 	}
 }
-

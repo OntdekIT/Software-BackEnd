@@ -1,7 +1,6 @@
 package Ontdekstation013.ClimateChecker.utility;
 
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
-
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 

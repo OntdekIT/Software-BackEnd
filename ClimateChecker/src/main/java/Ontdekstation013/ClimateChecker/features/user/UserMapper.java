@@ -8,7 +8,6 @@ import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.GetAllUsersReq
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UpdateMyAccountRequest;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserResponse;
 import Ontdekstation013.ClimateChecker.features.workshop.Workshop;
-
 import java.util.HashSet;
 import java.util.Set;
 

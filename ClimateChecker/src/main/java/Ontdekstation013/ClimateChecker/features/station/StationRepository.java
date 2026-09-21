@@ -1,12 +1,9 @@
 package Ontdekstation013.ClimateChecker.features.station;
 
-import Ontdekstation013.ClimateChecker.features.user.User;
-import Ontdekstation013.ClimateChecker.features.user.UserRole;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
-import java.util.List;
 
 public interface StationRepository extends JpaRepository <Station, Long> {
     Station getByRegistrationCode(Long meetstationCode);
@@ -20,7 +17,7 @@ public interface StationRepository extends JpaRepository <Station, Long> {
             "(:databaseTag IS NULL OR s.database_tag LIKE %:databaseTag%) AND " +
             "(:isPublic IS NULL OR s.is_public = :isPublic) AND " +
             "(:registrationCode IS NULL OR s.registrationCode = :registrationCode) AND " +
-            "(COALESCE(:userIds, NULL) IS NULL OR s.userid IN :userIds) AND " +
+            "(:userIds IS NULL OR s.userid IN :userIds) AND " +
             "(:isActive IS NULL OR s.isActive = :isActive)")
     List<Station> findStationsByOptionalFilters(@Param("name") String name,
                                                 @Param("databaseTag") String databaseTag,

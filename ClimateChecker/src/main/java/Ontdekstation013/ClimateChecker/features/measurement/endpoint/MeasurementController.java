@@ -1,26 +1,23 @@
 package Ontdekstation013.ClimateChecker.features.measurement.endpoint;
 
-import java.time.*;
-import java.time.format.*;
-import java.util.List;
-
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.features.measurement.MeasurementService;
 import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadService;
 import Ontdekstation013.ClimateChecker.features.neighbourhood.NeighbourhoodService;
 import Ontdekstation013.ClimateChecker.features.station.StationService;
 import Ontdekstation013.ClimateChecker.features.station.endpoint.StationDto;
+import Ontdekstation013.ClimateChecker.utility.DayMeasurementResponse;
+import Ontdekstation013.ClimateChecker.utility.HourMeasurementResponse;
+import Ontdekstation013.ClimateChecker.utility.RegionAverageBucketResponse;
+import java.time.*;
+import java.time.format.*;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import Ontdekstation013.ClimateChecker.utility.DayMeasurementResponse;
-import Ontdekstation013.ClimateChecker.utility.HourMeasurementResponse;
-import Ontdekstation013.ClimateChecker.utility.RegionAverageBucketResponse;
-import org.springframework.web.bind.annotation.*;
-
-import lombok.RequiredArgsConstructor;
 
 /**
  * For getting measurements of stations, only includes those inside the municipality of Tilburg.

@@ -1,10 +1,9 @@
 package Ontdekstation013.ClimateChecker.exception;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import java.time.Instant;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
-
-import java.time.Instant;
 
 // LARS
 @Getter

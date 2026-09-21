@@ -9,15 +9,14 @@ import Ontdekstation013.ClimateChecker.features.workshop.WorkshopMapper;
 import Ontdekstation013.ClimateChecker.features.workshop.WorkshopService;
 import Ontdekstation013.ClimateChecker.features.workshop.endpoint.dto.WorkshopRequest;
 import Ontdekstation013.ClimateChecker.features.workshop.endpoint.dto.WorkshopResponse;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/workshops")

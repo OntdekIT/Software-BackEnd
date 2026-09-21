@@ -8,13 +8,12 @@ import Ontdekstation013.ClimateChecker.utility.DayMeasurementResponse;
 import Ontdekstation013.ClimateChecker.utility.GpsTriangulation;
 import Ontdekstation013.ClimateChecker.utility.MeasurementLogic;
 import Ontdekstation013.ClimateChecker.utility.RegionAverageBucketResponse;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
