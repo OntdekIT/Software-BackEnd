@@ -16,7 +16,17 @@ import java.util.*;
 public class MeasurementLogic {
 
     public static List<DayMeasurementResponse> splitIntoDayMeasurements(Collection<Measurement> measurements) {
-        LinkedHashMap<LocalDate, Set<Measurement>> dayMeasurements = new LinkedHashMap<>();
+        // A day is only reported when at least one reading has a temperature,
+        // but within that day each metric is aggregated independently: a
+        // reading that is missing humidity or particulate must not crash the
+        // humidity/pm aggregation nor skew it, so every metric filters its own
+        // nulls (see splitIntoHourMeasurements for the same pattern).
+        //
+        // A TreeMap keeps the day buckets in chronological order no matter the
+        // order the source returned readings in, so a late ("nagestuurde")
+        // measurement for an earlier day still appears before later days in the
+        // response instead of being appended at the end.
+        TreeMap<LocalDate, Set<Measurement>> dayMeasurements = new TreeMap<>();
         for (Measurement measurement : measurements) {
             if (measurement.getTemperature() != null) {
                 LocalDate date = LocalDate.ofInstant(measurement.getTimestamp(), ZoneId.systemDefault());
@@ -35,32 +45,38 @@ public class MeasurementLogic {
             response.setTimestamp(entry.getKey().format(pattern));
             response.setAvgTemp((float) entry.getValue()
                     .stream()
+                    .filter(m -> m.getTemperature() != null)
                     .mapToDouble(Measurement::getTemperature)
                     .average()
                     .orElse(Double.NaN));
             response.setMinTemp(entry.getValue()
                     .stream()
                     .map(Measurement::getTemperature)
+                    .filter(Objects::nonNull)
                     .min(Float::compare)
                     .orElse(Float.NaN));
             response.setMaxTemp(entry.getValue()
                     .stream()
                     .map(Measurement::getTemperature)
+                    .filter(Objects::nonNull)
                     .max(Float::compare)
                     .orElse(Float.NaN));
             response.setAvgHum((float) entry.getValue()
                     .stream()
+                    .filter(m -> m.getHumidity() != null)
                     .mapToDouble(Measurement::getHumidity)
                     .average()
                     .orElse(Double.NaN));
             response.setMinHum(entry.getValue()
                     .stream()
                     .map(Measurement::getHumidity)
+                    .filter(Objects::nonNull)
                     .min(Float::compare)
                     .orElse(Float.NaN));
             response.setMaxHum(entry.getValue()
                     .stream()
                     .map(Measurement::getHumidity)
+                    .filter(Objects::nonNull)
                     .max(Float::compare)
                     .orElse(Float.NaN));
             response.setAvgStof((float) entry.getValue()
@@ -77,7 +93,10 @@ public class MeasurementLogic {
     }
 
     public static List<HourMeasurementResponse> splitIntoHourMeasurements(Collection<Measurement> measurements) {
-        LinkedHashMap<LocalDateTime, Set<Measurement>> hourMeasurements = new LinkedHashMap<>();
+        // TreeMap keeps the hour buckets chronological regardless of arrival
+        // order, so a late-arriving reading lands in its own hour in the right
+        // position rather than at the tail of the response.
+        TreeMap<LocalDateTime, Set<Measurement>> hourMeasurements = new TreeMap<>();
 
         for (Measurement measurement : measurements) {
             LocalDateTime hour = LocalDateTime.ofInstant(measurement.getTimestamp(), ZoneId.systemDefault())
