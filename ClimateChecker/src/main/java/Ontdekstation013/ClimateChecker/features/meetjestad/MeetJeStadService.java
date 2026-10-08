@@ -5,6 +5,7 @@ import Ontdekstation013.ClimateChecker.features.measurement.endpoint.Measurement
 import Ontdekstation013.ClimateChecker.features.station.Station;
 import Ontdekstation013.ClimateChecker.features.station.StationRepository;
 import Ontdekstation013.ClimateChecker.utility.GpsTriangulation;
+import Ontdekstation013.ClimateChecker.utility.MeasurementDeduplicator;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import lombok.Getter;
@@ -125,6 +126,11 @@ public class MeetJeStadService {
 
             measurements.add(measurement);
         }
+
+        // Collapse duplicate/resent rows for the same (station, timestamp)
+        // before anything downstream aggregates them, otherwise a resend is
+        // counted twice in every average/min/max.
+        measurements = MeasurementDeduplicator.deduplicate(measurements);
 
         if (params.includeFaultyMeasurements)
             return measurements;
