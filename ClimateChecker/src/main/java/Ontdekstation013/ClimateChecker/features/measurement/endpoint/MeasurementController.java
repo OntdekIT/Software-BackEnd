@@ -8,16 +8,13 @@ import Ontdekstation013.ClimateChecker.features.station.StationService;
 import Ontdekstation013.ClimateChecker.features.station.endpoint.StationDto;
 import Ontdekstation013.ClimateChecker.utility.DayMeasurementResponse;
 import Ontdekstation013.ClimateChecker.utility.HourMeasurementResponse;
+import Ontdekstation013.ClimateChecker.utility.HalfHourMeasurementResponse;
 import Ontdekstation013.ClimateChecker.utility.RegionAverageBucketResponse;
 import java.time.*;
 import java.time.format.*;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
 /**
  * For getting measurements of stations, only includes those inside the municipality of Tilburg.
@@ -90,7 +87,7 @@ public class MeasurementController {
      * @param regionId    ID of the neighbourhood/region
      * @param from        ISO 8601 start of time window (default: 24 h ago)
      * @param to          ISO 8601 end of time window (default: now)
-     * @param granularity "hour" or "day" (default: "hour")
+     * @param granularity "half-hour", "hour" or "day" (default: "hour")
      */
     @GetMapping("/history/average/region/{regionId}")
     public List<RegionAverageBucketResponse> getMeasurementsAverageForRegion(
@@ -129,6 +126,23 @@ public class MeasurementController {
             Instant endOfCurrentHour = Instant.now();
 
             return measurementService.getHourlyMeasurements(id, startOfDay, endOfCurrentHour);
+        } catch (Exception ex) {
+            throw ex;
+        }
+    }
+
+    /**
+     * Haalt halfuurlijkse gemiddeldes op (temp en PM2.5) van een specifiek station voor de huidige dag (tot nu).
+     * @param id - stationId
+     */
+    @GetMapping("/history/half-hourly/{id}")
+    public List<HalfHourMeasurementResponse> getTodayHalfHourlyMeasurements(@PathVariable int id) {
+        try {
+            LocalDate today = LocalDate.now(ZoneId.systemDefault());
+            Instant startOfDay = today.atStartOfDay(ZoneId.systemDefault()).toInstant();
+            Instant endOfCurrentHour = Instant.now();
+
+            return measurementService.getHalfHourlyMeasurements(id, startOfDay, endOfCurrentHour);
         } catch (Exception ex) {
             throw ex;
         }

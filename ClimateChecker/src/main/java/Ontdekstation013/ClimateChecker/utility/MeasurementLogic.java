@@ -114,16 +114,54 @@ public class MeasurementLogic {
         return responseList;
     }
 
+    public static List<HalfHourMeasurementResponse> splitIntoHalfHourMeasurements(Collection<Measurement> measurements) {
+        LinkedHashMap<LocalDateTime, Set<Measurement>> halfhourMeasurements = new LinkedHashMap<>();
+
+        for (Measurement measurement : measurements) {
+            LocalDateTime hour = LocalDateTime.ofInstant(measurement.getTimestamp(), ZoneId.systemDefault())
+                    .truncatedTo(ChronoUnit.MINUTES);
+            LocalDateTime halfHour = hour.withMinute(hour.getMinute() < 30 ? 0 : 30);
+
+            if (!halfhourMeasurements.containsKey(halfHour)) {
+                halfhourMeasurements.put(halfHour, new HashSet<>());
+            }
+            halfhourMeasurements.get(halfHour).add(measurement);
+        }
+
+        DateTimeFormatter pattern = DateTimeFormatter.ofPattern("HH:mm");
+        List<HalfHourMeasurementResponse> responseList = new ArrayList<>();
+
+        for (Map.Entry<LocalDateTime, Set<Measurement>> entry : halfhourMeasurements.entrySet()) {
+            HalfHourMeasurementResponse response = new HalfHourMeasurementResponse();
+            response.setTimestamp(entry.getKey().format(pattern));
+
+            response.setAvgTemp((float) entry.getValue().stream()
+                    .filter(m -> m.getTemperature() != null)
+                    .mapToDouble(Measurement::getTemperature)
+                    .average()
+                    .orElse(Double.NaN));
+
+            response.setAvgPm25((float) entry.getValue().stream()
+                    .filter(m -> m.getPm25() != null)
+                    .mapToDouble(Measurement::getPm25)
+                    .average()
+                    .orElse(Double.NaN));
+
+            responseList.add(response);
+        }
+
+        return responseList;
+    }
+
     /**
-     * Groups measurements into time buckets (hour or day) and returns min/max/avg temperature
+     * Groups measurements into time buckets (half-hour, hour or day) and returns min/max/avg temperature
      * and average pm25/pm10 per bucket.
      * Results are ordered by timestamp ascending.
      *
      * @param measurements source measurements (temperature nulls are skipped)
-     * @param granularity  "hour" or "day" — anything else defaults to "hour"
+     * @param granularity  "half-hour", "hour" or "day" — anything else defaults to "hour"
      */
     public static List<RegionAverageBucketResponse> splitIntoRegionBuckets(Collection<Measurement> measurements, String granularity) {
-        ChronoUnit bucketUnit = "day".equalsIgnoreCase(granularity) ? ChronoUnit.DAYS : ChronoUnit.HOURS;
         DateTimeFormatter isoFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
         LinkedHashMap<LocalDateTime, List<Float>> tempBuckets = new LinkedHashMap<>();
@@ -133,8 +171,7 @@ public class MeasurementLogic {
         measurements.stream()
                 .sorted(Comparator.comparing(Measurement::getTimestamp))
                 .forEach(m -> {
-                    LocalDateTime bucket = LocalDateTime.ofInstant(m.getTimestamp(), ZoneId.systemDefault())
-                            .truncatedTo(bucketUnit);
+                    LocalDateTime bucket = toBucket(LocalDateTime.ofInstant(m.getTimestamp(), ZoneId.systemDefault()), granularity);
 
                     if (m.getTemperature() != null)
                         tempBuckets.computeIfAbsent(bucket, k -> new ArrayList<>()).add(m.getTemperature());
@@ -160,6 +197,21 @@ public class MeasurementLogic {
             result.add(response);
         }
         return result;
+    }
+
+    /**
+     * Truncates a timestamp to the start of its bucket. ChronoUnit has no half-hour unit,
+     * so half-hours are rounded down to :00 or :30 manually.
+     */
+    private static LocalDateTime toBucket(LocalDateTime time, String granularity) {
+        if ("day".equalsIgnoreCase(granularity)) {
+            return time.truncatedTo(ChronoUnit.DAYS);
+        }
+        LocalDateTime hour = time.truncatedTo(ChronoUnit.HOURS);
+        if ("half-hour".equalsIgnoreCase(granularity) && time.getMinute() >= 30) {
+            return hour.plusMinutes(30);
+        }
+        return hour;
     }
 
     /**
