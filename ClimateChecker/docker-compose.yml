@@ -13,13 +13,12 @@ services:
       # becomes healthy, blocking dependents from starting.
       MARIADB_MYSQL_LOCALHOST_USER: "1"
     ports:
-      - "3306:3306"
+      - "3307:3306"
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 10s
       timeout: 5s
       retries: 3
-
 
   smtp:
     image: mailserver/docker-mailserver:latest

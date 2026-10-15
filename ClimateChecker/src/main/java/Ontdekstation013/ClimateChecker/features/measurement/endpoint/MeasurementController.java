@@ -9,6 +9,7 @@ import Ontdekstation013.ClimateChecker.features.station.endpoint.StationDto;
 import Ontdekstation013.ClimateChecker.utility.DayMeasurementResponse;
 import Ontdekstation013.ClimateChecker.utility.HourMeasurementResponse;
 import Ontdekstation013.ClimateChecker.utility.HalfHourMeasurementResponse;
+import Ontdekstation013.ClimateChecker.utility.NetworkMeasurementResponse;
 import Ontdekstation013.ClimateChecker.utility.RegionAverageBucketResponse;
 import java.time.*;
 import java.time.format.*;
@@ -79,6 +80,38 @@ public class MeasurementController {
         catch (Exception ex){
             throw ex;
         }
+    }
+
+    /**
+     * Geeft per dag de netwerkbrede statistiek: minimum, maximum, mediaan en
+     * gemiddelde temperatuur over alle meetstations samen.
+     *
+     * <p>Gebruikt bewust hetzelfde datumformaat en dezelfde dagbuckets als
+     * {@link #getMeasurementsAverage}, zodat de frontend de netwerkpanelen en het
+     * paneel van het geselecteerde station over dezelfde periode kan tonen.
+     *
+     * @param startDate - dd-MM-yyyy HH:mm format
+     * @param endDate   - dd-MM-yyyy HH:mm format
+     */
+    @GetMapping("/history/network")
+    public List<NetworkMeasurementResponse> getNetworkMeasurements(@RequestParam String startDate,
+                                                                   @RequestParam String endDate) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+
+        Instant startInstant;
+        Instant endInstant;
+        try {
+            startInstant = LocalDateTime.parse(startDate, formatter).atZone(ZoneId.systemDefault()).toInstant();
+            endInstant = LocalDateTime.parse(endDate, formatter).atZone(ZoneId.systemDefault()).toInstant();
+        } catch (DateTimeParseException e) {
+            throw new InvalidArgumentException("Dates must be in dd-MM-yyyy HH:mm format");
+        }
+
+        if (startInstant.isAfter(endInstant)) {
+            throw new InvalidArgumentException("Start date is after end date");
+        }
+
+        return measurementService.getNetworkMeasurements(startInstant, endInstant);
     }
 
     /**

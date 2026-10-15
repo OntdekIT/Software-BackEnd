@@ -92,6 +92,99 @@ public class MeasurementLogic {
         return responseList;
     }
 
+    /**
+     * Groepeert de metingen van het hele netwerk per dag en berekent per dag het
+     * minimum, het maximum, de mediaan en het gemiddelde over alle stations samen.
+     *
+     * <p>Alle vier de waarden komen uit dezelfde verzameling metingen van die dag.
+     * Het minimum is dus de koudste meting die ergens in het netwerk is gedaan, en
+     * de mediaan de middelste meting — niet de mediaan van de stationsgemiddelden.
+     * Die keuze houdt de vier waarden onderling consistent.
+     *
+     * <p>Een dag zonder enkele temperatuurmeting levert geen bucket op, zodat de
+     * grafiek geen lege punten toont. Een TreeMap houdt de dagen chronologisch,
+     * ook als er later nog metingen voor een eerdere dag binnenkomen.
+     *
+     * @param measurements metingen van alle stations (temperatuur-nulls worden overgeslagen)
+     */
+    public static List<NetworkMeasurementResponse> splitIntoNetworkDayMeasurements(Collection<Measurement> measurements) {
+        TreeMap<LocalDate, List<Float>> temperaturesPerDay = new TreeMap<>();
+        TreeMap<LocalDate, Set<Long>> stationsPerDay = new TreeMap<>();
+
+        for (Measurement measurement : measurements) {
+            if (measurement.getTemperature() == null) {
+                continue;
+            }
+
+            LocalDate date = LocalDate.ofInstant(measurement.getTimestamp(), ZoneId.systemDefault());
+            temperaturesPerDay.computeIfAbsent(date, k -> new ArrayList<>()).add(measurement.getTemperature());
+
+            // Het station kan ontbreken wanneer een meting niet aan een bekend
+            // station te koppelen is; die meting telt dan wel mee in de
+            // statistiek, maar niet in het aantal stations.
+            if (measurement.getStation() != null && measurement.getStation().getStationid() != null) {
+                stationsPerDay.computeIfAbsent(date, k -> new HashSet<>())
+                        .add(measurement.getStation().getStationid());
+            }
+        }
+
+        DateTimeFormatter pattern = DateTimeFormatter.ofPattern("dd-MM");
+        List<NetworkMeasurementResponse> responseList = new ArrayList<>();
+
+        for (Map.Entry<LocalDate, List<Float>> entry : temperaturesPerDay.entrySet()) {
+            List<Float> temperatures = entry.getValue();
+
+            NetworkMeasurementResponse response = new NetworkMeasurementResponse();
+            response.setTimestamp(entry.getKey().format(pattern));
+            response.setMinTemp(temperatures.stream().min(Float::compare).orElse(null));
+            response.setMaxTemp(temperatures.stream().max(Float::compare).orElse(null));
+            response.setMedianTemp(median(temperatures));
+            response.setAvgTemp((float) temperatures.stream()
+                    .mapToDouble(Float::doubleValue)
+                    .average()
+                    .orElse(Double.NaN));
+            response.setStationCount(stationsPerDay.getOrDefault(entry.getKey(), Set.of()).size());
+            response.setMeasurementCount(temperatures.size());
+
+            responseList.add(response);
+        }
+
+        return responseList;
+    }
+
+    /**
+     * Berekent de mediaan van een reeks waarden.
+     *
+     * <p>Bij een oneven aantal waarden is dat de middelste waarde, bij een even
+     * aantal het gemiddelde van de twee middelste. Null-waarden worden
+     * overgeslagen; een lege of volledig lege reeks levert {@code null} op in
+     * plaats van NaN, zodat de frontend het punt kan overslaan in plaats van een
+     * onzinnige waarde te tekenen.
+     *
+     * <p>De invoerlijst wordt niet gewijzigd.
+     */
+    public static Float median(Collection<Float> values) {
+        if (values == null) {
+            return null;
+        }
+
+        List<Float> sorted = values.stream()
+                .filter(Objects::nonNull)
+                .filter(value -> !value.isNaN())
+                .sorted()
+                .toList();
+
+        if (sorted.isEmpty()) {
+            return null;
+        }
+
+        int middle = sorted.size() / 2;
+        if (sorted.size() % 2 == 1) {
+            return sorted.get(middle);
+        }
+        return (sorted.get(middle - 1) + sorted.get(middle)) / 2f;
+    }
+
     public static List<HourMeasurementResponse> splitIntoHourMeasurements(Collection<Measurement> measurements) {
         // TreeMap keeps the hour buckets chronological regardless of arrival
         // order, so a late-arriving reading lands in its own hour in the right
@@ -211,6 +304,7 @@ public class MeasurementLogic {
             response.setMin(temps.stream().min(Float::compare).orElse(Float.NaN));
             response.setMax(temps.stream().max(Float::compare).orElse(Float.NaN));
             response.setAvg((float) temps.stream().mapToDouble(Float::doubleValue).average().orElse(Double.NaN));
+            response.setMedian(median(temps));
             response.setPm25(pm25s.isEmpty() ? null : (float) pm25s.stream().mapToDouble(Float::doubleValue).average().orElse(Double.NaN));
             response.setPm10(pm10s.isEmpty() ? null : (float) pm10s.stream().mapToDouble(Float::doubleValue).average().orElse(Double.NaN));
             result.add(response);

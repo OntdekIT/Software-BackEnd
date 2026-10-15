@@ -7,6 +7,7 @@ import Ontdekstation013.ClimateChecker.utility.DayMeasurementResponse;
 import Ontdekstation013.ClimateChecker.utility.HourMeasurementResponse;
 import Ontdekstation013.ClimateChecker.utility.HalfHourMeasurementResponse;
 import Ontdekstation013.ClimateChecker.utility.MeasurementLogic;
+import Ontdekstation013.ClimateChecker.utility.NetworkMeasurementResponse;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Paragraph;
@@ -64,6 +65,28 @@ public class  MeasurementService {
         List<Measurement> measurements = meetJeStadService.getMeasurements(params);
 
         return MeasurementLogic.splitIntoDayMeasurements(measurements);
+    }
+
+    /**
+     * Haalt de netwerkbrede statistiek op: per dag het minimum, het maximum, de
+     * mediaan en het gemiddelde over álle meetstations binnen Tilburg.
+     *
+     * <p>Door geen StationIds mee te geven levert MeetJeStad de metingen van
+     * alle stations; MeetJeStadService filtert die daarna op de gemeentegrens.
+     *
+     * <p>Let op: dit is een zware aanroep. Over een lange periode haalt hij de
+     * metingen van het hele netwerk op bij meetjestad.net, zonder cache. Zodra
+     * er een lokale kopie van de meetdata is, hoort deze query daarop te draaien.
+     */
+    public List<NetworkMeasurementResponse> getNetworkMeasurements(Instant startDate, Instant endDate) {
+        MeetJeStadParameters params = new MeetJeStadParameters();
+        params.StartDate = startDate;
+        params.EndDate = endDate;
+        params.StationIds.clear(); // leeg = alle stations
+        params.includeFaultyMeasurements = false; // netwerkstatistiek zonder uitschieters van defecte sensoren
+
+        List<Measurement> measurements = meetJeStadService.getMeasurements(params);
+        return MeasurementLogic.splitIntoNetworkDayMeasurements(measurements);
     }
 
     public List<HourMeasurementResponse> getHourlyMeasurements(int id, Instant startDate, Instant endDate) {

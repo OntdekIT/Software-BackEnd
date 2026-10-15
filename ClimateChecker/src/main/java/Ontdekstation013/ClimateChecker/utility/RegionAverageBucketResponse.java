@@ -21,6 +21,13 @@ public class RegionAverageBucketResponse {
     @JsonProperty("avg")
     private float avg;
 
+    /**
+     * Mediaan van de temperaturen in deze bucket. Null wanneer er geen
+     * bruikbare metingen zijn; de frontend slaat het punt dan over.
+     */
+    @JsonProperty("median")
+    private Float median;
+
     @JsonProperty("pm25")
     private Float pm25;
 
