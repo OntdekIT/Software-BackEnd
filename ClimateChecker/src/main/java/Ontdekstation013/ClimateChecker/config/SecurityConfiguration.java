@@ -39,6 +39,8 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.PUT, "/api/Meetstation/Claim").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/Meetstation/add").authenticated()
                         .requestMatchers("/api/Meetstation/**").permitAll()
+                        // Coverage pulls weeks of raw data for every station; keep it to admins.
+                        .requestMatchers("/api/measurement/coverage").hasAnyAuthority(UserRole.ADMIN.name(), UserRole.SUPER_ADMIN.name())
                         .requestMatchers("/api/measurement/**").permitAll()
                         .requestMatchers("/api/neighbourhood/**").permitAll()
                         .requestMatchers("/api/e2e/**").permitAll()
