@@ -1,11 +1,13 @@
 package Ontdekstation013.ClimateChecker.features.measurement.endpoint;
 
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
+import Ontdekstation013.ClimateChecker.features.measurement.DataCoverageService;
 import Ontdekstation013.ClimateChecker.features.measurement.MeasurementService;
 import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadService;
 import Ontdekstation013.ClimateChecker.features.neighbourhood.NeighbourhoodService;
 import Ontdekstation013.ClimateChecker.features.station.StationService;
 import Ontdekstation013.ClimateChecker.features.station.endpoint.StationDto;
+import Ontdekstation013.ClimateChecker.utility.DataCoverageResponse;
 import Ontdekstation013.ClimateChecker.utility.DayMeasurementResponse;
 import Ontdekstation013.ClimateChecker.utility.HourMeasurementResponse;
 import Ontdekstation013.ClimateChecker.utility.HalfHourMeasurementResponse;
@@ -13,6 +15,7 @@ import Ontdekstation013.ClimateChecker.utility.NetworkMeasurementResponse;
 import Ontdekstation013.ClimateChecker.utility.RegionAverageBucketResponse;
 import java.time.*;
 import java.time.format.*;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +31,7 @@ public class MeasurementController {
     private final MeasurementService measurementService;
     private final StationService stationService;
     private final NeighbourhoodService neighbourhoodService;
+    private final DataCoverageService dataCoverageService;
 
     /**
      * Gets the closest measurement to a given timestamp for each station.
@@ -137,6 +141,28 @@ public class MeasurementController {
         }
 
         return neighbourhoodService.getRegionAverageHistory(regionId, fromInstant, toInstant, granularity);
+    }
+
+    /**
+     * Shows per station and for the whole network how complete the particulate matter data is,
+     * so missing or irregular data can be spotted. Admin only (see SecurityConfiguration).
+     *
+     * @param from        ISO 8601 start of time window (default: 7 days before 'to')
+     * @param to          ISO 8601 end of time window, exclusive (default: start of the current hour)
+     * @param granularity "hour" or "day" (default: "hour")
+     */
+    @GetMapping("/coverage")
+    public DataCoverageResponse getDataCoverage(
+            @RequestParam(required = false) String from,
+            @RequestParam(required = false) String to,
+            @RequestParam(required = false, defaultValue = "hour") String granularity) {
+
+        // Default to the start of the current hour so the last bucket is complete
+        // and does not show up as a gap just because the hour is not over yet.
+        Instant toInstant = (to != null) ? parseIso8601(to) : Instant.now().truncatedTo(ChronoUnit.HOURS);
+        Instant fromInstant = (from != null) ? parseIso8601(from) : toInstant.minus(Duration.ofDays(7));
+
+        return dataCoverageService.getPmCoverage(fromInstant, toInstant, granularity);
     }
 
     private Instant parseIso8601(String value) {
