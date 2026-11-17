@@ -130,6 +130,11 @@ public class  MeasurementService {
             PdfWriter.getInstance(document, baos);
             document.open();
 
+            // iText gooit bij sluiten een fout als het document geen enkele pagina heeft.
+            if (measurements.isEmpty()) {
+                document.add(new Paragraph("Geen metingen gevonden"));
+            }
+
             for (Measurement measurement : measurements) {
                 String formattedMeasurement = formatMeasurement(measurement);
                 Paragraph paragraph = new Paragraph(formattedMeasurement);
