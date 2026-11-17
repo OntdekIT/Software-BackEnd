@@ -1,16 +1,21 @@
+# Keep the build context small and free of secrets
+.git
 .github
 .idea
-.git
+.vscode
 .gitignore
+.env
+.env.*
+*.env
+secrets.properties
 
-*/test
 target/
+res/
+**/*.log
 
 README.md
 HELP.md
-
 docker-build.sh
-
-mvnw
-mvnw.cmd
-.mvn
+docker-compose*.yml
+Dockerfile
+.dockerignore
