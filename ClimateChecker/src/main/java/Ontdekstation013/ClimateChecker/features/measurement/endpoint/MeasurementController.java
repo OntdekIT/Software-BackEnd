@@ -1,5 +1,12 @@
 package Ontdekstation013.ClimateChecker.features.measurement.endpoint;
 
+import Ontdekstation013.ClimateChecker.config.OpenApiConfig;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.features.measurement.DataCoverageService;
 import Ontdekstation013.ClimateChecker.features.measurement.MeasurementService;
@@ -23,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 /**
  * For getting measurements of stations, only includes those inside the municipality of Tilburg.
  */
+@Tag(name = "Metingen", description = "Metingen van meetstations in Tilburg, historisch en per wijk")
 @RestController
 @RequestMapping("/api/measurement")
 @RequiredArgsConstructor
@@ -39,6 +47,8 @@ public class MeasurementController {
      * Only includes measurements within {@link MeetJeStadService#getMinuteLimit() n} minutes of given timestamps past
      * @param timestamp - ISO 8601 format
      */
+    @Operation(summary = "Geef per meetstation de meting dichtst bij een tijdstip")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer")})
     @GetMapping("/history")
     public List<MeasurementDto> getMeasurementsAtTime(@RequestParam(value = "timestamp") String timestamp) {
         try {
@@ -66,25 +76,24 @@ public class MeasurementController {
      * @param startDate - dd-MM-yyyy HH:mm format
      * @param endDate -dd-MM-yyyy HH:mm format
      */
+    @Operation(summary = "Geef dagelijkse gemiddelde, minimum en maximum temperatuur van een station")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer")})
     @GetMapping("/history/average/{id}")
     public List<DayMeasurementResponse> getMeasurementsAverage(@PathVariable int id, @RequestParam String startDate, @RequestParam String endDate) {
-
-    try{
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
-        LocalDateTime localDateTimeStart = LocalDateTime.parse(startDate, formatter);
-        Instant startInstant = localDateTimeStart.atZone(applicationZone).toInstant();
+        Instant startInstant;
+        Instant endInstant;
+        try {
+            startInstant = LocalDateTime.parse(startDate, formatter).atZone(applicationZone).toInstant();
+            endInstant = LocalDateTime.parse(endDate, formatter).atZone(applicationZone).toInstant();
+        } catch (DateTimeParseException e) {
+            throw new InvalidArgumentException("Dates must be in dd-MM-yyyy HH:mm format");
+        }
 
-        LocalDateTime localDateTimeEnd = LocalDateTime.parse(endDate, formatter);
-        Instant endInstant = localDateTimeEnd.atZone(applicationZone).toInstant();
-
-        if (startInstant.isAfter(endInstant)){
+        if (startInstant.isAfter(endInstant)) {
             throw new InvalidArgumentException("Start date is after end date");
         }
         return measurementService.getHistoricalMeasurements(id, startInstant, endInstant);
-        }
-        catch (Exception ex){
-            throw ex;
-        }
     }
 
     /**
@@ -98,6 +107,8 @@ public class MeasurementController {
      * @param startDate - dd-MM-yyyy HH:mm format
      * @param endDate   - dd-MM-yyyy HH:mm format
      */
+    @Operation(summary = "Geef dagelijkse netwerkbrede temperatuurstatistiek over alle stations")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer")})
     @GetMapping("/history/network")
     public List<NetworkMeasurementResponse> getNetworkMeasurements(@RequestParam String startDate,
                                                                    @RequestParam String endDate) {
@@ -127,6 +138,8 @@ public class MeasurementController {
      * @param to          ISO 8601 end of time window (default: now)
      * @param granularity "half-hour", "hour" or "day" (default: "hour")
      */
+    @Operation(summary = "Geef gemiddelde temperatuur per tijdsblok voor een wijk")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer")})
     @GetMapping("/history/average/region/{regionId}")
     public List<RegionAverageBucketResponse> getMeasurementsAverageForRegion(
             @PathVariable Long regionId,
@@ -152,6 +165,9 @@ public class MeasurementController {
      * @param to          ISO 8601 end of time window, exclusive (default: start of the current hour)
      * @param granularity "hour" or "day" (default: "hour")
      */
+    @Operation(summary = "Geef de volledigheid van fijnstofdata per station (alleen beheerders)")
+    @SecurityRequirement(name = OpenApiConfig.BEARER_AUTH)
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "401", description = "Niet ingelogd"), @ApiResponse(responseCode = "403", description = "Geen toegang")})
     @GetMapping("/coverage")
     public DataCoverageResponse getDataCoverage(
             @RequestParam(required = false) String from,
@@ -178,33 +194,29 @@ public class MeasurementController {
      * Haalt uurlijkse gemiddeldes op (temp en PM2.5) van een specifiek station voor de huidige dag (tot nu).
      * @param id - stationId
      */
+    @Operation(summary = "Geef uurgemiddelden van een station voor vandaag")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt")})
     @GetMapping("/history/hourly/{id}")
     public List<HourMeasurementResponse> getTodayHourlyMeasurements(@PathVariable int id) {
-        try {
-            LocalDate today = LocalDate.now(applicationZone);
-            Instant startOfDay = today.atStartOfDay(applicationZone).toInstant();
-            Instant endOfCurrentHour = Instant.now();
+        LocalDate today = LocalDate.now(applicationZone);
+        Instant startOfDay = today.atStartOfDay(applicationZone).toInstant();
+        Instant endOfCurrentHour = Instant.now();
 
-            return measurementService.getHourlyMeasurements(id, startOfDay, endOfCurrentHour);
-        } catch (Exception ex) {
-            throw ex;
-        }
+        return measurementService.getHourlyMeasurements(id, startOfDay, endOfCurrentHour);
     }
 
     /**
      * Haalt halfuurlijkse gemiddeldes op (temp en PM2.5) van een specifiek station voor de huidige dag (tot nu).
      * @param id - stationId
      */
+    @Operation(summary = "Geef halfuurgemiddelden van een station voor vandaag")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt")})
     @GetMapping("/history/half-hourly/{id}")
     public List<HalfHourMeasurementResponse> getTodayHalfHourlyMeasurements(@PathVariable int id) {
-        try {
-            LocalDate today = LocalDate.now(applicationZone);
-            Instant startOfDay = today.atStartOfDay(applicationZone).toInstant();
-            Instant endOfCurrentHour = Instant.now();
+        LocalDate today = LocalDate.now(applicationZone);
+        Instant startOfDay = today.atStartOfDay(applicationZone).toInstant();
+        Instant endOfCurrentHour = Instant.now();
 
-            return measurementService.getHalfHourlyMeasurements(id, startOfDay, endOfCurrentHour);
-        } catch (Exception ex) {
-            throw ex;
-        }
+        return measurementService.getHalfHourlyMeasurements(id, startOfDay, endOfCurrentHour);
     }
 }
