@@ -238,6 +238,7 @@ public class StationService {
                                 measurement.setTimestamp(parseTimestamp(measurementDto.getTimestamp()));
                                 measurement.setLatitude(measurementDto.getLatitude());
                                 measurement.setLongitude(measurementDto.getLongitude());
+                                measurement.setLocationInherited(measurementDto.isLocationInherited());
                                 measurement.setTemperature(measurementDto.getTemperature());
                                 measurement.setHumidity(measurementDto.getHumidity());
                                 measurement.setPm25(measurementDto.getPm25());

@@ -24,6 +24,11 @@ public class Measurement {
     private Float pm10;
     private Boolean is_public;
 
+    // True als de GPS-positie van de laatst bekende locatie van het station
+    // is overgenomen, omdat de meting zelf geen geldige positie had.
+    @Column(name = "location_inherited", nullable = false)
+    private boolean locationInherited;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stationid")
     private Station station;

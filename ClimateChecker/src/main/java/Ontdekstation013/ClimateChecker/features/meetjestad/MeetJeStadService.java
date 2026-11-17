@@ -21,7 +21,9 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class MeetJeStadService {
@@ -114,13 +116,13 @@ public class MeetJeStadService {
                 .ofPattern("yyyy-MM-dd HH:mm:ss")
                 .withZone(ZoneOffset.UTC);
 
+        Map<Integer, float[]> latestValidLocations = findLatestValidLocations(measurementsDto);
+        Map<Long, Station> locationUpdates = new HashMap<>();
+
         List<Measurement> measurements = new ArrayList<>();
         for (MeasurementDto dto : measurementsDto) {
-            float[] point = {dto.getLatitude(), dto.getLongitude()};
-            if (!GpsTriangulation.pointInPolygon(cityLimits, point))
-                continue;
-
             Station station = stationRepository.getMeetstationByStationid((long) dto.getId());
+            boolean knownStation = station != null;
 
             if (station == null) {
                 station = new Station();
@@ -132,10 +134,28 @@ public class MeetJeStadService {
                 station.setMeasurementList(new ArrayList<>());
             }
 
+            float[] point;
+            boolean inherited = false;
+            if (hasValidLocation(dto)) {
+                point = new float[]{dto.getLatitude(), dto.getLongitude()};
+                // Een echte positie buiten Tilburg hoort niet op onze kaart.
+                if (!GpsTriangulation.pointInPolygon(cityLimits, point))
+                    continue;
+            } else {
+                point = lastKnownLocation(station, latestValidLocations.get(dto.getId()));
+                // Zonder enige bekende positie kunnen we de meting niet plaatsen.
+                if (point == null || !GpsTriangulation.pointInPolygon(cityLimits, point))
+                    continue;
+                inherited = true;
+            }
+            dto.setLatitude(point[0]);
+            dto.setLongitude(point[1]);
+
             Measurement measurement = new Measurement();
             measurement.setStation(station);
-            measurement.setLongitude(dto.getLongitude());
-            measurement.setLatitude(dto.getLatitude());
+            measurement.setLocationInherited(inherited);
+            measurement.setLongitude(point[1]);
+            measurement.setLatitude(point[0]);
             measurement.setTemperature(dto.getTemperature());
             measurement.setHumidity(dto.getHumidity());
             measurement.setPm25(dto.getPm25());
@@ -145,7 +165,12 @@ public class MeetJeStadService {
             measurement.setTimestamp(Instant.from(temp));
 
             measurements.add(measurement);
+
+            if (knownStation && !inherited) {
+                rememberLocation(station, point, latestValidLocations.get(dto.getId()), locationUpdates);
+            }
         }
+        locationUpdates.values().forEach(stationRepository::save);
 
         // Collapse duplicate/resent rows for the same (station, timestamp)
         // before anything downstream aggregates them, otherwise a resend is
@@ -156,6 +181,56 @@ public class MeetJeStadService {
             return measurements;
         else
             return IncorrectValueFilter(measurements);
+    }
+
+    // Een positie is geldig als hij echt is doorgegeven: niet ontbrekend, niet NaN
+    // en niet het "0,0"-punt dat een station zonder GPS-ontvangst oplevert.
+    static boolean hasValidLocation(MeasurementDto dto) {
+        Float lat = dto.getLatitude();
+        Float lon = dto.getLongitude();
+        if (lat == null || lon == null || lat.isNaN() || lon.isNaN() || lat.isInfinite() || lon.isInfinite())
+            return false;
+        return !(lat == 0f && lon == 0f);
+    }
+
+    // Nieuwste geldige positie per station binnen deze batch (op tijdstip).
+    private Map<Integer, float[]> findLatestValidLocations(List<MeasurementDto> dtos) {
+        Map<Integer, String> latestTimestamp = new HashMap<>();
+        Map<Integer, float[]> latest = new HashMap<>();
+        for (MeasurementDto dto : dtos) {
+            if (!hasValidLocation(dto) || dto.getTimestamp() == null)
+                continue;
+            float[] point = {dto.getLatitude(), dto.getLongitude()};
+            if (!GpsTriangulation.pointInPolygon(cityLimits, point))
+                continue;
+            String previous = latestTimestamp.get(dto.getId());
+            if (previous == null || dto.getTimestamp().compareTo(previous) > 0) {
+                latestTimestamp.put(dto.getId(), dto.getTimestamp());
+                latest.put(dto.getId(), point);
+            }
+        }
+        return latest;
+    }
+
+    private float[] lastKnownLocation(Station station, float[] latestInBatch) {
+        if (latestInBatch != null)
+            return latestInBatch;
+        if (station.getLastKnownLatitude() != null && station.getLastKnownLongitude() != null)
+            return new float[]{station.getLastKnownLatitude(), station.getLastKnownLongitude()};
+        return null;
+    }
+
+    // Bewaar de nieuwste geldige positie op het station, alleen als die veranderd is.
+    private void rememberLocation(Station station, float[] point, float[] latestInBatch, Map<Long, Station> updates) {
+        if (latestInBatch == null || point[0] != latestInBatch[0] || point[1] != latestInBatch[1])
+            return;
+        Float storedLat = station.getLastKnownLatitude();
+        Float storedLon = station.getLastKnownLongitude();
+        if (storedLat != null && storedLon != null && storedLat == point[0] && storedLon == point[1])
+            return;
+        station.setLastKnownLatitude(point[0]);
+        station.setLastKnownLongitude(point[1]);
+        updates.put(station.getStationid(), station);
     }
 
     public List<Measurement> IncorrectValueFilter(List<Measurement> measurements) {
