@@ -48,10 +48,10 @@ public class AuthEndpointsFeatureTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void usersEndpoint_isForbidden_withoutAuthentication() throws Exception {
-        // /api/users mag alleen door (super)admins; zonder token -> 403.
+    public void usersEndpoint_isUnauthorized_withoutAuthentication() throws Exception {
+        // /api/users mag alleen door (super)admins; zonder token -> 401.
         mockMvc.perform(get("/api/users"))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test

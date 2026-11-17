@@ -1,5 +1,6 @@
 package Ontdekstation013.ClimateChecker.config;
 
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,15 +34,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         jwt = authHeader.substring(7);
-        userId = jwtService.extractUsername(jwt);
+        try {
+            userId = jwtService.extractUsername(jwt);
 
-        if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            final UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
-            if (jwtService.IsTokenValid(jwt, userDetails)) {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+            if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                final UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
+                if (userDetails != null && jwtService.IsTokenValid(jwt, userDetails)) {
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
             }
+        } catch (JwtException | IllegalArgumentException e) {
+            // Malformed, expired or tampered token (or a subject that is not a user id): treat the
+            // request as unauthenticated. Protected endpoints then answer 401 via the entry point.
+            logger.debug("Ignoring invalid JWT: " + e.getMessage());
         }
         filterChain.doFilter(request, response);
     }

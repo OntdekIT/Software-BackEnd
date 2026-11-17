@@ -47,6 +47,8 @@ services:
     environment:
       # dev profile: allows the built-in dev JWT key (see README, JWT_SECRET per omgeving)
       SPRING_PROFILES_ACTIVE: docker,dev
+      # Flyway owns the schema; Hibernate may only validate it, never change it.
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
       SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL:-jdbc:mariadb://db:3306/${SPRING_DATASOURCE_SCHEME}}
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME:-root}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
