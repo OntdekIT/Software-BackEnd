@@ -12,6 +12,7 @@ import Ontdekstation013.ClimateChecker.features.measurement.MeasurementService;
 import Ontdekstation013.ClimateChecker.features.station.Station;
 import Ontdekstation013.ClimateChecker.features.station.StationMapper;
 import Ontdekstation013.ClimateChecker.features.station.StationService;
+import Ontdekstation013.ClimateChecker.features.station.endpoint.dto.AddStationRequest;
 import Ontdekstation013.ClimateChecker.features.station.endpoint.dto.GetAllStationsRequest;
 import Ontdekstation013.ClimateChecker.features.station.endpoint.dto.UpdateStationRequest;
 import Ontdekstation013.ClimateChecker.features.station.endpoint.dto.TransferStationRequest;
@@ -24,7 +25,6 @@ import Ontdekstation013.ClimateChecker.features.workshop.WorkshopService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -44,7 +44,6 @@ import java.util.concurrent.CompletableFuture;
 @Tag(name = "Meetstations", description = "Meetstations opvragen, claimen, bewerken en overdragen")
 @RestController
 @RequestMapping("/api/Meetstation")
-@CrossOrigin(origins = {"http://localhost:5173"}, allowCredentials = "true")
 public class StationController {
     private final StationService stationService;
     private final MeasurementService measurementService;
@@ -196,35 +195,33 @@ public CompletableFuture<ResponseEntity<List<StationDto>>> getMeetstationWithMea
     @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer"), @ApiResponse(responseCode = "401", description = "Niet ingelogd")})
     @PutMapping("/Claim")
     public ResponseEntity<String> ClaimStation(@RequestBody StationDto stationDto, @AuthenticationPrincipal User currentUser) {
-        try {
-            // Bind the claim to the authenticated user, never to a client-supplied id.
-            stationDto.userid = currentUser.getUserId();
-            stationService.ClaimMeetstation(new Station(stationDto));
-            return ResponseEntity.status(HttpStatus.OK).body(null);
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        }
+        // Bind the claim to the authenticated user, never to a client-supplied id.
+        // A station that already has an owner is rejected with 409 (see StationService).
+        stationDto.userid = currentUser.getUserId();
+        stationService.ClaimMeetstation(new Station(stationDto));
+        return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
     @Operation(summary = "Voeg een nieuw station toe")
     @SecurityRequirement(name = OpenApiConfig.BEARER_AUTH)
     @ApiResponses({@ApiResponse(responseCode = "201", description = "Station aangemaakt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer"), @ApiResponse(responseCode = "401", description = "Niet ingelogd"), @ApiResponse(responseCode = "500", description = "Onverwachte fout")})
     @PostMapping("/add")
-    public ResponseEntity<?> addStation(@RequestBody Station stationRequest) {
+    public ResponseEntity<?> addStation(@Valid @RequestBody AddStationRequest request) {
         try {
             Station station = new Station();
-            station.setName(stationRequest.getName());
+            station.setStationid(request.stationid() != null ? request.stationid() : request.registrationCode());
+            station.setName(request.name());
             station.setDatabase_tag("MJS");
             station.setIs_public(false);
             station.setIsActive(false);
-            station.setRegistrationCode(stationRequest.getRegistrationCode());
-            station.setLocation_locationid(stationRequest.getLocation_locationid());
+            station.setRegistrationCode(request.registrationCode());
+            station.setLocation_locationid(request.location_locationid());
 
             Station savedStation = stationService.addStation(station);
-            return ResponseEntity.status(HttpStatus.CREATED).body(savedStation);
-        }  catch (IncorrectResultSizeDataAccessException e) {  // Catch database constraint violation
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Registratiecode is al in gebruik!");
-        }   catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedStation.toDto());
+        } catch (InvalidArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Er is een fout opgetreden bij het toevoegen van het meetstation.");
         }
     }
