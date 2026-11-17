@@ -15,6 +15,7 @@ import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadService;
 import Ontdekstation013.ClimateChecker.features.station.Station;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,7 +28,7 @@ public class MeasurementServiceTest {
     @BeforeEach
     public void setUp() {
         meetJeStadService = mock(MeetJeStadService.class);
-        service = new MeasurementService(meetJeStadService);
+        service = new MeasurementService(meetJeStadService, ZoneOffset.UTC);
     }
 
     private static Measurement measurement(Instant timestamp, Float temperature) {
