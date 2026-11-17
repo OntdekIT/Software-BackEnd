@@ -13,7 +13,7 @@ import static org.mockito.Mockito.when;
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.features.measurement.DataCoverageService;
 import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadParameters;
-import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadService;
+import Ontdekstation013.ClimateChecker.features.measurement.LocalMeasurementReader;
 import Ontdekstation013.ClimateChecker.features.station.Station;
 import Ontdekstation013.ClimateChecker.features.station.StationRepository;
 import Ontdekstation013.ClimateChecker.utility.DataCoverageResponse;
@@ -26,15 +26,15 @@ import org.mockito.ArgumentCaptor;
 
 public class DataCoverageServiceTest {
 
-    private MeetJeStadService meetJeStadService;
+    private LocalMeasurementReader localMeasurementReader;
     private StationRepository stationRepository;
     private DataCoverageService service;
 
     @BeforeEach
     public void setUp() {
-        meetJeStadService = mock(MeetJeStadService.class);
+        localMeasurementReader = mock(LocalMeasurementReader.class);
         stationRepository = mock(StationRepository.class);
-        service = new DataCoverageService(meetJeStadService, stationRepository);
+        service = new DataCoverageService(localMeasurementReader, stationRepository);
     }
 
     @Test
@@ -43,7 +43,7 @@ public class DataCoverageServiceTest {
         Instant from = to.minus(DataCoverageService.MAX_RANGE).minus(Duration.ofHours(1));
 
         assertThrows(InvalidArgumentException.class, () -> service.getPmCoverage(from, to, "hour"));
-        verifyNoInteractions(meetJeStadService);
+        verifyNoInteractions(localMeasurementReader);
     }
 
     @Test
@@ -58,14 +58,14 @@ public class DataCoverageServiceTest {
         Station station = new Station();
         station.setStationid(42L);
         when(stationRepository.findAll()).thenReturn(List.of(station));
-        when(meetJeStadService.getMeasurements(any())).thenReturn(List.of());
+        when(localMeasurementReader.getMeasurements(any())).thenReturn(List.of());
 
         Instant from = Instant.parse("2026-01-01T00:00:00Z");
         Instant to = Instant.parse("2026-01-02T00:00:00Z");
         DataCoverageResponse response = service.getPmCoverage(from, to, "hour");
 
         ArgumentCaptor<MeetJeStadParameters> captor = ArgumentCaptor.forClass(MeetJeStadParameters.class);
-        verify(meetJeStadService).getMeasurements(captor.capture());
+        verify(localMeasurementReader).getMeasurements(captor.capture());
         assertEquals(List.of(42), captor.getValue().StationIds);
         assertEquals(true, captor.getValue().includeFaultyMeasurements);
         assertEquals(24, response.getBuckets().size());
@@ -79,7 +79,7 @@ public class DataCoverageServiceTest {
         Instant to = from.plus(DataCoverageService.MAX_RANGE);
 
         assertThrows(InvalidArgumentException.class, () -> service.getPmCoverage(from, to, "day"));
-        verifyNoInteractions(meetJeStadService);
+        verifyNoInteractions(localMeasurementReader);
     }
 
     @Test
@@ -87,14 +87,14 @@ public class DataCoverageServiceTest {
         Station station = new Station();
         station.setStationid(42L);
         when(stationRepository.findAll()).thenReturn(List.of(station));
-        when(meetJeStadService.getMeasurements(any())).thenReturn(List.of());
+        when(localMeasurementReader.getMeasurements(any())).thenReturn(List.of());
 
         Instant from = Instant.parse("2026-01-01T00:00:00Z");
         Instant to = from.plus(Duration.ofDays(30));
         service.getPmCoverage(from, to, "hour");
 
         ArgumentCaptor<MeetJeStadParameters> captor = ArgumentCaptor.forClass(MeetJeStadParameters.class);
-        verify(meetJeStadService, times(5)).getMeasurements(captor.capture());
+        verify(localMeasurementReader, times(5)).getMeasurements(captor.capture());
         List<MeetJeStadParameters> chunks = captor.getAllValues();
         assertEquals(from, chunks.get(0).StartDate);
         assertEquals(to, chunks.get(4).EndDate);
@@ -110,7 +110,7 @@ public class DataCoverageServiceTest {
         Instant from = Instant.parse("2026-01-01T00:00:00Z");
         DataCoverageResponse response = service.getPmCoverage(from, from.plus(Duration.ofDays(1)), "hour");
 
-        verify(meetJeStadService, never()).getMeasurements(any());
+        verify(localMeasurementReader, never()).getMeasurements(any());
         assertEquals(0, response.getStationCount());
     }
 
@@ -119,16 +119,16 @@ public class DataCoverageServiceTest {
         Station station = new Station();
         station.setStationid(42L);
         when(stationRepository.findAll()).thenReturn(List.of(station));
-        when(meetJeStadService.getMeasurements(any())).thenReturn(List.of());
+        when(localMeasurementReader.getMeasurements(any())).thenReturn(List.of());
 
         Instant from = Instant.parse("2026-01-01T00:00:00Z");
         Instant to = from.plus(Duration.ofDays(1));
         DataCoverageResponse first = service.getPmCoverage(from, to, "hour");
         DataCoverageResponse second = service.getPmCoverage(from, to, "hour");
 
-        verify(meetJeStadService, times(1)).getMeasurements(any());
+        verify(localMeasurementReader, times(1)).getMeasurements(any());
         assertEquals(first, second);
         service.getPmCoverage(from, to, "day");
-        verify(meetJeStadService, times(2)).getMeasurements(any());
+        verify(localMeasurementReader, times(2)).getMeasurements(any());
     }
 }

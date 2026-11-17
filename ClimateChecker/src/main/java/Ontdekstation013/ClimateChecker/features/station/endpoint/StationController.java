@@ -37,6 +37,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import Ontdekstation013.ClimateChecker.snapshot.SnapshotService;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -53,8 +54,10 @@ public class StationController {
     private final MeasurementService measurementService;
     private final WorkshopService adminService;
     private final ZoneId applicationZone;
+    private final SnapshotService snapshotService;
 
-    public StationController(StationService stationService, MeasurementService measurementService, WorkshopService workshopService, ZoneId applicationZone) {
+    public StationController(StationService stationService, MeasurementService measurementService, WorkshopService workshopService, ZoneId applicationZone, SnapshotService snapshotService) {
+        this.snapshotService = snapshotService;
         this.applicationZone = applicationZone;
         this.stationService = stationService;
         this.measurementService = measurementService;
@@ -104,6 +107,11 @@ public class StationController {
             throw new InvalidArgumentException("Timestamp must be in ISO 8601 format");
         }
         // A failing future is turned into a 500 by the central exception handler.
+        // Voor "nu" komt het antwoord uit de vooraf berekende snapshot.
+        var snapshot = snapshotService.servableAt(utcDateTime);
+        if (snapshot.isPresent()) {
+            return CompletableFuture.completedFuture(ResponseEntity.ok(snapshot.get().stations()));
+        }
         return stationService.getStationsWithMeasurements(utcDateTime).thenApply(ResponseEntity::ok);
     }
 

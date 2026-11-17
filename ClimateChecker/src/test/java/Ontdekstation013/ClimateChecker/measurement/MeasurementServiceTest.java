@@ -12,6 +12,7 @@ import Ontdekstation013.ClimateChecker.features.measurement.LocalMeasurementRead
 import Ontdekstation013.ClimateChecker.features.measurement.Measurement;
 import Ontdekstation013.ClimateChecker.features.measurement.MeasurementService;
 import Ontdekstation013.ClimateChecker.features.measurement.endpoint.MeasurementDto;
+import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadParameters;
 import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadService;
 import Ontdekstation013.ClimateChecker.features.station.Station;
 import java.nio.charset.StandardCharsets;
@@ -79,7 +80,7 @@ public class MeasurementServiceTest {
     @Test
     public void getDailyMeasurements_convertsEntitiesToDtosWithDutchTimestamp() {
         Instant time = Instant.parse("2026-01-01T12:00:00Z");
-        when(meetJeStadService.getMeasurements(any())).thenReturn(List.of(measurement(time, 15f)));
+        when(localMeasurementReader.getMeasurements(any(MeetJeStadParameters.class))).thenReturn(List.of(measurement(time, 15f)));
 
         List<MeasurementDto> result = service.GetDailyMeasurements(time);
 
@@ -90,7 +91,7 @@ public class MeasurementServiceTest {
 
     @Test
     public void getDailyMeasurements_returnsEmptyListWhenThereAreNoMeasurements() {
-        when(meetJeStadService.getMeasurements(any())).thenReturn(List.of());
+        when(localMeasurementReader.getMeasurements(any(MeetJeStadParameters.class))).thenReturn(List.of());
 
         assertTrue(service.GetDailyMeasurements(Instant.now()).isEmpty());
     }

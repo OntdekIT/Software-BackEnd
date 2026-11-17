@@ -74,6 +74,11 @@ public class NeighbourhoodService {
     @Cacheable(cacheNames = CacheNames.NEIGHBOURHOODS_AT_TIME,
             key = "T(Ontdekstation013.ClimateChecker.cache.TimeBuckets).floorToMinute(#dateTime)")
     public List<NeighbourhoodDto> getNeighbourhoodsAtTime(Instant dateTime) {
+        return computeNeighbourhoodsAtTime(dateTime);
+    }
+
+    /** Zoals {@link #getNeighbourhoodsAtTime}, maar zonder cache: voor het bouwen van snapshots. */
+    public List<NeighbourhoodDto> computeNeighbourhoodsAtTime(Instant dateTime) {
         List<Neighbourhood> neighbourhoods = neighbourhoodRepository.findAll();
 
         return getNeighbourhoodsAverageTemp(neighbourhoods, getClosestMeasurementsAtTime(TimeBuckets.floorToMinute(dateTime)));
@@ -115,6 +120,11 @@ public class NeighbourhoodService {
     @Cacheable(cacheNames = CacheNames.NEIGHBOURHOOD_TIMELAPSE,
             key = "T(Ontdekstation013.ClimateChecker.cache.TimeBuckets).timelapseKey(#rawFrom, #rawTo, #steps)")
     public NeighbourhoodTimelapseResponse getNeighbourhoodTimelapse(Instant rawFrom, Instant rawTo, int steps) {
+        return computeNeighbourhoodTimelapse(rawFrom, rawTo, steps);
+    }
+
+    /** Zoals {@link #getNeighbourhoodTimelapse}, maar zonder cache: voor het bouwen van snapshots. */
+    public NeighbourhoodTimelapseResponse computeNeighbourhoodTimelapse(Instant rawFrom, Instant rawTo, int steps) {
         // Begin en eind op de minuut, zodat de uitkomst bij de cachesleutel past.
         Instant from = TimeBuckets.floorToMinute(rawFrom);
         Instant to = TimeBuckets.floorToMinute(rawTo);
@@ -227,7 +237,7 @@ public class NeighbourhoodService {
         historicalParams.StartDate = startDate;
         historicalParams.EndDate = endDate;
         historicalParams.includeFaultyMeasurements = true;
-        List<Measurement> allMeasurements = meetJeStadService.getMeasurements(historicalParams);
+        List<Measurement> allMeasurements = localMeasurementReader.getMeasurements(historicalParams);
 
         Set<Integer> stationIds = allMeasurements.stream()
                 .filter(measurement -> {
@@ -262,7 +272,7 @@ public class NeighbourhoodService {
         params.StartDate = from;
         params.EndDate = to;
         params.includeFaultyMeasurements = true;
-        List<Measurement> allMeasurements = meetJeStadService.getMeasurements(params);
+        List<Measurement> allMeasurements = localMeasurementReader.getMeasurements(params);
 
         Set<Integer> stationIds = allMeasurements.stream()
                 .filter(m -> m.getStation() != null)

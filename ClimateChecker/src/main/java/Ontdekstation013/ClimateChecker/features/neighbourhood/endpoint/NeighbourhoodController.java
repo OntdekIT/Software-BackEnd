@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadService;
 import Ontdekstation013.ClimateChecker.features.neighbourhood.NeighbourhoodService;
+import Ontdekstation013.ClimateChecker.snapshot.MapSnapshot;
+import Ontdekstation013.ClimateChecker.snapshot.SnapshotService;
 import Ontdekstation013.ClimateChecker.utility.DayMeasurementResponse;
 import java.time.Duration;
 import java.time.Instant;
@@ -30,6 +32,7 @@ import org.springframework.web.bind.annotation.*;
 public class NeighbourhoodController {
 
     private final NeighbourhoodService neighbourhoodService;
+    private final SnapshotService snapshotService;
     private final ZoneId applicationZone;
 
     /**
@@ -43,7 +46,9 @@ public class NeighbourhoodController {
     public List<NeighbourhoodDto> getNeighbourhoodsAtTime(@RequestParam(value = "timestamp") String timestamp) {
         try {
             Instant utcDateTime = Instant.parse(timestamp);
-            return neighbourhoodService.getNeighbourhoodsAtTime(utcDateTime);
+            // Voor "nu" komt het antwoord uit de vooraf berekende snapshot, anders uit de database (met cache).
+            return snapshotService.servableAt(utcDateTime).map(MapSnapshot::neighbourhoods)
+                    .orElseGet(() -> neighbourhoodService.getNeighbourhoodsAtTime(utcDateTime));
         } catch (DateTimeParseException e) {
             throw new InvalidArgumentException("Timestamp must be in ISO 8601 format");
         }
@@ -73,7 +78,8 @@ public class NeighbourhoodController {
         Instant toInstant = (to != null) ? parseIso8601(to) : Instant.now();
         Instant fromInstant = (from != null) ? parseIso8601(from) : toInstant.minus(Duration.ofHours(24));
 
-        return neighbourhoodService.getNeighbourhoodTimelapse(fromInstant, toInstant, steps);
+        return snapshotService.timelapseFor(fromInstant, toInstant, steps)
+                .orElseGet(() -> neighbourhoodService.getNeighbourhoodTimelapse(fromInstant, toInstant, steps));
     }
 
     private Instant parseIso8601(String value) {

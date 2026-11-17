@@ -1,9 +1,11 @@
 package Ontdekstation013.ClimateChecker.features.measurement;
 
+import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadParameters;
 import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadService;
 import Ontdekstation013.ClimateChecker.features.station.Station;
 import Ontdekstation013.ClimateChecker.features.station.StationRepository;
 import Ontdekstation013.ClimateChecker.utility.MeasurementDeduplicator;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,8 +29,25 @@ public class LocalMeasurementReader {
     private final StationRepository stationRepository;
     private final MeetJeStadService meetJeStadService;
 
+    /**
+     * Zelfde parameters als de live-route: lege StationIds betekent alle stations, een ontbrekende
+     * begin- of einddatum betekent onbegrensd naar die kant. {@code Limit} wordt niet gebruikt.
+     */
+    public List<Measurement> getMeasurements(MeetJeStadParameters params) {
+        Instant start = params.StartDate != null ? params.StartDate : Instant.EPOCH;
+        Instant end = params.EndDate != null ? params.EndDate : Instant.now().plus(Duration.ofDays(1));
+        List<Long> stationIds = params.StationIds.stream().map(Integer::longValue).toList();
+        return read(stationIds, start, end, params.includeFaultyMeasurements);
+    }
+
     public List<Measurement> getMeasurements(Instant start, Instant end, boolean includeFaultyMeasurements) {
-        List<MeasurementRow> rows = measurementRepository.findRowsBetween(start, end);
+        return read(List.of(), start, end, includeFaultyMeasurements);
+    }
+
+    private List<Measurement> read(List<Long> stationIds, Instant start, Instant end, boolean includeFaultyMeasurements) {
+        List<MeasurementRow> rows = stationIds.isEmpty()
+                ? measurementRepository.findRowsBetween(start, end)
+                : measurementRepository.findRowsForStationsBetween(stationIds, start, end);
         if (rows.isEmpty()) {
             return new ArrayList<>();
         }

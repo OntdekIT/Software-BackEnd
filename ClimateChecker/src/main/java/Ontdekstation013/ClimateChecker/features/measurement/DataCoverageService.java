@@ -2,7 +2,6 @@ package Ontdekstation013.ClimateChecker.features.measurement;
 
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadParameters;
-import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadService;
 import Ontdekstation013.ClimateChecker.features.station.Station;
 import Ontdekstation013.ClimateChecker.features.station.StationRepository;
 import Ontdekstation013.ClimateChecker.utility.DataCoverageLogic;
@@ -37,7 +36,7 @@ public class DataCoverageService {
     static final int CACHE_MAX_ENTRIES = 16;
     private static final ZoneId ZONE = ZoneId.of("Europe/Amsterdam");
 
-    private final MeetJeStadService meetJeStadService;
+    private final LocalMeasurementReader localMeasurementReader;
     private final StationRepository stationRepository;
     private final Map<CacheKey, CachedResponse> cache = new ConcurrentHashMap<>();
 
@@ -84,7 +83,7 @@ public class DataCoverageService {
         List<Measurement> measurements = new ArrayList<>();
         for (Instant chunkStart = start; chunkStart.isBefore(to); chunkStart = chunkStart.plus(FETCH_CHUNK)) {
             Instant chunkEnd = chunkStart.plus(FETCH_CHUNK).isBefore(to) ? chunkStart.plus(FETCH_CHUNK) : to;
-            measurements.addAll(meetJeStadService.getMeasurements(chunkParams(stationIds, chunkStart, chunkEnd)));
+            measurements.addAll(localMeasurementReader.getMeasurements(chunkParams(stationIds, chunkStart, chunkEnd)));
         }
         // A reading exactly on a chunk boundary can come back in both chunks.
         measurements = MeasurementDeduplicator.deduplicate(measurements);

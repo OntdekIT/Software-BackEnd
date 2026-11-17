@@ -10,7 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import Ontdekstation013.ClimateChecker.features.measurement.Measurement;
 import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadParameters;
-import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadService;
+import Ontdekstation013.ClimateChecker.features.measurement.LocalMeasurementReader;
 import Ontdekstation013.ClimateChecker.support.AbstractApiTest;
 import java.time.Instant;
 import java.util.List;
@@ -27,7 +27,7 @@ import org.springframework.test.context.TestPropertySource;
 class TimeZoneApiTest extends AbstractApiTest {
 
     @MockBean
-    private MeetJeStadService meetJeStadService;
+    private LocalMeasurementReader localMeasurementReader;
 
     private TimeZone originalDefault;
 
@@ -35,7 +35,7 @@ class TimeZoneApiTest extends AbstractApiTest {
     void switchJvmZoneAwayFromTheConfiguredOne() {
         originalDefault = TimeZone.getDefault();
         TimeZone.setDefault(TimeZone.getTimeZone("Pacific/Auckland"));
-        when(meetJeStadService.getMeasurements(any(MeetJeStadParameters.class))).thenReturn(List.<Measurement>of());
+        when(localMeasurementReader.getMeasurements(any(MeetJeStadParameters.class))).thenReturn(List.<Measurement>of());
     }
 
     @AfterEach
@@ -46,7 +46,7 @@ class TimeZoneApiTest extends AbstractApiTest {
     private MeetJeStadParameters capturedParameters() {
         ArgumentCaptor<MeetJeStadParameters> captor = ArgumentCaptor.forClass(MeetJeStadParameters.class);
         // The background station monitor may call the service as well; pick the call for our station.
-        verify(meetJeStadService, atLeastOnce()).getMeasurements(captor.capture());
+        verify(localMeasurementReader, atLeastOnce()).getMeasurements(captor.capture());
         return captor.getAllValues().stream()
                 .filter(params -> params.StationIds.contains(7))
                 .findFirst()

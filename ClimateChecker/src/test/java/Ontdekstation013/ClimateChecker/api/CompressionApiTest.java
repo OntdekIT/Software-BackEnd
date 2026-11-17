@@ -54,6 +54,9 @@ class CompressionApiTest {
     private int port;
 
     @Autowired
+    private Ontdekstation013.ClimateChecker.snapshot.SnapshotService snapshotService;
+
+    @Autowired
     private NeighbourhoodRepository neighbourhoodRepository;
 
     @Autowired
@@ -76,6 +79,8 @@ class CompressionApiTest {
                         (FIRST_ID + i) * 100 + c, 51.5f + c * 0.001f, 5.0f + c * 0.001f, neighbourhood));
             }
         }
+        // De snapshot bevat de wijken pas na een herbouw.
+        snapshotService.rebuild();
     }
 
     @AfterEach
@@ -122,5 +127,19 @@ class CompressionApiTest {
     @Test
     void compressedBodyIsSmallerThanThePlainBody() throws Exception {
         assertThat(get("gzip").body().length).isLessThan(get(null).body().length);
+    }
+
+    @Test
+    void theSnapshotEndpointIsGzippedAndAnswersNotModifiedForItsEtag() throws Exception {
+        HttpRequest.Builder request = HttpRequest.newBuilder(URI.create("http://127.0.0.1:" + port + "/api/snapshot"))
+                .header("Accept-Encoding", "gzip");
+        HttpResponse<byte[]> response = client.send(request.build(), HttpResponse.BodyHandlers.ofByteArray());
+
+        assertThat(response.statusCode()).isEqualTo(200);
+        assertThat(response.headers().firstValue("Content-Encoding")).hasValue("gzip");
+        String etag = response.headers().firstValue("ETag").orElseThrow();
+        HttpResponse<byte[]> second = client.send(request.header("If-None-Match", etag).build(),
+                HttpResponse.BodyHandlers.ofByteArray());
+        assertThat(second.statusCode()).isEqualTo(304);
     }
 }

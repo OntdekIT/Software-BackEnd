@@ -41,6 +41,11 @@ public class  MeasurementService {
     @Cacheable(cacheNames = CacheNames.STATIONS_WITH_MEASUREMENTS,
             key = "T(Ontdekstation013.ClimateChecker.cache.TimeBuckets).floorToMinute(#dateTime)")
     public List<MeasurementDto> getMeasurementsAtTime(Instant dateTime) {
+        return computeMeasurementsAtTime(dateTime);
+    }
+
+    /** Zoals {@link #getMeasurementsAtTime}, maar zonder cache: voor het bouwen van snapshots. */
+    public List<MeasurementDto> computeMeasurementsAtTime(Instant dateTime) {
         Instant at = TimeBuckets.floorToMinute(dateTime);
         int minuteMargin = meetJeStadService.getMinuteLimit();
         List<Measurement> allMeasurements = localMeasurementReader.getMeasurements(
@@ -60,7 +65,7 @@ public class  MeasurementService {
         params.EndDate = dateTime;
         params.includeFaultyMeasurements = true;
         params.StationIds.clear();
-        List<Measurement> allMeasurements = meetJeStadService.getMeasurements(params);
+        List<Measurement> allMeasurements = localMeasurementReader.getMeasurements(params);
 
         return allMeasurements.stream()
                 .map(this::convertToDTO)
@@ -74,7 +79,7 @@ public class  MeasurementService {
         params.EndDate = endDate;
         params.StationIds.add(id);
         params.includeFaultyMeasurements = true;
-        List<Measurement> measurements = meetJeStadService.getMeasurements(params);
+        List<Measurement> measurements = localMeasurementReader.getMeasurements(params);
 
         return MeasurementLogic.splitIntoDayMeasurements(measurements, applicationZone);
     }
@@ -97,7 +102,7 @@ public class  MeasurementService {
         params.StationIds.clear(); // leeg = alle stations
         params.includeFaultyMeasurements = false; // netwerkstatistiek zonder uitschieters van defecte sensoren
 
-        List<Measurement> measurements = meetJeStadService.getMeasurements(params);
+        List<Measurement> measurements = localMeasurementReader.getMeasurements(params);
         return MeasurementLogic.splitIntoNetworkDayMeasurements(measurements, applicationZone);
     }
 
@@ -108,7 +113,7 @@ public class  MeasurementService {
         params.StationIds.add(id);
         params.includeFaultyMeasurements = true;
 
-        List<Measurement> measurements = meetJeStadService.getMeasurements(params);
+        List<Measurement> measurements = localMeasurementReader.getMeasurements(params);
         return MeasurementLogic.splitIntoHourMeasurements(measurements, applicationZone);
     }
 
@@ -119,7 +124,7 @@ public class  MeasurementService {
         params.StationIds.add(id);
         params.includeFaultyMeasurements = true;
 
-        List<Measurement> measurements = meetJeStadService.getMeasurements(params);
+        List<Measurement> measurements = localMeasurementReader.getMeasurements(params);
         return MeasurementLogic.splitIntoHalfHourMeasurements(measurements, applicationZone);
     }
 
@@ -129,7 +134,7 @@ public class  MeasurementService {
         params.EndDate = endDate;
         params.StationIds.add(id);
         params.includeFaultyMeasurements = true;
-        List<Measurement> measurements = meetJeStadService.getMeasurements(params);
+        List<Measurement> measurements = localMeasurementReader.getMeasurements(params);
 
         return generatePdf(measurements);
     }

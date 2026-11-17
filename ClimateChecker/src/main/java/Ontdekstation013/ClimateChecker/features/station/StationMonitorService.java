@@ -3,7 +3,7 @@ package Ontdekstation013.ClimateChecker.features.station;
 import Ontdekstation013.ClimateChecker.features.measurement.Measurement;
 import Ontdekstation013.ClimateChecker.features.measurement.MeasurementService;
 import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadParameters;
-import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadService;
+import Ontdekstation013.ClimateChecker.features.measurement.LocalMeasurementReader;
 import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.authentication.EmailSenderService;
 import jakarta.annotation.PostConstruct;
@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 public class StationMonitorService {
     private final StationService stationService;
     private final MeasurementService measurementService;
-    private final MeetJeStadService meetJeStadService;
+    private final LocalMeasurementReader localMeasurementReader;
     private final EmailSenderService emailSenderService;
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
@@ -37,12 +37,12 @@ public class StationMonitorService {
     private final long dataOphaalIntervalSeconden;
 
     @Autowired
-    public StationMonitorService(StationService stationService, MeasurementService measurementService, MeetJeStadService meetJeStadService, EmailSenderService emailSenderService,
+    public StationMonitorService(StationService stationService, MeasurementService measurementService, LocalMeasurementReader localMeasurementReader, EmailSenderService emailSenderService,
                                  @Value("${station.monitor.downtime-check-interval-seconds:300}") long uitvalControleIntervalSeconden,
                                  @Value("${station.monitor.measurement-fetch-interval-seconds:21600}") long dataOphaalIntervalSeconden) {
         this.stationService = stationService;
         this.measurementService = measurementService;
-        this.meetJeStadService = meetJeStadService;
+        this.localMeasurementReader = localMeasurementReader;
         this.emailSenderService = emailSenderService;
         this.uitvalControleIntervalSeconden = uitvalControleIntervalSeconden;
         this.dataOphaalIntervalSeconden = dataOphaalIntervalSeconden;
@@ -55,7 +55,7 @@ public class StationMonitorService {
 
     private void scheduleCheck() {
         scheduler.scheduleAtFixedRate(this::checkMeetstations, 0, uitvalControleIntervalSeconden, TimeUnit.SECONDS);
-        scheduler.scheduleAtFixedRate(this::checkMeasurements, 0, dataOphaalIntervalSeconden, TimeUnit.SECONDS);
+        // Het ophalen van metingen doet de IngestWorker (de enige route naar meetjestad.net).
     }
 
     public void checkMeasurements() {
@@ -91,7 +91,7 @@ public class StationMonitorService {
             params.StationIds.add(station.getStationid().intValue());
             params.StartDate = Instant.now().minusSeconds(24 * 60 * 60);
             params.includeFaultyMeasurements = true;
-            return meetJeStadService.getMeasurements(params);
+            return localMeasurementReader.getMeasurements(params);
         }
         catch (Exception ex){
             throw ex;
