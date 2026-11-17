@@ -1,79 +1,74 @@
-name: climatechecker-dev
+# Test, acceptance and production use THIS file with different environment values
+# (see docs/deployment.md). The same image is promoted through the environments;
+# only the variables differ. No secrets in this file: everything comes from the
+# environment (Dokploy environment settings or a local .env, never committed).
+name: ${COMPOSE_PROJECT_NAME:-climatechecker}
+
 services:
   db:
     # Pinned to 11.2: newer 11.x (e.g. 11.8) is not supported by Flyway 10.10
     # and breaks the migration connection on startup.
     image: mariadb:11.2
-    container_name: climatechecker-dev-db
+    restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
-      MYSQL_DATABASE: ${SPRING_DATASOURCE_SCHEME}
-      # Passwordless localhost/socket user so healthcheck.sh --connect can reach
-      # the server; without it the check is denied and the container never
-      # becomes healthy, blocking dependents from starting.
+      MYSQL_ROOT_PASSWORD: ${SPRING_DATASOURCE_PASSWORD:?set SPRING_DATASOURCE_PASSWORD}
+      MYSQL_DATABASE: ${SPRING_DATASOURCE_SCHEME:?set SPRING_DATASOURCE_SCHEME}
+      # Passwordless localhost/socket user so healthcheck.sh --connect can reach the server.
       MARIADB_MYSQL_LOCALHOST_USER: "1"
-    ports:
-      - "3306:3306"
+    # Persistent volume: without it all data is lost when the container is recreated.
+    volumes:
+      - db_data:/var/lib/mysql
+    # No published ports: the database is only reachable from the backend container.
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 10s
       timeout: 5s
-      retries: 3
-
-
-  smtp:
-    image: mailserver/docker-mailserver:latest
-    container_name: climatechecker-dev-smtp
-    hostname: mail
-    domainname: example.com
-    environment:
-      MAILSERVER_RELAY_HOST: ${MAILSERVER_RELAY_HOST}
-      MAILSERVER_RELAY_PORT: ${MAILSERVER_RELAY_PORT}
-      MAILSERVER_RELAY_USER: ${MAILSERVER_RELAY_USER}
-      MAILSERVER_RELAY_PASSWORD: ${MAILSERVER_RELAY_PASSWORD}
-    ports:
-      - "25:25"
-      - "587:587"
-      - "993:993"
+      retries: 5
 
   backend:
-    build: .
-    image: climatechecker-springboot:dev
-    container_name: climatechecker-dev-backend
+    image: ${BACKEND_IMAGE:-ghcr.io/ontdekit/climatechecker-backend}:${BACKEND_TAG:-latest}
+    restart: unless-stopped
     environment:
-      SPRING_PROFILES_ACTIVE: docker
-      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
-      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-docker}
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL:-jdbc:mariadb://db:3306/${SPRING_DATASOURCE_SCHEME}}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME:-root}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
-      JWT_SECRET: ${JWT_SECRET}
+      # Required: the backend refuses to start with a missing or default key.
+      JWT_SECRET: ${JWT_SECRET:?set a unique JWT_SECRET per environment}
+      TRUSTED_IP_PEPPER: ${TRUSTED_IP_PEPPER:?set a unique TRUSTED_IP_PEPPER per environment}
       MAILSERVER_RELAY_HOST: ${MAILSERVER_RELAY_HOST}
       MAILSERVER_RELAY_PORT: ${MAILSERVER_RELAY_PORT}
-      MAILSERVER_RELAY_USER: ${MAILSERVER_RELAY_USER}
-      MAILSERVER_RELAY_PASSWORD: ${MAILSERVER_RELAY_PASSWORD}
+      USE_REAL_MAILSERVER: ${USE_REAL_MAILSERVER:-false}
       MAIL_USERNAME: ${MAIL_USERNAME}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
       ROOT_USER_FIRSTNAME: ${ROOT_USER_FIRSTNAME}
       ROOT_USER_LASTNAME: ${ROOT_USER_LASTNAME}
       ROOT_USER_EMAIL: ${ROOT_USER_EMAIL}
       ROOT_USER_PASSWORD: ${ROOT_USER_PASSWORD}
+      FRONTEND_HOST: ${FRONTEND_HOST:?set the public URL of the frontend}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:?set the allowed frontend origin(s)}
     ports:
-      - "8082:8082"
+      - "${BACKEND_PORT:-8082}:8082"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8082/actuator/health/readiness"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
     depends_on:
       db:
         condition: service_healthy
 
   frontend:
-    build:
-      context: ../../Software-FrontEnd/
-      dockerfile: Dockerfile
-      target: release
-      args:
-        VITE_BACKEND_API_URL: ${VITE_BACKEND_API_URL}
-    image: climatechecker-frontend:dev
-    container_name: climatechecker-dev-frontend
-    environment:
-      VITE_BACKEND_API_URL: ${VITE_BACKEND_API_URL}
+    # Built and published by the Software-FrontEnd repo. Note that VITE_BACKEND_API_URL
+    # is baked in at build time there, see docs/deployment.md.
+    image: ${FRONTEND_IMAGE:-ghcr.io/ontdekit/climatechecker-frontend}:${FRONTEND_TAG:-latest}
+    restart: unless-stopped
     ports:
-      - "5173:80"
+      - "${FRONTEND_PORT:-5173}:80"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
+
+volumes:
+  db_data:
