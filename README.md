@@ -39,6 +39,12 @@ Stappen per omgeving:
 
 Gerelateerd (handmatig): de MailSlurp-key die ooit in de code stond moet in het MailSlurp-dashboard worden ingetrokken en vervangen, en de nieuwe key hoort alleen in GitHub-secrets en lokale `.env`-bestanden.
 
+### Overige standaardwaarden en proxies
+
+Naast `JWT_SECRET` weigert de backend buiten het profiel `dev` of `test` ook te starten met `TRUSTED_IP_PEPPER` op de bekende standaardwaarde (of leeg), met `SPRING_DATASOURCE_PASSWORD` of `ROOT_USER_PASSWORD` op `password` of de placeholder `change-me` uit `.env.example`. Zet per omgeving eigen, unieke waarden.
+
+`X-Forwarded-For` wordt alleen gelezen als het verzoek van een bekende proxy komt (rate limiting en vertrouwde IP's). Standaard zijn dat loopback en de privéreeksen (`10/8`, `172.16/12`, `192.168/16`), dus een reverse proxy in het Docker-netwerk werkt zonder extra instelling. Wil je het aanscherpen, zet dan `TRUSTED_PROXIES` op een kommagescheiden lijst met IP's of CIDR-reeksen. Een client die rechtstreeks verbindt kan de header niet meer vervalsen.
+
 ### API-documentatie (OpenAPI / Swagger UI)
 
 De backend genereert zijn eigen API-documentatie uit de code (springdoc-openapi). Alle controllers staan erin, met Nederlandse samenvattingen, request- en responsebodies en foutcodes.

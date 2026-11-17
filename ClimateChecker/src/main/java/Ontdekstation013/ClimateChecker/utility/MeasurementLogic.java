@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -15,7 +16,17 @@ import java.util.*;
  */
 public class MeasurementLogic {
 
+    /**
+     * Zone used by the overloads without a zone parameter. Matches the default of
+     * {@code application.timezone}; services pass the configured zone explicitly.
+     */
+    public static final ZoneId DEFAULT_ZONE = ZoneOffset.UTC;
+
     public static List<DayMeasurementResponse> splitIntoDayMeasurements(Collection<Measurement> measurements) {
+        return splitIntoDayMeasurements(measurements, DEFAULT_ZONE);
+    }
+
+    public static List<DayMeasurementResponse> splitIntoDayMeasurements(Collection<Measurement> measurements, ZoneId zone) {
         // A day is only reported when at least one reading has a temperature,
         // but within that day each metric is aggregated independently: a
         // reading that is missing humidity or particulate must not crash the
@@ -29,7 +40,7 @@ public class MeasurementLogic {
         TreeMap<LocalDate, Set<Measurement>> dayMeasurements = new TreeMap<>();
         for (Measurement measurement : measurements) {
             if (measurement.getTemperature() != null) {
-                LocalDate date = LocalDate.ofInstant(measurement.getTimestamp(), ZoneId.systemDefault());
+                LocalDate date = LocalDate.ofInstant(measurement.getTimestamp(), zone);
                 if (!dayMeasurements.containsKey(date)) {
                     dayMeasurements.put(date, new HashSet<>());
                 }
@@ -108,6 +119,10 @@ public class MeasurementLogic {
      * @param measurements metingen van alle stations (temperatuur-nulls worden overgeslagen)
      */
     public static List<NetworkMeasurementResponse> splitIntoNetworkDayMeasurements(Collection<Measurement> measurements) {
+        return splitIntoNetworkDayMeasurements(measurements, DEFAULT_ZONE);
+    }
+
+    public static List<NetworkMeasurementResponse> splitIntoNetworkDayMeasurements(Collection<Measurement> measurements, ZoneId zone) {
         TreeMap<LocalDate, List<Float>> temperaturesPerDay = new TreeMap<>();
         TreeMap<LocalDate, Set<Long>> stationsPerDay = new TreeMap<>();
 
@@ -116,7 +131,7 @@ public class MeasurementLogic {
                 continue;
             }
 
-            LocalDate date = LocalDate.ofInstant(measurement.getTimestamp(), ZoneId.systemDefault());
+            LocalDate date = LocalDate.ofInstant(measurement.getTimestamp(), zone);
             temperaturesPerDay.computeIfAbsent(date, k -> new ArrayList<>()).add(measurement.getTemperature());
 
             // Het station kan ontbreken wanneer een meting niet aan een bekend
@@ -186,13 +201,17 @@ public class MeasurementLogic {
     }
 
     public static List<HourMeasurementResponse> splitIntoHourMeasurements(Collection<Measurement> measurements) {
+        return splitIntoHourMeasurements(measurements, DEFAULT_ZONE);
+    }
+
+    public static List<HourMeasurementResponse> splitIntoHourMeasurements(Collection<Measurement> measurements, ZoneId zone) {
         // TreeMap keeps the hour buckets chronological regardless of arrival
         // order, so a late-arriving reading lands in its own hour in the right
         // position rather than at the tail of the response.
         TreeMap<LocalDateTime, Set<Measurement>> hourMeasurements = new TreeMap<>();
 
         for (Measurement measurement : measurements) {
-            LocalDateTime hour = LocalDateTime.ofInstant(measurement.getTimestamp(), ZoneId.systemDefault())
+            LocalDateTime hour = LocalDateTime.ofInstant(measurement.getTimestamp(), zone)
                     .truncatedTo(ChronoUnit.HOURS);
 
             if (!hourMeasurements.containsKey(hour)) {
@@ -227,10 +246,14 @@ public class MeasurementLogic {
     }
 
     public static List<HalfHourMeasurementResponse> splitIntoHalfHourMeasurements(Collection<Measurement> measurements) {
+        return splitIntoHalfHourMeasurements(measurements, DEFAULT_ZONE);
+    }
+
+    public static List<HalfHourMeasurementResponse> splitIntoHalfHourMeasurements(Collection<Measurement> measurements, ZoneId zone) {
         LinkedHashMap<LocalDateTime, Set<Measurement>> halfhourMeasurements = new LinkedHashMap<>();
 
         for (Measurement measurement : measurements) {
-            LocalDateTime hour = LocalDateTime.ofInstant(measurement.getTimestamp(), ZoneId.systemDefault())
+            LocalDateTime hour = LocalDateTime.ofInstant(measurement.getTimestamp(), zone)
                     .truncatedTo(ChronoUnit.MINUTES);
             LocalDateTime halfHour = hour.withMinute(hour.getMinute() < 30 ? 0 : 30);
 
@@ -274,6 +297,10 @@ public class MeasurementLogic {
      * @param granularity  "half-hour", "hour" or "day" — anything else defaults to "hour"
      */
     public static List<RegionAverageBucketResponse> splitIntoRegionBuckets(Collection<Measurement> measurements, String granularity) {
+        return splitIntoRegionBuckets(measurements, granularity, DEFAULT_ZONE);
+    }
+
+    public static List<RegionAverageBucketResponse> splitIntoRegionBuckets(Collection<Measurement> measurements, String granularity, ZoneId zone) {
         DateTimeFormatter isoFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
         LinkedHashMap<LocalDateTime, List<Float>> tempBuckets = new LinkedHashMap<>();
@@ -283,7 +310,7 @@ public class MeasurementLogic {
         measurements.stream()
                 .sorted(Comparator.comparing(Measurement::getTimestamp))
                 .forEach(m -> {
-                    LocalDateTime bucket = toBucket(LocalDateTime.ofInstant(m.getTimestamp(), ZoneId.systemDefault()), granularity);
+                    LocalDateTime bucket = toBucket(LocalDateTime.ofInstant(m.getTimestamp(), zone), granularity);
 
                     if (m.getTemperature() != null)
                         tempBuckets.computeIfAbsent(bucket, k -> new ArrayList<>()).add(m.getTemperature());

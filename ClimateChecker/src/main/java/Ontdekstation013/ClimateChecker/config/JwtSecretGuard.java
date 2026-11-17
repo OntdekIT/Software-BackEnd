@@ -33,7 +33,7 @@ public final class JwtSecretGuard {
         }
     }
 
-    private static boolean isLocalProfileActive(Environment environment) {
+    static boolean isLocalProfileActive(Environment environment) {
         for (String profile : environment.getActiveProfiles()) {
             if (LOCAL_PROFILES.contains(profile)) {
                 return true;

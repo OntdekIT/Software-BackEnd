@@ -150,7 +150,9 @@ public class StationMonitorService {
             if (m.getTemperature() != null) hasTemp = true;
             if (m.getHumidity() != null) hasHum = true;
             if (m.getPm25() != null || m.getPm10() != null) hasStof = true;
-            if (!Float.isNaN(m.getLatitude()) && !Float.isNaN(m.getLongitude())) hasLoc = true;
+            // Een overgenomen locatie telt niet als eigen GPS-positie, zodat het
+            // station een locatiefout (loc_error) krijgt als de GPS niets doorgeeft.
+            if (!m.isLocationInherited() && !Float.isNaN(m.getLatitude()) && !Float.isNaN(m.getLongitude())) hasLoc = true;
         }
 
         Map<String, Boolean> result = new HashMap<>();

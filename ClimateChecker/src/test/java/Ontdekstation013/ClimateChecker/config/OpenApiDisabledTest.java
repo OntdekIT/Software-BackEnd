@@ -25,7 +25,8 @@ import org.springframework.test.web.servlet.MockMvc;
         "application.root-user.first-name=Admin",
         "application.root-user.last-name=User",
         "application.root-user.email=admin@example.com",
-        "application.root-user.password=password",
+        "application.root-user.password=prodlike-root-password-test-only",
+        "application.trusted-ip.pepper=prodlike-pepper-test-only-0123456789",
         "spring.profiles.active=prodlike",
         "application.jwt.secret=cHJvZGxpa2Utc2VjcmV0LXRlc3Qtb25seS1hdC1sZWFzdC0zMi1ieXRlcy1sb25n"
 })

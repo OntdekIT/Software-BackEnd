@@ -21,6 +21,8 @@ public class SecurityConfiguration {
     private final CorsConfigurationSource corsConfigurationSource;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final AuthenticationProvider authenticationProvider;
+    private final RestAuthenticationEntryPoint authenticationEntryPoint;
+    private final RestAccessDeniedHandler accessDeniedHandler;
 
     /** Alleen true in dev/test (zie application-dev.properties en application-test.properties). */
     @Value("${springdoc.api-docs.enabled:false}")
@@ -49,7 +51,8 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.PUT, "/api/meetstation/edit/**", "/api/Meetstation/edit/**").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/meetstation/transfer/**", "/api/Meetstation/transfer/**").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/meetstation/claim", "/api/meetstation/Claim", "/api/Meetstation/claim", "/api/Meetstation/Claim").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/api/meetstation/add", "/api/Meetstation/add").authenticated()
+                        // Adding a station by hand is an admin task, not something any logged-in user may do.
+                        .requestMatchers(HttpMethod.POST, "/api/meetstation/add", "/api/Meetstation/add").hasAnyAuthority(UserRole.ADMIN.name(), UserRole.SUPER_ADMIN.name())
                         .requestMatchers("/api/meetstation/**", "/api/Meetstation/**").permitAll()
                         // Coverage pulls weeks of raw data for every station; keep it to admins.
                         .requestMatchers("/api/measurement/coverage").hasAnyAuthority(UserRole.ADMIN.name(), UserRole.SUPER_ADMIN.name())
@@ -59,6 +62,9 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/my-account/**").authenticated()
                         .anyRequest().authenticated()
                 )
+                .exceptionHandling(handling -> handling
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler))
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
