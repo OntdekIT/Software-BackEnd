@@ -20,6 +20,10 @@
 		     project- en organisatiesleutel zijn nodig. -->
 		<sonar.projectKey>OntdekIT_Software-BackEnd</sonar.projectKey>
 		<sonar.organization>ontdekit</sonar.organization>
+		<!-- SonarCloud leest hiermee het JaCoCo-rapport in. -->
+		<sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+		<!-- Minimale regeldekking (0.00 tot 1.00). De build faalt eronder. -->
+		<jacoco.minimum.coverage>0.60</jacoco.minimum.coverage>
 	</properties>
 	<dependencies>
 
@@ -196,6 +200,47 @@
 						<exclude>**/*EndToEndTests.java</exclude>
 					</excludes>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.8.12</version>
+				<executions>
+					<execution>
+						<id>prepare-agent</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>report</id>
+						<phase>test</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>check</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<rule>
+									<element>BUNDLE</element>
+									<limits>
+										<limit>
+											<counter>LINE</counter>
+											<value>COVEREDRATIO</value>
+											<minimum>${jacoco.minimum.coverage}</minimum>
+										</limit>
+									</limits>
+								</rule>
+							</rules>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
