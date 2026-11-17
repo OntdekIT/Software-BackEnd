@@ -43,14 +43,17 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/users/**").hasAnyAuthority(UserRole.ADMIN.name(), UserRole.SUPER_ADMIN.name())
                         .requestMatchers("/api/workshops/**").hasAnyAuthority(UserRole.ADMIN.name(), UserRole.SUPER_ADMIN.name())
                         // State-changing station operations require an authenticated user.
-                        // These must be listed before the blanket /api/Meetstation/** rule,
-                        // since request matchers are evaluated top to bottom.
-                        .requestMatchers(HttpMethod.PUT, "/api/Meetstation/edit/**").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/Meetstation/transfer/**").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/Meetstation/Claim").authenticated()
+                        // These must be listed before the blanket station rule, since request
+                        // matchers are evaluated top to bottom. Every station path exists in its
+                        // canonical lowercase form and as the old mixed-case alias (path matching
+                        // is case sensitive, so an alias without a rule would bypass these; class and method aliases
+                        // combine, hence the four spellings of claim).
+                        .requestMatchers(HttpMethod.PUT, "/api/meetstation/edit/**", "/api/Meetstation/edit/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/meetstation/transfer/**", "/api/Meetstation/transfer/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/meetstation/claim", "/api/meetstation/Claim", "/api/Meetstation/claim", "/api/Meetstation/Claim").authenticated()
                         // Adding a station by hand is an admin task, not something any logged-in user may do.
-                        .requestMatchers(HttpMethod.POST, "/api/Meetstation/add").hasAnyAuthority(UserRole.ADMIN.name(), UserRole.SUPER_ADMIN.name())
-                        .requestMatchers("/api/Meetstation/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/meetstation/add", "/api/Meetstation/add").hasAnyAuthority(UserRole.ADMIN.name(), UserRole.SUPER_ADMIN.name())
+                        .requestMatchers("/api/meetstation/**", "/api/Meetstation/**").permitAll()
                         // Coverage pulls weeks of raw data for every station; keep it to admins.
                         .requestMatchers("/api/measurement/coverage").hasAnyAuthority(UserRole.ADMIN.name(), UserRole.SUPER_ADMIN.name())
                         .requestMatchers("/api/measurement/**").permitAll()

@@ -42,8 +42,13 @@ import java.util.concurrent.CompletableFuture;
 
 @Tag(name = "Meetstations", description = "Meetstations opvragen, claimen, bewerken en overdragen")
 @RestController
-@RequestMapping("/api/Meetstation")
+@RequestMapping({StationController.BASE_PATH, StationController.LEGACY_BASE_PATH})
 public class StationController {
+    /** Canonical (lowercase) base path. */
+    public static final String BASE_PATH = "/api/meetstation";
+    /** Old spelling, kept as an alias so existing clients keep working. Hidden from the OpenAPI spec. */
+    public static final String LEGACY_BASE_PATH = "/api/Meetstation";
+
     private final StationService stationService;
     private final MeasurementService measurementService;
     private final WorkshopService adminService;
@@ -89,7 +94,7 @@ public class StationController {
 
     @Operation(summary = "Geef meetstations met hun meting op een tijdstip")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer")})
-    @GetMapping("/stationsMetMeasurements")
+    @GetMapping({"/stations-met-measurements", "/stationsMetMeasurements"})
     public CompletableFuture<ResponseEntity<List<StationDto>>> getMeetstationWithMeasurement(
             @RequestParam(value = "timestamp") String timestamp) {
         Instant utcDateTime;
@@ -106,7 +111,7 @@ public class StationController {
     @SecurityRequirement(name = OpenApiConfig.BEARER_AUTH)
     @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "401", description = "Niet ingelogd"), @ApiResponse(responseCode = "403", description = "Geen toegang")})
     @PutMapping("/edit/{id}")
-    public ResponseEntity<?> updateMeetstation(@PathVariable long id, @RequestBody UpdateStationRequest updaterequest, @AuthenticationPrincipal User currentUser) throws Exception {
+    public ResponseEntity<String> updateMeetstation(@PathVariable long id, @RequestBody UpdateStationRequest updaterequest, @AuthenticationPrincipal User currentUser) throws Exception {
         Station station = stationService.GetStationById(id);
         if (!isOwnerOrAdmin(currentUser, station.getUserid())) {
             throw new AccessDeniedException("You are not allowed to edit this station");
@@ -123,7 +128,7 @@ public class StationController {
     @SecurityRequirement(name = OpenApiConfig.BEARER_AUTH)
     @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer"), @ApiResponse(responseCode = "401", description = "Niet ingelogd"), @ApiResponse(responseCode = "403", description = "Geen toegang")})
     @PutMapping("/transfer/{id}")
-    public ResponseEntity<?> transferMeetstation(@PathVariable long id, @Valid @RequestBody TransferStationRequest request, @AuthenticationPrincipal User currentUser) {
+    public ResponseEntity<String> transferMeetstation(@PathVariable long id, @Valid @RequestBody TransferStationRequest request, @AuthenticationPrincipal User currentUser) {
         Station station = stationService.GetStationById(id);
         if (!isOwnerOrAdmin(currentUser, station.getUserid())) {
             throw new AccessDeniedException("You are not allowed to transfer this station");
@@ -168,7 +173,7 @@ public class StationController {
 
     @Operation(summary = "Controleer of een station beschikbaar is en de workshopcode geldig is")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "Statuscode in de body: 200 ok, 402 station bezet, 403 ongeldige workshopcode"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer")})
-    @GetMapping("/Availibility/{stationId}/{workshopCode}")
+    @GetMapping({"/availability/{stationId}/{workshopCode}", "/Availibility/{stationId}/{workshopCode}"})
     public ResponseEntity<Integer> IsAvailable(@PathVariable Long stationId, @PathVariable Long workshopCode) {
         if (!stationService.IsAvailable(stationId)) {
             return ResponseEntity.status(HttpStatus.OK).body(402);
@@ -181,7 +186,7 @@ public class StationController {
     @Operation(summary = "Claim een station voor de ingelogde gebruiker")
     @SecurityRequirement(name = OpenApiConfig.BEARER_AUTH)
     @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer"), @ApiResponse(responseCode = "401", description = "Niet ingelogd")})
-    @PutMapping("/Claim")
+    @PutMapping({"/claim", "/Claim"})
     public ResponseEntity<String> ClaimStation(@RequestBody StationDto stationDto, @AuthenticationPrincipal User currentUser) {
         // Bind the claim to the authenticated user, never to a client-supplied id.
         // A station that already has an owner is rejected with 409 (see StationService).
@@ -194,7 +199,7 @@ public class StationController {
     @SecurityRequirement(name = OpenApiConfig.BEARER_AUTH)
     @ApiResponses({@ApiResponse(responseCode = "201", description = "Station aangemaakt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer"), @ApiResponse(responseCode = "401", description = "Niet ingelogd"), @ApiResponse(responseCode = "500", description = "Onverwachte fout")})
     @PostMapping("/add")
-    public ResponseEntity<?> addStation(@Valid @RequestBody AddStationRequest request) {
+    public ResponseEntity<StationDto> addStation(@Valid @RequestBody AddStationRequest request) {
         Station station = new Station();
         station.setStationid(request.stationid() != null ? request.stationid() : request.registrationCode());
         station.setName(request.name());

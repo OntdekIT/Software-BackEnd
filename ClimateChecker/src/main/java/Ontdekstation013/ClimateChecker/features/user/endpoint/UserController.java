@@ -40,7 +40,7 @@ public class UserController {
     @Operation(summary = "Geef een gebruiker op id")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer"), @ApiResponse(responseCode = "403", description = "Geen toegang")})
     @GetMapping("/{id}")
-    public ResponseEntity<?> getUserById(@PathVariable long id, @RequestParam(defaultValue = "false") boolean includeStations) {
+    public ResponseEntity<UserResponse> getUserById(@PathVariable long id, @RequestParam(defaultValue = "false") boolean includeStations) {
         User user = userService.getUserById(id);
         return ResponseEntity.ok(UserMapper.toUserResponse(user, includeStations));
     }
@@ -49,7 +49,7 @@ public class UserController {
     @Operation(summary = "Geef een pagina met gebruikers, optioneel gefilterd")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer"), @ApiResponse(responseCode = "403", description = "Geen toegang")})
     @GetMapping()
-    public ResponseEntity<?> getAllUsers(GetAllUsersRequest request) {
+    public ResponseEntity<Page<UserResponse>> getAllUsers(GetAllUsersRequest request) {
         Pageable pageable = PageRequest.of(request.page(), Math.min(request.pageSize(), MAX_PAGE_SIZE));
         Page<UserResponse> responses = userService.getAllUsers(UserMapper.toUserFilter(request), pageable)
                 .map(user -> UserMapper.toUserResponse(user, false));
@@ -60,7 +60,7 @@ public class UserController {
     @Operation(summary = "Verwijder een gebruiker")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer"), @ApiResponse(responseCode = "403", description = "Geen toegang")})
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUser(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long id) {
+    public ResponseEntity<Void> deleteUser(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long id) {
         User loggedInUser = (User) userDetails;
         User user = userService.getUserById(id);
 
@@ -75,7 +75,7 @@ public class UserController {
     @Operation(summary = "Wijzig de rol van een gebruiker")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer"), @ApiResponse(responseCode = "403", description = "Geen toegang")})
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateUserRole(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long id, @RequestBody UpdateUserRequest request) {
+    public ResponseEntity<Void> updateUserRole(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long id, @RequestBody UpdateUserRequest request) {
         User loggedInUser = (User) userDetails;
 
         if (request.role() == UserRole.SUPER_ADMIN && loggedInUser.getRole() != UserRole.SUPER_ADMIN) {

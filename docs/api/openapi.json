@@ -1,0 +1,2520 @@
+{
+  "components" : {
+    "schemas" : {
+      "AddStationRequest" : {
+        "properties" : {
+          "location_locationid" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "name" : {
+            "maxLength" : 255,
+            "minLength" : 0,
+            "type" : "string"
+          },
+          "registrationCode" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "stationid" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        },
+        "required" : [ "registrationCode" ],
+        "type" : "object"
+      },
+      "AuthenticationResponse" : {
+        "properties" : {
+          "token" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "DataCoverageResponse" : {
+        "properties" : {
+          "buckets" : {
+            "items" : {
+              "type" : "string"
+            },
+            "type" : "array"
+          },
+          "from" : {
+            "type" : "string"
+          },
+          "granularity" : {
+            "type" : "string"
+          },
+          "networkGapThreshold" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "networkGaps" : {
+            "items" : {
+              "$ref" : "#/components/schemas/NetworkGapResponse"
+            },
+            "type" : "array"
+          },
+          "networkPmCoverage" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "networkTimeline" : {
+            "items" : {
+              "format" : "float",
+              "type" : "number"
+            },
+            "type" : "array"
+          },
+          "okThreshold" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "pmCapableStationCount" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "stationCount" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "stations" : {
+            "items" : {
+              "$ref" : "#/components/schemas/StationCoverageResponse"
+            },
+            "type" : "array"
+          },
+          "to" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "DayMeasurementResponse" : {
+        "properties" : {
+          "avgHum" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "avgStof" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "avgTemp" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "maxHum" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "maxTemp" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "minHum" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "minTemp" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "timestamp" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "ForgotPasswordRequest" : {
+        "properties" : {
+          "email" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "GetAllStationsRequest" : {
+        "properties" : {
+          "database_tag" : {
+            "type" : "string"
+          },
+          "isActive" : {
+            "type" : "boolean"
+          },
+          "isPublic" : {
+            "type" : "boolean"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "page" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "pageSize" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "paged" : {
+            "type" : "boolean"
+          },
+          "registrationCode" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "userid" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "username" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "GetAllUsersRequest" : {
+        "properties" : {
+          "email" : {
+            "type" : "string"
+          },
+          "firstName" : {
+            "type" : "string"
+          },
+          "lastName" : {
+            "type" : "string"
+          },
+          "page" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "pageSize" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "role" : {
+            "enum" : [ "USER", "SUPER_ADMIN", "ADMIN" ],
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "HalfHourMeasurementResponse" : {
+        "properties" : {
+          "avgPm25" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "avgTemp" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "timestamp" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "HourMeasurementResponse" : {
+        "properties" : {
+          "avgPm25" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "avgTemp" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "timestamp" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "LoginRequest" : {
+        "properties" : {
+          "email" : {
+            "type" : "string"
+          },
+          "password" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "LoginResponse" : {
+        "properties" : {
+          "token" : {
+            "type" : "string"
+          },
+          "verificationRequired" : {
+            "type" : "boolean"
+          }
+        },
+        "type" : "object"
+      },
+      "MeasurementDto" : {
+        "properties" : {
+          "humidity" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "id" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "is_public" : {
+            "type" : "boolean"
+          },
+          "latitude" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "locationInherited" : {
+            "type" : "boolean"
+          },
+          "longitude" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "measurementId" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "particulate" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "pm10" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "pm2.5" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "temperature" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "timestamp" : {
+            "type" : "string"
+          },
+          "userId" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        },
+        "type" : "object"
+      },
+      "NeighbourhoodDto" : {
+        "properties" : {
+          "avgPm25" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "avgTemp" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "coordinates" : {
+            "items" : {
+              "items" : {
+                "format" : "float",
+                "type" : "number"
+              },
+              "type" : "array"
+            },
+            "type" : "array"
+          },
+          "id" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "name" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "NeighbourhoodTimelapseResponse" : {
+        "properties" : {
+          "frames" : {
+            "items" : {
+              "$ref" : "#/components/schemas/TimelapseFrame"
+            },
+            "type" : "array"
+          },
+          "neighbourhoods" : {
+            "items" : {
+              "$ref" : "#/components/schemas/TimelapseNeighbourhood"
+            },
+            "type" : "array"
+          }
+        },
+        "type" : "object"
+      },
+      "NetworkGapResponse" : {
+        "properties" : {
+          "bucketCount" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "end" : {
+            "type" : "string"
+          },
+          "lowestShare" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "start" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "NetworkMeasurementResponse" : {
+        "properties" : {
+          "avgTemp" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "maxTemp" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "measurementCount" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "medianTemp" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "minTemp" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "stationCount" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "timestamp" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "PageUserResponse" : {
+        "properties" : {
+          "content" : {
+            "items" : {
+              "$ref" : "#/components/schemas/UserResponse"
+            },
+            "type" : "array"
+          },
+          "empty" : {
+            "type" : "boolean"
+          },
+          "first" : {
+            "type" : "boolean"
+          },
+          "last" : {
+            "type" : "boolean"
+          },
+          "number" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "numberOfElements" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "pageable" : {
+            "$ref" : "#/components/schemas/PageableObject"
+          },
+          "size" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "sort" : {
+            "items" : {
+              "$ref" : "#/components/schemas/SortObject"
+            },
+            "type" : "array"
+          },
+          "totalElements" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "totalPages" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        },
+        "type" : "object"
+      },
+      "PageableObject" : {
+        "properties" : {
+          "offset" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "pageNumber" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "pageSize" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "paged" : {
+            "type" : "boolean"
+          },
+          "sort" : {
+            "items" : {
+              "$ref" : "#/components/schemas/SortObject"
+            },
+            "type" : "array"
+          },
+          "unpaged" : {
+            "type" : "boolean"
+          }
+        },
+        "type" : "object"
+      },
+      "RegionAverageBucketResponse" : {
+        "properties" : {
+          "avg" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "max" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "median" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "min" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "pm10" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "pm25" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "timestamp" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "RegisterUserRequest" : {
+        "properties" : {
+          "email" : {
+            "type" : "string"
+          },
+          "firstName" : {
+            "type" : "string"
+          },
+          "lastName" : {
+            "type" : "string"
+          },
+          "password" : {
+            "type" : "string"
+          },
+          "stationCode" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "workshopCode" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        },
+        "type" : "object"
+      },
+      "ResetPasswordRequest" : {
+        "properties" : {
+          "email" : {
+            "type" : "string"
+          },
+          "password" : {
+            "pattern" : "^(?=.*[A-Z])(?=.*\\d).{8,128}$",
+            "type" : "string"
+          },
+          "token" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "email", "password", "token" ],
+        "type" : "object"
+      },
+      "SortObject" : {
+        "properties" : {
+          "ascending" : {
+            "type" : "boolean"
+          },
+          "direction" : {
+            "type" : "string"
+          },
+          "ignoreCase" : {
+            "type" : "boolean"
+          },
+          "nullHandling" : {
+            "type" : "string"
+          },
+          "property" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "StationCoverageResponse" : {
+        "properties" : {
+          "active" : {
+            "type" : "boolean"
+          },
+          "bucketsWithData" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "bucketsWithPm" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "dataCoverage" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "longestPmGapBuckets" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "medianPmIntervalMinutes" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "pmCoverage" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "pmReadings" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "pmTimeline" : {
+            "items" : {
+              "format" : "int32",
+              "type" : "integer"
+            },
+            "type" : "array"
+          },
+          "stationId" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "status" : {
+            "type" : "string"
+          },
+          "stofError" : {
+            "type" : "boolean"
+          },
+          "totalReadings" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        },
+        "type" : "object"
+      },
+      "StationDto" : {
+        "properties" : {
+          "database_tag" : {
+            "type" : "string"
+          },
+          "humError" : {
+            "type" : "boolean"
+          },
+          "isActive" : {
+            "type" : "boolean"
+          },
+          "is_public" : {
+            "type" : "boolean"
+          },
+          "latitude" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "locError" : {
+            "type" : "boolean"
+          },
+          "location_locationid" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "longitude" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "measurements" : {
+            "items" : {
+              "$ref" : "#/components/schemas/MeasurementDto"
+            },
+            "type" : "array"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "registrationCode" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "stationid" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "stofError" : {
+            "type" : "boolean"
+          },
+          "tempError" : {
+            "type" : "boolean"
+          },
+          "userid" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        },
+        "type" : "object"
+      },
+      "TimelapseFrame" : {
+        "properties" : {
+          "stationCount" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "timestamp" : {
+            "type" : "string"
+          },
+          "values" : {
+            "items" : {
+              "$ref" : "#/components/schemas/TimelapseValue"
+            },
+            "type" : "array"
+          }
+        },
+        "type" : "object"
+      },
+      "TimelapseNeighbourhood" : {
+        "properties" : {
+          "coordinates" : {
+            "items" : {
+              "items" : {
+                "format" : "float",
+                "type" : "number"
+              },
+              "type" : "array"
+            },
+            "type" : "array"
+          },
+          "id" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "name" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "TimelapseValue" : {
+        "properties" : {
+          "avgPm25" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "avgTemp" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "id" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        },
+        "type" : "object"
+      },
+      "TransferStationRequest" : {
+        "properties" : {
+          "newOwnerEmail" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "newOwnerEmail" ],
+        "type" : "object"
+      },
+      "UpdateMyAccountRequest" : {
+        "properties" : {
+          "email" : {
+            "type" : "string"
+          },
+          "firstName" : {
+            "type" : "string"
+          },
+          "lastName" : {
+            "type" : "string"
+          },
+          "password" : {
+            "pattern" : "^(?=.*[A-Z])(?=.*\\d).{8,}$",
+            "type" : "string"
+          }
+        },
+        "required" : [ "email", "firstName", "lastName" ],
+        "type" : "object"
+      },
+      "UpdateStationRequest" : {
+        "properties" : {
+          "is_public" : {
+            "type" : "boolean"
+          },
+          "name" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "is_public", "name" ],
+        "type" : "object"
+      },
+      "UpdateUserRequest" : {
+        "properties" : {
+          "role" : {
+            "enum" : [ "USER", "SUPER_ADMIN", "ADMIN" ],
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "UserResponse" : {
+        "properties" : {
+          "email" : {
+            "type" : "string"
+          },
+          "firstName" : {
+            "type" : "string"
+          },
+          "id" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "lastName" : {
+            "type" : "string"
+          },
+          "role" : {
+            "enum" : [ "USER", "SUPER_ADMIN", "ADMIN" ],
+            "type" : "string"
+          },
+          "stations" : {
+            "items" : {
+              "$ref" : "#/components/schemas/StationDto"
+            },
+            "type" : "array",
+            "uniqueItems" : true
+          }
+        },
+        "type" : "object"
+      },
+      "VerifyLoginRequest" : {
+        "properties" : {
+          "code" : {
+            "type" : "string"
+          },
+          "email" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "WorkshopRequest" : {
+        "properties" : {
+          "expirationDate" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "expirationDate" ],
+        "type" : "object"
+      },
+      "WorkshopResponse" : {
+        "properties" : {
+          "code" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "creationDate" : {
+            "type" : "string"
+          },
+          "expirationDate" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      }
+    },
+    "securitySchemes" : {
+      "bearerAuth" : {
+        "bearerFormat" : "JWT",
+        "description" : "JWT uit het login- of verify-antwoord, meegestuurd als `Authorization: Bearer <token>`.",
+        "scheme" : "bearer",
+        "type" : "http"
+      }
+    }
+  },
+  "info" : {
+    "description" : "REST API van ClimateChecker: meetstations, metingen en wijken van de klimaatkaart, plus accountbeheer en workshops.\n\nInloggen: roep `POST /api/authentication/login` aan (en daarna `POST /api/authentication/verify` met de code uit de e-mail). Plak het ontvangen token via de knop \"Authorize\" om beveiligde endpoints uit te proberen.",
+    "title" : "ClimateChecker API",
+    "version" : "1.0"
+  },
+  "openapi" : "3.0.1",
+  "paths" : {
+    "/api/authentication/forgot-password" : {
+      "post" : {
+        "operationId" : "createForgotPasswordRequest",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ForgotPasswordRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Gelukt"
+          },
+          "400" : {
+            "description" : "Ongeldige invoer"
+          },
+          "429" : {
+            "description" : "Te veel pogingen"
+          }
+        },
+        "summary" : "Vraag een wachtwoordresetcode aan per e-mail",
+        "tags" : [ "Authenticatie" ]
+      }
+    },
+    "/api/authentication/login" : {
+      "post" : {
+        "operationId" : "loginUser",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/LoginResponse"
+                }
+              }
+            },
+            "description" : "Gelukt"
+          },
+          "400" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/LoginResponse"
+                }
+              }
+            },
+            "description" : "Ongeldige invoer"
+          },
+          "429" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/LoginResponse"
+                }
+              }
+            },
+            "description" : "Te veel pogingen"
+          }
+        },
+        "summary" : "Log in met e-mail en wachtwoord (geeft een token of vraagt om een e-mailcode)",
+        "tags" : [ "Authenticatie" ]
+      }
+    },
+    "/api/authentication/register" : {
+      "post" : {
+        "operationId" : "createNewUser",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/RegisterUserRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UserResponse"
+                }
+              }
+            },
+            "description" : "Gebruiker aangemaakt"
+          },
+          "400" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UserResponse"
+                }
+              }
+            },
+            "description" : "Ongeldige invoer"
+          }
+        },
+        "summary" : "Registreer een gebruiker met workshop- en stationcode",
+        "tags" : [ "Authenticatie" ]
+      }
+    },
+    "/api/authentication/reset-password" : {
+      "post" : {
+        "operationId" : "resetPassword",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ResetPasswordRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Gelukt"
+          },
+          "400" : {
+            "description" : "Ongeldige invoer"
+          },
+          "429" : {
+            "description" : "Te veel pogingen"
+          }
+        },
+        "summary" : "Stel een nieuw wachtwoord in met een resetcode",
+        "tags" : [ "Authenticatie" ]
+      }
+    },
+    "/api/authentication/verify" : {
+      "post" : {
+        "operationId" : "verifyEmailCode",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/VerifyLoginRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AuthenticationResponse"
+                }
+              }
+            },
+            "description" : "Gelukt"
+          },
+          "400" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AuthenticationResponse"
+                }
+              }
+            },
+            "description" : "Ongeldige invoer"
+          },
+          "429" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AuthenticationResponse"
+                }
+              }
+            },
+            "description" : "Te veel pogingen"
+          }
+        },
+        "summary" : "Verifieer de e-mailcode en ontvang een JWT",
+        "tags" : [ "Authenticatie" ]
+      }
+    },
+    "/api/measurement/coverage" : {
+      "get" : {
+        "operationId" : "getDataCoverage",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "from",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "to",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "granularity",
+          "required" : false,
+          "schema" : {
+            "default" : "hour",
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/DataCoverageResponse"
+                }
+              }
+            },
+            "description" : "Gelukt"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/DataCoverageResponse"
+                }
+              }
+            },
+            "description" : "Niet ingelogd"
+          },
+          "403" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/DataCoverageResponse"
+                }
+              }
+            },
+            "description" : "Geen toegang"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "summary" : "Geef de volledigheid van fijnstofdata per station (alleen beheerders)",
+        "tags" : [ "Metingen" ]
+      }
+    },
+    "/api/measurement/history" : {
+      "get" : {
+        "operationId" : "getMeasurementsAtTime",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "timestamp",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/MeasurementDto"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "Gelukt"
+          },
+          "400" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/MeasurementDto"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "Ongeldige invoer"
+          }
+        },
+        "summary" : "Geef per meetstation de meting dichtst bij een tijdstip",
+        "tags" : [ "Metingen" ]
+      }
+    },
+    "/api/measurement/history/average/region/{regionId}" : {
+      "get" : {
+        "operationId" : "getMeasurementsAverageForRegion",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "regionId",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        }, {
+          "in" : "query",
+          "name" : "from",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "to",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "granularity",
+          "required" : false,
+          "schema" : {
+            "default" : "hour",
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/RegionAverageBucketResponse"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "Gelukt"
+          },
+          "400" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/RegionAverageBucketResponse"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "Ongeldige invoer"
+          }
+        },
+        "summary" : "Geef gemiddelde temperatuur per tijdsblok voor een wijk",
+        "tags" : [ "Metingen" ]
+      }
+    },
+    "/api/measurement/history/average/{id}" : {
+      "get" : {
+        "operationId" : "getMeasurementsAverage",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        }, {
+          "in" : "query",
+          "name" : "startDate",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "endDate",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/DayMeasurementResponse"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "Gelukt"
+          },
+          "400" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/DayMeasurementResponse"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "Ongeldige invoer"
+          }
+        },
+        "summary" : "Geef dagelijkse gemiddelde, minimum en maximum temperatuur van een station",
+        "tags" : [ "Metingen" ]
+      }
+    },
+    "/api/measurement/history/half-hourly/{id}" : {
+      "get" : {
+        "operationId" : "getTodayHalfHourlyMeasurements",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/HalfHourMeasurementResponse"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "Gelukt"
+          }
+        },
+        "summary" : "Geef halfuurgemiddelden van een station voor vandaag",
+        "tags" : [ "Metingen" ]
+      }
+    },
+    "/api/measurement/history/hourly/{id}" : {
+      "get" : {
+        "operationId" : "getTodayHourlyMeasurements",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/HourMeasurementResponse"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "Gelukt"
+          }
+        },
+        "summary" : "Geef uurgemiddelden van een station voor vandaag",
+        "tags" : [ "Metingen" ]
+      }
+    },
+    "/api/measurement/history/network" : {
+      "get" : {
+        "operationId" : "getNetworkMeasurements",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "startDate",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "endDate",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/NetworkMeasurementResponse"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "Gelukt"
+          },
+          "400" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/NetworkMeasurementResponse"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "Ongeldige invoer"
+          }
+        },
+        "summary" : "Geef dagelijkse netwerkbrede temperatuurstatistiek over alle stations",
+        "tags" : [ "Metingen" ]
+      }
+    },
+    "/api/meetstation/add" : {
+      "post" : {
+        "operationId" : "addStation",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/AddStationRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/StationDto"
+                }
+              }
+            },
+            "description" : "Station aangemaakt"
+          },
+          "400" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/StationDto"
+                }
+              }
+            },
+            "description" : "Ongeldige invoer"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/StationDto"
+                }
+              }
+            },
+            "description" : "Niet ingelogd"
+          },
+          "500" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/StationDto"
+                }
+              }
+            },
+            "description" : "Onverwachte fout"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "summary" : "Voeg een nieuw station toe",
+        "tags" : [ "Meetstations" ]
+      }
+    },
+    "/api/meetstation/availability/{stationId}/{workshopCode}" : {
+      "get" : {
+        "operationId" : "isAvailable",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "stationId",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        }, {
+          "in" : "path",
+          "name" : "workshopCode",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "format" : "int32",
+                  "type" : "integer"
+                }
+              }
+            },
+            "description" : "Statuscode in de body: 200 ok, 402 station bezet, 403 ongeldige workshopcode"
+          },
+          "400" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "format" : "int32",
+                  "type" : "integer"
+                }
+              }
+            },
+            "description" : "Ongeldige invoer"
+          }
+        },
+        "summary" : "Controleer of een station beschikbaar is en de workshopcode geldig is",
+        "tags" : [ "Meetstations" ]
+      }
+    },
+    "/api/meetstation/claim" : {
+      "put" : {
+        "operationId" : "claimStation",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/StationDto"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            },
+            "description" : "Gelukt"
+          },
+          "400" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            },
+            "description" : "Ongeldige invoer"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            },
+            "description" : "Niet ingelogd"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "summary" : "Claim een station voor de ingelogde gebruiker",
+        "tags" : [ "Meetstations" ]
+      }
+    },
+    "/api/meetstation/edit/{id}" : {
+      "put" : {
+        "operationId" : "updateMeetstation",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/UpdateStationRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            },
+            "description" : "Gelukt"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            },
+            "description" : "Niet ingelogd"
+          },
+          "403" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            },
+            "description" : "Geen toegang"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "summary" : "Pas naam en zichtbaarheid van een station aan (eigenaar of beheerder)",
+        "tags" : [ "Meetstations" ]
+      }
+    },
+    "/api/meetstation/measurements/{id}" : {
+      "get" : {
+        "operationId" : "getMeetstationMeasurements",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        }, {
+          "in" : "query",
+          "name" : "startDate",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "endDate",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "format" : "byte",
+                  "type" : "string"
+                }
+              }
+            },
+            "description" : "Gelukt"
+          },
+          "400" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "format" : "byte",
+                  "type" : "string"
+                }
+              }
+            },
+            "description" : "Ongeldige invoer"
+          }
+        },
+        "summary" : "Download de metingen van een station als PDF",
+        "tags" : [ "Meetstations" ]
+      }
+    },
+    "/api/meetstation/stations" : {
+      "get" : {
+        "operationId" : "getAllMeetstations",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "request",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/GetAllStationsRequest"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/StationDto"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "Gelukt"
+          },
+          "400" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/StationDto"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "Ongeldige invoer"
+          }
+        },
+        "summary" : "Geef alle meetstations, optioneel gefilterd",
+        "tags" : [ "Meetstations" ]
+      }
+    },
+    "/api/meetstation/stations-met-measurements" : {
+      "get" : {
+        "operationId" : "getMeetstationWithMeasurement",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "timestamp",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/StationDto"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "Gelukt"
+          },
+          "400" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/StationDto"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "Ongeldige invoer"
+          }
+        },
+        "summary" : "Geef meetstations met hun meting op een tijdstip",
+        "tags" : [ "Meetstations" ]
+      }
+    },
+    "/api/meetstation/transfer/{id}" : {
+      "put" : {
+        "operationId" : "transferMeetstation",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/TransferStationRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            },
+            "description" : "Gelukt"
+          },
+          "400" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            },
+            "description" : "Ongeldige invoer"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            },
+            "description" : "Niet ingelogd"
+          },
+          "403" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            },
+            "description" : "Geen toegang"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "summary" : "Draag een station over aan een andere gebruiker",
+        "tags" : [ "Meetstations" ]
+      }
+    },
+    "/api/meetstation/{id}" : {
+      "get" : {
+        "operationId" : "getMeetstation",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/StationDto"
+                }
+              }
+            },
+            "description" : "Gelukt"
+          },
+          "404" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/StationDto"
+                }
+              }
+            },
+            "description" : "Niet gevonden"
+          }
+        },
+        "summary" : "Geef een meetstation op id",
+        "tags" : [ "Meetstations" ]
+      }
+    },
+    "/api/my-account" : {
+      "get" : {
+        "operationId" : "getUser",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "includeStations",
+          "required" : false,
+          "schema" : {
+            "default" : false,
+            "type" : "boolean"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UserResponse"
+                }
+              }
+            },
+            "description" : "Gelukt"
+          },
+          "401" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UserResponse"
+                }
+              }
+            },
+            "description" : "Niet ingelogd"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "summary" : "Geef het account van de ingelogde gebruiker",
+        "tags" : [ "Mijn account" ]
+      },
+      "put" : {
+        "operationId" : "updateUser",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/UpdateMyAccountRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Gelukt"
+          },
+          "400" : {
+            "description" : "Ongeldige invoer"
+          },
+          "401" : {
+            "description" : "Niet ingelogd"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "summary" : "Wijzig naam, e-mail of wachtwoord van de ingelogde gebruiker",
+        "tags" : [ "Mijn account" ]
+      }
+    },
+    "/api/neighbourhood/history" : {
+      "get" : {
+        "operationId" : "getNeighbourhoodsAtTime",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "timestamp",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/NeighbourhoodDto"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "Gelukt"
+          },
+          "400" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/NeighbourhoodDto"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "Ongeldige invoer"
+          }
+        },
+        "summary" : "Geef alle wijken met hun metingen op een tijdstip",
+        "tags" : [ "Wijken" ]
+      }
+    },
+    "/api/neighbourhood/history/average/{id}" : {
+      "get" : {
+        "operationId" : "getNeighbourhoodData",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        }, {
+          "in" : "query",
+          "name" : "startDate",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "endDate",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/DayMeasurementResponse"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "Gelukt"
+          },
+          "400" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/DayMeasurementResponse"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "Ongeldige invoer"
+          }
+        },
+        "summary" : "Geef dagelijkse temperatuurstatistiek van een wijk",
+        "tags" : [ "Wijken" ]
+      }
+    },
+    "/api/neighbourhood/history/timelapse" : {
+      "get" : {
+        "operationId" : "getNeighbourhoodTimelapse",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "from",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "to",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "query",
+          "name" : "steps",
+          "required" : false,
+          "schema" : {
+            "default" : 24,
+            "format" : "int32",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/NeighbourhoodTimelapseResponse"
+                }
+              }
+            },
+            "description" : "Gelukt"
+          },
+          "400" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/NeighbourhoodTimelapseResponse"
+                }
+              }
+            },
+            "description" : "Ongeldige invoer"
+          }
+        },
+        "summary" : "Geef een time-lapse van de heatmap per wijk",
+        "tags" : [ "Wijken" ]
+      }
+    },
+    "/api/neighbourhood/{id}" : {
+      "get" : {
+        "operationId" : "getNeighbourhoodById",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/NeighbourhoodDto"
+                }
+              }
+            },
+            "description" : "Gelukt"
+          },
+          "404" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/NeighbourhoodDto"
+                }
+              }
+            },
+            "description" : "Niet gevonden"
+          }
+        },
+        "summary" : "Geef een wijk op id",
+        "tags" : [ "Wijken" ]
+      }
+    },
+    "/api/users" : {
+      "get" : {
+        "operationId" : "getAllUsers",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "request",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/GetAllUsersRequest"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageUserResponse"
+                }
+              }
+            },
+            "description" : "Gelukt"
+          },
+          "400" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageUserResponse"
+                }
+              }
+            },
+            "description" : "Ongeldige invoer"
+          },
+          "403" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PageUserResponse"
+                }
+              }
+            },
+            "description" : "Geen toegang"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "summary" : "Geef een pagina met gebruikers, optioneel gefilterd",
+        "tags" : [ "Gebruikers" ]
+      }
+    },
+    "/api/users/{id}" : {
+      "delete" : {
+        "operationId" : "deleteUser",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Gelukt"
+          },
+          "400" : {
+            "description" : "Ongeldige invoer"
+          },
+          "403" : {
+            "description" : "Geen toegang"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "summary" : "Verwijder een gebruiker",
+        "tags" : [ "Gebruikers" ]
+      },
+      "get" : {
+        "operationId" : "getUserById",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        }, {
+          "in" : "query",
+          "name" : "includeStations",
+          "required" : false,
+          "schema" : {
+            "default" : false,
+            "type" : "boolean"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UserResponse"
+                }
+              }
+            },
+            "description" : "Gelukt"
+          },
+          "400" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UserResponse"
+                }
+              }
+            },
+            "description" : "Ongeldige invoer"
+          },
+          "403" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UserResponse"
+                }
+              }
+            },
+            "description" : "Geen toegang"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "summary" : "Geef een gebruiker op id",
+        "tags" : [ "Gebruikers" ]
+      },
+      "put" : {
+        "operationId" : "updateUserRole",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/UpdateUserRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Gelukt"
+          },
+          "400" : {
+            "description" : "Ongeldige invoer"
+          },
+          "403" : {
+            "description" : "Geen toegang"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "summary" : "Wijzig de rol van een gebruiker",
+        "tags" : [ "Gebruikers" ]
+      }
+    },
+    "/api/workshops" : {
+      "get" : {
+        "operationId" : "getAllWorkshops",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "isExpired",
+          "required" : false,
+          "schema" : {
+            "default" : false,
+            "type" : "boolean"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/WorkshopResponse"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "Gelukt"
+          },
+          "403" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/WorkshopResponse"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "Geen toegang"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "summary" : "Geef actieve of verlopen workshops",
+        "tags" : [ "Workshops" ]
+      },
+      "post" : {
+        "operationId" : "createNewWorkshop",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/WorkshopRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/WorkshopResponse"
+                }
+              }
+            },
+            "description" : "Workshop aangemaakt"
+          },
+          "403" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/WorkshopResponse"
+                }
+              }
+            },
+            "description" : "Geen toegang"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "summary" : "Maak een workshop met een vervaldatum",
+        "tags" : [ "Workshops" ]
+      }
+    },
+    "/api/workshops/{code}" : {
+      "delete" : {
+        "operationId" : "deleteWorkshopCode",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "code",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "Verwijderd"
+          },
+          "403" : {
+            "description" : "Geen toegang"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "summary" : "Verwijder een workshopcode",
+        "tags" : [ "Workshops" ]
+      }
+    },
+    "/api/workshops/{code}/users" : {
+      "get" : {
+        "operationId" : "getAllUsersByWorkshopCode",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "code",
+          "required" : true,
+          "schema" : {
+            "format" : "int64",
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/UserResponse"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "Gelukt"
+          },
+          "403" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/UserResponse"
+                  },
+                  "type" : "array"
+                }
+              }
+            },
+            "description" : "Geen toegang"
+          }
+        },
+        "security" : [ {
+          "bearerAuth" : [ ]
+        } ],
+        "summary" : "Geef de gebruikers die via een workshopcode zijn geregistreerd",
+        "tags" : [ "Workshops" ]
+      }
+    }
+  },
+  "servers" : [ {
+    "description" : "Lokale ontwikkelomgeving",
+    "url" : "http://localhost:8082"
+  } ],
+  "tags" : [ {
+    "description" : "Workshopcodes beheren (alleen beheerders)",
+    "name" : "Workshops"
+  }, {
+    "description" : "Registreren, inloggen en wachtwoord herstellen (publiek)",
+    "name" : "Authenticatie"
+  }, {
+    "description" : "Wijken met gemiddelde meetwaarden, onder andere voor de heatmap",
+    "name" : "Wijken"
+  }, {
+    "description" : "Meetstations opvragen, claimen, bewerken en overdragen",
+    "name" : "Meetstations"
+  }, {
+    "description" : "Gebruikersbeheer (alleen beheerders)",
+    "name" : "Gebruikers"
+  }, {
+    "description" : "Metingen van meetstations in Tilburg, historisch en per wijk",
+    "name" : "Metingen"
+  }, {
+    "description" : "Gegevens van de ingelogde gebruiker",
+    "name" : "Mijn account"
+  } ]
+}
