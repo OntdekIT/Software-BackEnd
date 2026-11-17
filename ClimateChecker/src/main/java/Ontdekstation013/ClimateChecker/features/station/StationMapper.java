@@ -45,6 +45,9 @@ public class StationMapper {
                 .registrationCode(request.registrationCode())
                 .username(request.username())
                 .isActive(request.isActive())
+                .userIds(request.userid() != null ? List.of(request.userid()) : null)
+                .page(request.page())
+                .pageSize(request.pageSize())
                 .build();
     }
 }

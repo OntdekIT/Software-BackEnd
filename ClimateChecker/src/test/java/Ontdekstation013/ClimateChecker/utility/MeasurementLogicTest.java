@@ -324,4 +324,34 @@ public class MeasurementLogicTest {
         assertEquals(40f, result.get(0).getAvgHum());
         assertEquals(10f, result.get(0).getAvgStof());
     }
+
+    // --- Time zone ----------------------------------------------------------
+
+    @Test
+    public void dayBucketsFollowTheGivenZone() {
+        // 23:30 UTC on 1 July is already 2 July in Amsterdam (UTC+2) and in UTC still 1 July.
+        List<Measurement> measurements = List.of(
+                measurement(Instant.parse("2025-07-01T23:30:00Z"), 20f, 50f, 5f, 8f));
+
+        List<DayMeasurementResponse> utc = MeasurementLogic.splitIntoDayMeasurements(measurements, java.time.ZoneOffset.UTC);
+        List<DayMeasurementResponse> amsterdam = MeasurementLogic.splitIntoDayMeasurements(
+                measurements, java.time.ZoneId.of("Europe/Amsterdam"));
+
+        assertEquals("01-07", utc.get(0).getTimestamp());
+        assertEquals("02-07", amsterdam.get(0).getTimestamp());
+    }
+
+    @Test
+    public void overloadsWithoutZoneUseUtcRegardlessOfTheJvmZone() {
+        java.util.TimeZone original = java.util.TimeZone.getDefault();
+        try {
+            java.util.TimeZone.setDefault(java.util.TimeZone.getTimeZone("Pacific/Auckland"));
+            List<Measurement> measurements = List.of(
+                    measurement(Instant.parse("2025-07-01T23:30:00Z"), 20f, 50f, 5f, 8f));
+
+            assertEquals("01-07", MeasurementLogic.splitIntoDayMeasurements(measurements).get(0).getTimestamp());
+        } finally {
+            java.util.TimeZone.setDefault(original);
+        }
+    }
 }
