@@ -19,8 +19,10 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class  MeasurementService {
@@ -145,7 +147,7 @@ public class  MeasurementService {
 
             document.close();
         } catch (DocumentException e) {
-            e.printStackTrace();
+            log.error("PDF genereren mislukt", e);
         }
 
         return baos.toByteArray();

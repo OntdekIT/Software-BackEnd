@@ -4,12 +4,15 @@ import Ontdekstation013.ClimateChecker.features.station.Station;
 import Ontdekstation013.ClimateChecker.features.user.User;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class EmailSenderService {
     private final JavaMailSender mailSender;
@@ -26,10 +29,30 @@ public class EmailSenderService {
 
     private boolean shouldSendEmail() {
         if (!useRealMailserver) {
-            System.out.println("[WARN] Skipping email sending because use.real.mailserver is false");
+            log.warn("Mail overgeslagen: use.real.mailserver staat uit");
             return false;
         }
         return true;
+    }
+
+    private void sendMessage(SimpleMailMessage message, String type) {
+        try {
+            mailSender.send(message);
+            log.info("Mail verstuurd: {}", type);
+        } catch (MailException e) {
+            log.error("Mail versturen mislukt: {}", type, e);
+            throw e;
+        }
+    }
+
+    private void sendMessage(MimeMessage message, String type) {
+        try {
+            mailSender.send(message);
+            log.info("Mail verstuurd: {}", type);
+        } catch (MailException e) {
+            log.error("Mail versturen mislukt: {}", type, e);
+            throw e;
+        }
     }
 
     public void sendEmail(String toEmail, String firstName, String lastName, String body) {
@@ -41,9 +64,7 @@ public class EmailSenderService {
             message.setText(String.format("Welcome %s", body));
 
 
-            mailSender.send(message);
-
-            System.out.print("Mail Send");
+            sendMessage(message, "sendEmail");
         }
     }
 
@@ -70,9 +91,7 @@ public class EmailSenderService {
             helper.setSubject(String.format("Welkom %s", firstName + " " + lastName));
             helper.setText(body, true);
 
-            mailSender.send(message);
-
-            System.out.print("Mail Sent");
+            sendMessage(message, "sendSignupMail");
         }
     }
 
@@ -100,9 +119,7 @@ public class EmailSenderService {
             helper.setSubject(String.format("Welkom %s", firstName + " " + lastName));
             helper.setText(body, true);
 
-            mailSender.send(message);
-
-            System.out.print("Mail Sent");
+            sendMessage(message, "sendLoginMail");
         }
     }
 
@@ -126,9 +143,7 @@ public class EmailSenderService {
             helper.setSubject("Wachtwoord resetten");
             helper.setText(body, true);
 
-            mailSender.send(message);
-
-            System.out.print("Mail Sent");
+            sendMessage(message, "sendForgotPasswordMail");
         }
     }
 
@@ -142,7 +157,7 @@ public class EmailSenderService {
             message.setText(String.format("Welcome %s", body));
 
 
-            mailSender.send(message);
+            sendMessage(message, "deleteUserMail");
         }
     }
 
@@ -169,9 +184,7 @@ public class EmailSenderService {
             helper.setSubject(String.format("Welkom %s", firstName + " " + lastName));
             helper.setText(body, true);
 
-            mailSender.send(message);
-
-            System.out.print("Mail Sent");
+            sendMessage(message, "sendEmailEditMail");
         }
     }
 
@@ -199,9 +212,7 @@ public class EmailSenderService {
             helper.setSubject(String.format("Hallo %s", user.getFirstName() + " " + user.getLastName()));
             helper.setText(body, true);
 
-            mailSender.send(message);
-
-            System.out.print("Mail Sent");
+            sendMessage(message, "sendEmailStationDown");
         }
     }
 
@@ -255,9 +266,7 @@ public class EmailSenderService {
             helper.setSubject(String.format("Hallo %s", user.getFirstName() + " " + user.getLastName()));
             helper.setText(body, true);
 
-            mailSender.send(message);
-
-            System.out.print("Mail Sent");
+            sendMessage(message, "sendEmailStationMeasurements");
         }
     }
 }
