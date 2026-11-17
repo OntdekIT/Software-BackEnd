@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Base64;
+import org.springframework.mock.env.MockEnvironment;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,7 +22,7 @@ public class JwtServiceTest {
 
     @BeforeEach
     public void setUp() {
-        jwtService = new JwtService(VALID_KEY);
+        jwtService = new JwtService(VALID_KEY, new MockEnvironment());
         user = new User(42L, "Test", "User", "test@example.com", UserRole.USER, "pw");
     }
 
@@ -52,7 +53,7 @@ public class JwtServiceTest {
     @Test
     public void extractUsername_throws_whenTokenSignedWithDifferentKey() {
         String otherKey = Base64.getEncoder().encodeToString("DIFFERENT-key-32bytes-long!!!xyz".getBytes());
-        JwtService otherService = new JwtService(otherKey);
+        JwtService otherService = new JwtService(otherKey, new MockEnvironment());
         String foreignToken = otherService.generateToken(user);
 
         // Een token dat met een andere sleutel is ondertekend, mag niet worden vertrouwd.
@@ -61,12 +62,12 @@ public class JwtServiceTest {
 
     @Test
     public void constructor_throws_whenKeyIsBlank() {
-        assertThrows(IllegalStateException.class, () -> new JwtService("  "));
+        assertThrows(IllegalStateException.class, () -> new JwtService("  ", new MockEnvironment()));
     }
 
     @Test
     public void constructor_throws_whenKeyIsTooShort() {
         // "c2hvcnQ=" decodeert naar "short" (5 bytes = 40 bit) -> te zwak voor HS256.
-        assertThrows(IllegalStateException.class, () -> new JwtService("c2hvcnQ="));
+        assertThrows(IllegalStateException.class, () -> new JwtService("c2hvcnQ=", new MockEnvironment()));
     }
 }
