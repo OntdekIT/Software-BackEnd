@@ -1,5 +1,12 @@
 package Ontdekstation013.ClimateChecker.features.station.endpoint;
 
+import Ontdekstation013.ClimateChecker.config.OpenApiConfig;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.features.measurement.MeasurementService;
 import Ontdekstation013.ClimateChecker.features.station.Station;
@@ -34,6 +41,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+@Tag(name = "Meetstations", description = "Meetstations opvragen, claimen, bewerken en overdragen")
 @RestController
 @RequestMapping("/api/Meetstation")
 @CrossOrigin(origins = {"http://localhost:5173"}, allowCredentials = "true")
@@ -48,6 +56,8 @@ public class StationController {
         this.adminService = workshopService;
     }
 
+    @Operation(summary = "Geef een meetstation op id")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "404", description = "Niet gevonden")})
     @GetMapping("{id}")
     public ResponseEntity<StationDto> getMeetstation(@PathVariable Long id) throws Exception {
         try {
@@ -61,6 +71,8 @@ public class StationController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
     }
 
+    @Operation(summary = "Geef alle meetstations, optioneel gefilterd")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer")})
     @GetMapping("/stations")
     public ResponseEntity<?> getAllMeetstations(GetAllStationsRequest request) {
         try {
@@ -81,6 +93,8 @@ public class StationController {
     }
 
 // Controller
+    @Operation(summary = "Geef meetstations met hun meting op een tijdstip")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer")})
 @GetMapping("/stationsMetMeasurements")
 public CompletableFuture<ResponseEntity<List<StationDto>>> getMeetstationWithMeasurement(
         @RequestParam(value = "timestamp") String timestamp) {
@@ -96,6 +110,9 @@ public CompletableFuture<ResponseEntity<List<StationDto>>> getMeetstationWithMea
     }
 }
 
+    @Operation(summary = "Pas naam en zichtbaarheid van een station aan (eigenaar of beheerder)")
+    @SecurityRequirement(name = OpenApiConfig.BEARER_AUTH)
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "401", description = "Niet ingelogd"), @ApiResponse(responseCode = "403", description = "Geen toegang")})
     @PutMapping("/edit/{id}")
     public ResponseEntity<?> updateMeetstation(@PathVariable long id, @RequestBody UpdateStationRequest updaterequest, @AuthenticationPrincipal User currentUser) throws Exception {
         Station station = stationService.GetStationById(id);
@@ -110,6 +127,9 @@ public CompletableFuture<ResponseEntity<List<StationDto>>> getMeetstationWithMea
         return ResponseEntity.status(HttpStatus.OK).body("OK");
     }
 
+    @Operation(summary = "Draag een station over aan een andere gebruiker")
+    @SecurityRequirement(name = OpenApiConfig.BEARER_AUTH)
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer"), @ApiResponse(responseCode = "401", description = "Niet ingelogd"), @ApiResponse(responseCode = "403", description = "Geen toegang")})
     @PutMapping("/transfer/{id}")
     public ResponseEntity<?> transferMeetstation(@PathVariable long id, @Valid @RequestBody TransferStationRequest request, @AuthenticationPrincipal User currentUser) {
         Station station = stationService.GetStationById(id);
@@ -128,6 +148,8 @@ public CompletableFuture<ResponseEntity<List<StationDto>>> getMeetstationWithMea
         return isAdmin || currentUser.getUserId().equals(ownerId);
     }
 
+    @Operation(summary = "Download de metingen van een station als PDF")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer")})
     @GetMapping("/measurements/{id}")
     public ResponseEntity<byte[]> getMeetstationMeasurements(@PathVariable int id, @RequestParam String startDate, @RequestParam String endDate) {
         try {
@@ -153,6 +175,8 @@ public CompletableFuture<ResponseEntity<List<StationDto>>> getMeetstationWithMea
         }
     }
 
+    @Operation(summary = "Controleer of een station beschikbaar is en de workshopcode geldig is")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Statuscode in de body: 200 ok, 402 station bezet, 403 ongeldige workshopcode"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer")})
     @GetMapping("/Availibility/{stationId}/{workshopCode}")
     public ResponseEntity<Integer> IsAvailable(@PathVariable Long stationId, @PathVariable Long workshopCode) {
         try {
@@ -167,6 +191,9 @@ public CompletableFuture<ResponseEntity<List<StationDto>>> getMeetstationWithMea
         }
     }
 
+    @Operation(summary = "Claim een station voor de ingelogde gebruiker")
+    @SecurityRequirement(name = OpenApiConfig.BEARER_AUTH)
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer"), @ApiResponse(responseCode = "401", description = "Niet ingelogd")})
     @PutMapping("/Claim")
     public ResponseEntity<String> ClaimStation(@RequestBody StationDto stationDto, @AuthenticationPrincipal User currentUser) {
         try {
@@ -179,6 +206,9 @@ public CompletableFuture<ResponseEntity<List<StationDto>>> getMeetstationWithMea
         }
     }
 
+    @Operation(summary = "Voeg een nieuw station toe")
+    @SecurityRequirement(name = OpenApiConfig.BEARER_AUTH)
+    @ApiResponses({@ApiResponse(responseCode = "201", description = "Station aangemaakt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer"), @ApiResponse(responseCode = "401", description = "Niet ingelogd"), @ApiResponse(responseCode = "500", description = "Onverwachte fout")})
     @PostMapping("/add")
     public ResponseEntity<?> addStation(@RequestBody Station stationRequest) {
         try {
