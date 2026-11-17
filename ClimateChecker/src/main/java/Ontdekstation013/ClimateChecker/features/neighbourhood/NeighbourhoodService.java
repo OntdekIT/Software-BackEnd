@@ -12,16 +12,21 @@ import Ontdekstation013.ClimateChecker.utility.MeasurementLogic;
 import Ontdekstation013.ClimateChecker.utility.RegionAverageBucketResponse;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.client.RestClientException;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class NeighbourhoodService {
     private final MeetJeStadService meetJeStadService;
     private final NeighbourhoodRepository neighbourhoodRepository;
+    private final ZoneId applicationZone;
 
     private List<NeighbourhoodDto> getNeighbourhoodsAverageTemp(List<Neighbourhood> neighbourhoods, List<Measurement> measurements) {
         List<NeighbourhoodDto> neighbourhoodDtos = new ArrayList<>();
@@ -60,6 +65,11 @@ public class NeighbourhoodService {
     public List<NeighbourhoodDto> getNeighbourhoodsAtTime(Instant dateTime) {
         List<Neighbourhood> neighbourhoods = neighbourhoodRepository.findAll();
 
+        return getNeighbourhoodsAverageTemp(neighbourhoods, getClosestMeasurementsAtTime(dateTime));
+    }
+
+    /** The measurement per station that is closest to {@code dateTime}, within the usual margin before it. */
+    private List<Measurement> getClosestMeasurementsAtTime(Instant dateTime) {
         int minuteMargin = meetJeStadService.getMinuteLimit();
         MeetJeStadParameters params = new MeetJeStadParameters();
         params.StartDate = dateTime.minus(Duration.ofMinutes(minuteMargin));
@@ -67,9 +77,7 @@ public class NeighbourhoodService {
         params.includeFaultyMeasurements = false;
         List<Measurement> allMeasurements = meetJeStadService.getMeasurements(params);
 
-        List<Measurement> closestMeasurements = MeasurementLogic.filterClosestMeasurements(allMeasurements, dateTime);
-
-        return getNeighbourhoodsAverageTemp(neighbourhoods, closestMeasurements);
+        return MeasurementLogic.filterClosestMeasurements(allMeasurements, dateTime);
     }
 
     /** Onder- en bovengrens voor het aantal tijdstappen in een time-lapse. */
@@ -231,7 +239,7 @@ public class NeighbourhoodService {
                         stationIds.contains(Math.toIntExact(measurement.getStation().getStationid())))
                 .collect(Collectors.toList());
 
-        return MeasurementLogic.splitIntoDayMeasurements(neighbourhoodMeasurements);
+        return MeasurementLogic.splitIntoDayMeasurements(neighbourhoodMeasurements, applicationZone);
     }
 
     public List<RegionAverageBucketResponse> getRegionAverageHistory(Long regionId, Instant from, Instant to, String granularity) {
@@ -264,7 +272,7 @@ public class NeighbourhoodService {
                         stationIds.contains(Math.toIntExact(m.getStation().getStationid())))
                 .collect(Collectors.toList());
 
-        return MeasurementLogic.splitIntoRegionBuckets(regionMeasurements, granularity);
+        return MeasurementLogic.splitIntoRegionBuckets(regionMeasurements, granularity, applicationZone);
     }
 
     private List<Measurement> filterMeasurementsInPolygon(List<Measurement> measurements, float[][] polygon) {
@@ -282,18 +290,24 @@ public class NeighbourhoodService {
                 .toArray(float[][]::new);
     }
 
+    /**
+     * Returns one neighbourhood with the current average temperature and PM2.5 (same calculation
+     * as {@link #getNeighbourhoodsAtTime} for "now"). When the data source is unreachable or there
+     * are no measurements in the neighbourhood, {@code avgTemp} stays NaN (like the list endpoint)
+     * so the neighbourhood itself can still be shown.
+     */
     public NeighbourhoodDto getNeighbourhoodById(Long id)
     {
         Neighbourhood neighbourhood = neighbourhoodRepository.findById(id).orElseThrow(() -> new NotFoundException("Neighbourhood not found"));
 
-        NeighbourhoodDto dto = new NeighbourhoodDto();
-        dto.setId(neighbourhood.getId());
-        dto.setName(neighbourhood.getName());
-        dto.setCoordinates(convertToFloatArray(neighbourhood.getCoordinates()));
-        dto.setAvgTemp(Float.NaN);
+        List<Measurement> measurements;
+        try {
+            measurements = getClosestMeasurementsAtTime(Instant.now());
+        } catch (RestClientException e) {
+            log.warn("Measurements unavailable, returning neighbourhood {} without averages", id, e);
+            measurements = List.of();
+        }
 
-        return dto;
+        return getNeighbourhoodsAverageTemp(List.of(neighbourhood), measurements).get(0);
     }
-
-
 }

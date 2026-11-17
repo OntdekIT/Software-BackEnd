@@ -266,4 +266,32 @@ public class StationMonitorServiceTest {
         verify(emailSenderService, never()).sendEmailStationMeasurements(any(), eq(station), eq(null), eq(null), eq(null), eq(null));
         assertTrue(station.getIsActive());
     }
+
+    @Test
+    public void testCheckMeetstations_withOnlyInheritedLocation_shouldReportLocationError() throws Exception {
+        Station station = new Station();
+        station.setStationid(1L);
+        station.setIsActive(true);
+        station.setUser(new User(1L, "FirstName", "LastName", "test@example.com", UserRole.USER, "Password"));
+        station.setTempError(false);
+        station.setHumError(false);
+        station.setStofError(false);
+        station.setLocError(false);
+
+        Measurement m = new Measurement();
+        m.setTemperature(22.5f);
+        m.setHumidity(55.0f);
+        m.setPm25(8.0f);
+        m.setLatitude(51.56f);
+        m.setLongitude(5.08f);
+        m.setLocationInherited(true);
+
+        when(stationService.findAll()).thenReturn(List.of(station));
+        when(meetJeStadService.getMeasurements(any())).thenReturn(List.of(m));
+
+        stationMonitorService.checkMeetstations();
+
+        assertTrue(station.getLocError());
+        verify(emailSenderService).sendEmailStationMeasurements(any(), eq(station), eq(null), eq(null), eq(null), eq(false));
+    }
 }

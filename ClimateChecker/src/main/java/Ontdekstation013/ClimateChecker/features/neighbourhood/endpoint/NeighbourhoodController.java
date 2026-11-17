@@ -1,5 +1,11 @@
 package Ontdekstation013.ClimateChecker.features.neighbourhood.endpoint;
 
+import Ontdekstation013.ClimateChecker.config.OpenApiConfig;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadService;
 import Ontdekstation013.ClimateChecker.features.neighbourhood.NeighbourhoodService;
@@ -17,18 +23,22 @@ import org.springframework.web.bind.annotation.*;
 /**
  * For getting measurements of stations divided into neighbourhoods, only includes those inside the municipality of Tilburg.
  */
+@Tag(name = "Wijken", description = "Wijken met gemiddelde meetwaarden, onder andere voor de heatmap")
 @RestController
 @RequestMapping("/api/neighbourhood")
 @RequiredArgsConstructor
 public class NeighbourhoodController {
 
     private final NeighbourhoodService neighbourhoodService;
+    private final ZoneId applicationZone;
 
     /**
      * Gets all neighbourhoods at a given timestamp.
      * Only includes measurements within {@link MeetJeStadService#getMinuteLimit() n} minutes of given timestamps past
      * @param timestamp - ISO 8601 format
      */
+    @Operation(summary = "Geef alle wijken met hun metingen op een tijdstip")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer")})
     @GetMapping("/history")
     public List<NeighbourhoodDto> getNeighbourhoodsAtTime(@RequestParam(value = "timestamp") String timestamp) {
         try {
@@ -52,6 +62,8 @@ public class NeighbourhoodController {
      * @param to    ISO 8601, tijdstip van de laatste stap (standaard nu)
      * @param steps aantal stappen inclusief begin en eind (standaard 24)
      */
+    @Operation(summary = "Geef een time-lapse van de heatmap per wijk")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer")})
     @GetMapping("/history/timelapse")
     public NeighbourhoodTimelapseResponse getNeighbourhoodTimelapse(
             @RequestParam(required = false) String from,
@@ -78,6 +90,8 @@ public class NeighbourhoodController {
      * @param startDate - dd-MM-yyyy HH:mm format
      * @param endDate - dd-MM-yyyy HH:mm format
      */
+    @Operation(summary = "Geef dagelijkse temperatuurstatistiek van een wijk")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer")})
     @GetMapping("/history/average/{id}")
     public List<DayMeasurementResponse> getNeighbourhoodData(
             @PathVariable Long id,
@@ -88,10 +102,10 @@ public class NeighbourhoodController {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
 
             LocalDateTime localDateTimeStart = LocalDateTime.parse(startDate, formatter);
-            Instant startInstant = localDateTimeStart.atZone(ZoneId.systemDefault()).toInstant();
+            Instant startInstant = localDateTimeStart.atZone(applicationZone).toInstant();
 
             LocalDateTime localDateTimeEnd = LocalDateTime.parse(endDate, formatter);
-            Instant endInstant = localDateTimeEnd.atZone(ZoneId.systemDefault()).toInstant();
+            Instant endInstant = localDateTimeEnd.atZone(applicationZone).toInstant();
 
             return neighbourhoodService.getHistoricalNeighbourhoodData(id, startInstant, endInstant);
         } catch (DateTimeParseException e) {
@@ -99,6 +113,8 @@ public class NeighbourhoodController {
         }
     }
 
+    @Operation(summary = "Geef een wijk op id")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "404", description = "Niet gevonden")})
     @GetMapping("/{id}")
     public NeighbourhoodDto getNeighbourhoodById(@PathVariable Long id) {
         return neighbourhoodService.getNeighbourhoodById(id);
