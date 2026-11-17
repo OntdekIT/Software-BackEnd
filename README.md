@@ -39,6 +39,19 @@ Stappen per omgeving:
 
 Gerelateerd (handmatig): de MailSlurp-key die ooit in de code stond moet in het MailSlurp-dashboard worden ingetrokken en vervangen, en de nieuwe key hoort alleen in GitHub-secrets en lokale `.env`-bestanden.
 
+### API-documentatie (OpenAPI / Swagger UI)
+
+De backend genereert zijn eigen API-documentatie uit de code (springdoc-openapi). Alle controllers staan erin, met Nederlandse samenvattingen, request- en responsebodies en foutcodes.
+
+| Wat | URL (lokaal) |
+|-----|--------------|
+| Swagger UI | `http://localhost:8082/swagger-ui.html` |
+| OpenAPI-specificatie (JSON) | `http://localhost:8082/v3/api-docs` |
+
+- Alleen beschikbaar met het profiel `dev` of `test` (`application-dev.properties` en `application-test.properties`). Zonder die profielen, dus ook in productie, staat springdoc uit en zijn de paden dicht (`springdoc.api-docs.enabled=false`).
+- Beveiligde endpoints proberen: log in via `POST /api/authentication/login` (en `verify`), klik in Swagger UI op "Authorize" en plak het JWT. Het token gaat mee als `Authorization: Bearer <token>`, cookies worden niet gebruikt.
+- Een test (`OpenApiDocsTest`) controleert dat de specificatie gegenereerd wordt.
+
 ### Mailserver configuratie
 De backend kan e-mails versturen via een echte SMTP-server of de verzending onderdrukken (bijv. voor tests).
 
