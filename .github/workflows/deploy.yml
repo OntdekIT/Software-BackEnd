@@ -1,0 +1,138 @@
+name: Deploy
+
+# Build once, promote through the environments (see docs/deployment.md).
+#  - push to s3nj26_dev: build the image, push it to GHCR and roll out to TEST
+#  - workflow_dispatch: promote an existing image tag to test, acceptance or production
+# Deployment calls a Dokploy webhook that is stored as a secret per GitHub
+# Environment. A missing secret disables that deploy step (the run still succeeds),
+# so nothing breaks before Dokploy is set up.
+on:
+  push:
+    branches:
+      - s3nj26_dev
+    paths:
+      - ClimateChecker/**
+      - .github/workflows/deploy.yml
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        type: choice
+        options:
+          - test
+          - acceptance
+          - production
+        default: test
+      source_tag:
+        description: Image tag to promote (for example sha-1a2b3c4). Empty means build the current commit.
+        type: string
+        required: false
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: deploy-${{ github.event.inputs.environment || 'test' }}
+  cancel-in-progress: false
+
+env:
+  IMAGE_NAME: climatechecker-backend
+
+jobs:
+  image:
+    name: Build and push image
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    outputs:
+      tag: ${{ steps.meta.outputs.tag }}
+      image: ${{ steps.meta.outputs.image }}
+    steps:
+      - name: Compute image name and tag
+        id: meta
+        run: |
+          owner="$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')"
+          source_tag='${{ github.event.inputs.source_tag }}'
+          echo "image=ghcr.io/${owner}/${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
+          if [ -n "$source_tag" ]; then
+            echo "tag=${source_tag}" >> "$GITHUB_OUTPUT"
+            echo "build=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+            echo "build=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout
+        if: steps.meta.outputs.build == 'true'
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        if: steps.meta.outputs.build == 'true'
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        if: steps.meta.outputs.build == 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: ClimateChecker
+          push: true
+          tags: ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag }}
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    name: Deploy to ${{ github.event.inputs.environment || 'test' }}
+    needs: image
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # GitHub Environment: configure required reviewers on acceptance and
+    # production so a person has to approve those deploys.
+    environment: ${{ github.event.inputs.environment || 'test' }}
+    steps:
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Point the environment tag at this image
+        # Dokploy runs the floating tag named after the environment
+        # (test, acceptance, production), so promotion is a retag, not a rebuild.
+        run: |
+          target='${{ github.event.inputs.environment || 'test' }}'
+          docker buildx imagetools create \
+            --tag "${{ needs.image.outputs.image }}:${target}" \
+            "${{ needs.image.outputs.image }}:${{ needs.image.outputs.tag }}"
+
+      - name: Trigger Dokploy deploy
+        env:
+          # Store each webhook as a secret in the matching GitHub Environment.
+          # An unset secret is an empty string here, which skips the deploy.
+          WEBHOOK_TEST: ${{ secrets.DOKPLOY_TEST_WEBHOOK }}
+          WEBHOOK_ACCEPTANCE: ${{ secrets.DOKPLOY_ACCEPTANCE_WEBHOOK }}
+          WEBHOOK_PRODUCTION: ${{ secrets.DOKPLOY_PRODUCTION_WEBHOOK }}
+          TARGET: ${{ github.event.inputs.environment || 'test' }}
+        run: |
+          case "$TARGET" in
+            test) url="$WEBHOOK_TEST" ;;
+            acceptance) url="$WEBHOOK_ACCEPTANCE" ;;
+            production) url="$WEBHOOK_PRODUCTION" ;;
+            *) echo "Unknown environment: $TARGET"; exit 1 ;;
+          esac
+          if [ -z "$url" ]; then
+            echo "No Dokploy webhook secret for '$TARGET', skipping deploy."
+            exit 0
+          fi
+          curl --fail --silent --show-error --retry 3 --retry-delay 5 -X POST "$url"
+          echo "Deploy triggered for $TARGET."
