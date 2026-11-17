@@ -1,5 +1,6 @@
 package Ontdekstation013.ClimateChecker.config.ratelimit;
 
+import Ontdekstation013.ClimateChecker.utility.ClientIpResolver;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.ConsumptionProbe;
@@ -27,8 +28,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * In-memory rate limiting filter based on Bucket4J.
  * <p>
  * Limits each client to a configurable number of requests per minute (default 20).
- * The client is identified by the first IP in the {@code X-Forwarded-For} header
- * when present, otherwise by the request remote address.
+ * The client IP is resolved by {@link ClientIpResolver}: {@code X-Forwarded-For}
+ * is only honoured when the request comes from a trusted proxy, otherwise the
+ * request remote address is used.
  */
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -36,14 +38,17 @@ public class RateLimitingFilter extends OncePerRequestFilter {
 
     private final boolean enabled;
     private final int requestsPerMinute;
+    private final ClientIpResolver clientIpResolver;
 
     private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();
 
     public RateLimitingFilter(
             @Value("${rate.limit.enabled:true}") boolean enabled,
-            @Value("${rate.limit.requests-per-minute:20}") int requestsPerMinute) {
+            @Value("${rate.limit.requests-per-minute:20}") int requestsPerMinute,
+            ClientIpResolver clientIpResolver) {
         this.enabled = enabled;
         this.requestsPerMinute = requestsPerMinute;
+        this.clientIpResolver = clientIpResolver;
     }
 
     @Override
@@ -86,11 +91,7 @@ public class RateLimitingFilter extends OncePerRequestFilter {
     }
 
     private String getClientKey(HttpServletRequest request) {
-        String forwardedFor = request.getHeader("X-Forwarded-For");
-        if (forwardedFor != null && !forwardedFor.isBlank()) {
-            return forwardedFor.split(",")[0].trim();
-        }
-        return request.getRemoteAddr();
+        return clientIpResolver.resolve(request);
     }
 
     private String buildErrorResponse(long retryAfterMillis) {

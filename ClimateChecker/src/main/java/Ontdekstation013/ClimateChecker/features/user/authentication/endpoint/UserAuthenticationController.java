@@ -1,9 +1,16 @@
 package Ontdekstation013.ClimateChecker.features.user.authentication.endpoint;
 
+import Ontdekstation013.ClimateChecker.config.OpenApiConfig;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.features.station.Station;
 import Ontdekstation013.ClimateChecker.features.station.StationService;
 import Ontdekstation013.ClimateChecker.features.user.PasswordEncodingService;
+import Ontdekstation013.ClimateChecker.features.user.PasswordRules;
 import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.UserMapper;
 import Ontdekstation013.ClimateChecker.features.user.UserService;
@@ -13,6 +20,7 @@ import Ontdekstation013.ClimateChecker.features.user.authentication.trustedip.Tr
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserResponse;
 import Ontdekstation013.ClimateChecker.features.workshop.Workshop;
 import Ontdekstation013.ClimateChecker.features.workshop.WorkshopService;
+import Ontdekstation013.ClimateChecker.utility.ClientIpResolver;
 import Ontdekstation013.ClimateChecker.utility.RateLimiter;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,6 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @AllArgsConstructor
+@Tag(name = "Authenticatie", description = "Registreren, inloggen en wachtwoord herstellen (publiek)")
 @RestController
 @RequestMapping("/api/authentication")
 public class UserAuthenticationController {
@@ -42,6 +51,7 @@ public class UserAuthenticationController {
     private final PasswordEncodingService passwordEncodingService;
     private final RateLimiter rateLimiter;
     private final TrustedIpService trustedIpService;
+    private final ClientIpResolver clientIpResolver;
 
     private static final String RATE_LIMIT_MESSAGE = "Te veel pogingen. Probeer het over een minuut opnieuw.";
 
@@ -50,22 +60,19 @@ public class UserAuthenticationController {
         return !rateLimiter.isAllowed(key);
     }
 
-    /**
-     * Bepaalt het client-IP. Achter een reverse proxy/load balancer staat het
-     * echte adres in de eerste waarde van X-Forwarded-For; anders het
-     * directe remote address.
-     */
     private String clientIp(HttpServletRequest request) {
-        String forwarded = request.getHeader("X-Forwarded-For");
-        if (forwarded != null && !forwarded.isBlank()) {
-            return forwarded.split(",")[0].trim();
-        }
-        return request.getRemoteAddr();
+        return clientIpResolver.resolve(request);
     }
 
+    @Operation(summary = "Registreer een gebruiker met workshop- en stationcode")
+    @ApiResponses({@ApiResponse(responseCode = "201", description = "Gebruiker aangemaakt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer")})
     @PostMapping("register")
     public ResponseEntity<?> createNewUser(@RequestBody RegisterUserRequest registerRequest) throws MessagingException {
         try {
+            // Plain-text 400 (like the other register errors), the frontend shows the body as-is.
+            if (registerRequest.password() == null || !registerRequest.password().matches(PasswordRules.PATTERN)) {
+                throw new InvalidArgumentException("Wachtwoord moet 8 tot 128 tekens lang zijn en minstens een hoofdletter en een cijfer bevatten");
+            }
             if (!workshopService.verifyWorkshopCode(registerRequest.workshopCode())) {
                 throw new InvalidArgumentException("Ongeldige workshopcode");
             }
@@ -102,6 +109,8 @@ public class UserAuthenticationController {
 
 
 
+    @Operation(summary = "Log in met e-mail en wachtwoord (geeft een token of vraagt om een e-mailcode)")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer"), @ApiResponse(responseCode = "429", description = "Te veel pogingen")})
     @PostMapping("login")
     public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest, HttpServletRequest request) throws Exception {
         if (isRateLimited("login", request, loginRequest.email())) {
@@ -128,6 +137,8 @@ public class UserAuthenticationController {
         }
     }
 
+    @Operation(summary = "Verifieer de e-mailcode en ontvang een JWT")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer"), @ApiResponse(responseCode = "429", description = "Te veel pogingen")})
     @PostMapping("verify")
     public ResponseEntity<?> verifyEmailCode(@RequestBody VerifyLoginRequest verifyLoginRequest, HttpServletRequest request) {
         if (isRateLimited("verify", request, verifyLoginRequest.email())) {
@@ -150,6 +161,8 @@ public class UserAuthenticationController {
         }
     }
 
+    @Operation(summary = "Stel een nieuw wachtwoord in met een resetcode")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer"), @ApiResponse(responseCode = "429", description = "Te veel pogingen")})
     @PostMapping("reset-password")
     public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest resetPasswordRequest, HttpServletRequest request) {
         if (isRateLimited("reset-password", request, resetPasswordRequest.email())) {
@@ -170,28 +183,28 @@ public class UserAuthenticationController {
         }
     }
 
+    @Operation(summary = "Vraag een wachtwoordresetcode aan per e-mail")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer"), @ApiResponse(responseCode = "429", description = "Te veel pogingen")})
     @PostMapping("forgot-password")
     public ResponseEntity<?> createForgotPasswordRequest(@RequestBody ForgotPasswordRequest forgotPasswordRequest, HttpServletRequest request) throws Exception {
         if (isRateLimited("forgot-password", request, forgotPasswordRequest.email())) {
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(RATE_LIMIT_MESSAGE);
         }
+        // Altijd dezelfde reactie, ongeacht of het adres bekend is of de mail lukt:
+        // anders kunnen bestaande accounts worden achterhaald (account enumeration).
         try {
-            User user = userService.getUserByEmail(forgotPasswordRequest.email());
+            User user = forgotPasswordRequest.email() == null
+                    ? null
+                    : userService.getUserByEmail(forgotPasswordRequest.email());
 
             if (user != null) {
                 Token token = tokenService.createVerifyToken(user.getUserId(), TokenType.PASSWORD_RESET);
                 emailSenderService.sendForgotPasswordMail(user.getEmail(), user.getFirstName(), user.getLastName(), token.getNumericCode());
-            } else {
-                throw new InvalidArgumentException("Invalid email");
             }
-
-            return ResponseEntity.ok().build();
-        }  catch (InvalidArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
             log.error("Unexpected error during forgot-password request", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Er is een onverwachte fout opgetreden.");
         }
+        return ResponseEntity.ok().build();
     }
 
     // Not necessary when using JWTs

@@ -1,5 +1,7 @@
 package Ontdekstation013.ClimateChecker.features.station;
 
+import Ontdekstation013.ClimateChecker.exception.ExistingUniqueIdentifierException;
+import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.exception.NotFoundException;
 import Ontdekstation013.ClimateChecker.features.measurement.Measurement;
 import Ontdekstation013.ClimateChecker.features.measurement.MeasurementService;
@@ -33,6 +35,12 @@ public class StationService {
     }
 
     public Station addStation(Station station) {
+        if (stationRepository.existsById(station.getStationid())) {
+            throw new InvalidArgumentException("Station-id is al in gebruik!");
+        }
+        if (stationRepository.getByRegistrationCode(station.getRegistrationCode()) != null) {
+            throw new InvalidArgumentException("Registratiecode is al in gebruik!");
+        }
         return stationRepository.save(station);
     }
 
@@ -52,16 +60,26 @@ public class StationService {
         stationRepository.save(station);
     }
 
+    /**
+     * Claimt een nog niet geclaimd station voor {@code station.getUserid()}. Een station
+     * dat al een eigenaar heeft wordt geweigerd (overnemen gaat via transfer). De
+     * registratiecode blijft ongewijzigd; alleen naam en zichtbaarheid worden overgenomen.
+     */
     public void ClaimMeetstation(Station station) {
         Station existingStation = stationRepository.getMeetstationByStationid(station.getStationid());
         if (existingStation == null) {
             throw new NotFoundException("Station not found");
         }
+        if (existingStation.getUserid() != null) {
+            throw new ExistingUniqueIdentifierException("Station is al geclaimd");
+        }
         existingStation.setUserid(station.getUserid());
-        existingStation.setName(station.getName());
-        existingStation.setDatabase_tag(station.getDatabase_tag());
-        existingStation.setIs_public(station.getIs_public());
-        existingStation.setRegistrationCode(station.getStationid());
+        if (station.getName() != null && !station.getName().isBlank()) {
+            existingStation.setName(station.getName());
+        }
+        if (station.getIs_public() != null) {
+            existingStation.setIs_public(station.getIs_public());
+        }
         stationRepository.save(existingStation);
     }
 

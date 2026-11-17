@@ -1,5 +1,12 @@
 package Ontdekstation013.ClimateChecker.features.user.endpoint;
 
+import Ontdekstation013.ClimateChecker.config.OpenApiConfig;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.UserMapper;
 import Ontdekstation013.ClimateChecker.features.user.UserRole;
@@ -17,6 +24,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 
+@Tag(name = "Gebruikers", description = "Gebruikersbeheer (alleen beheerders)")
+@SecurityRequirement(name = OpenApiConfig.BEARER_AUTH)
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -28,6 +37,8 @@ public class UserController {
         this.userService = userService;
     }
 
+    @Operation(summary = "Geef een gebruiker op id")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer"), @ApiResponse(responseCode = "403", description = "Geen toegang")})
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(@PathVariable long id, @RequestParam(defaultValue = "false") boolean includeStations) {
         User user = userService.getUserById(id);
@@ -35,6 +46,8 @@ public class UserController {
     }
 
     //TODO: Remove stations from response
+    @Operation(summary = "Geef een pagina met gebruikers, optioneel gefilterd")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer"), @ApiResponse(responseCode = "403", description = "Geen toegang")})
     @GetMapping()
     public ResponseEntity<?> getAllUsers(GetAllUsersRequest request) {
         Pageable pageable = PageRequest.of(request.page(), Math.min(request.pageSize(), MAX_PAGE_SIZE));
@@ -44,6 +57,8 @@ public class UserController {
         return ResponseEntity.ok(responses);
     }
 
+    @Operation(summary = "Verwijder een gebruiker")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer"), @ApiResponse(responseCode = "403", description = "Geen toegang")})
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long id) {
         User loggedInUser = (User) userDetails;
@@ -57,6 +72,8 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "Wijzig de rol van een gebruiker")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer"), @ApiResponse(responseCode = "403", description = "Geen toegang")})
     @PutMapping("/{id}")
     public ResponseEntity<?> updateUserRole(@AuthenticationPrincipal UserDetails userDetails, @PathVariable long id, @RequestBody UpdateUserRequest request) {
         User loggedInUser = (User) userDetails;

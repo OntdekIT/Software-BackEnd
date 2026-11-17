@@ -1,11 +1,19 @@
 package Ontdekstation013.ClimateChecker.features.station.endpoint;
 
+import Ontdekstation013.ClimateChecker.config.OpenApiConfig;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.exception.NotFoundException;
 import Ontdekstation013.ClimateChecker.features.measurement.MeasurementService;
 import Ontdekstation013.ClimateChecker.features.station.Station;
 import Ontdekstation013.ClimateChecker.features.station.StationMapper;
 import Ontdekstation013.ClimateChecker.features.station.StationService;
+import Ontdekstation013.ClimateChecker.features.station.endpoint.dto.AddStationRequest;
 import Ontdekstation013.ClimateChecker.features.station.endpoint.dto.GetAllStationsRequest;
 import Ontdekstation013.ClimateChecker.features.station.endpoint.dto.UpdateStationRequest;
 import Ontdekstation013.ClimateChecker.features.station.endpoint.dto.TransferStationRequest;
@@ -30,9 +38,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+@Tag(name = "Meetstations", description = "Meetstations opvragen, claimen, bewerken en overdragen")
 @RestController
 @RequestMapping("/api/Meetstation")
-@CrossOrigin(origins = {"http://localhost:5173"}, allowCredentials = "true")
 public class StationController {
     private final StationService stationService;
     private final MeasurementService measurementService;
@@ -44,6 +52,8 @@ public class StationController {
         this.adminService = workshopService;
     }
 
+    @Operation(summary = "Geef een meetstation op id")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "404", description = "Niet gevonden")})
     @GetMapping("{id}")
     public ResponseEntity<StationDto> getMeetstation(@PathVariable Long id) {
         StationDto stationDto = id != 0 ? stationService.ReadById(id) : null;
@@ -53,6 +63,8 @@ public class StationController {
         return ResponseEntity.status(HttpStatus.OK).body(stationDto);
     }
 
+    @Operation(summary = "Geef alle meetstations, optioneel gefilterd")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer")})
     @GetMapping("/stations")
     public ResponseEntity<?> getAllMeetstations(GetAllStationsRequest request) {
         List<Station> stations = stationService.getAllStations(StationMapper.toStationFilter(request));
@@ -65,6 +77,8 @@ public class StationController {
         return ResponseEntity.ok(responses);
     }
 
+    @Operation(summary = "Geef meetstations met hun meting op een tijdstip")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer")})
     @GetMapping("/stationsMetMeasurements")
     public CompletableFuture<ResponseEntity<List<StationDto>>> getMeetstationWithMeasurement(
             @RequestParam(value = "timestamp") String timestamp) {
@@ -78,6 +92,9 @@ public class StationController {
         return stationService.getStationsWithMeasurements(utcDateTime).thenApply(ResponseEntity::ok);
     }
 
+    @Operation(summary = "Pas naam en zichtbaarheid van een station aan (eigenaar of beheerder)")
+    @SecurityRequirement(name = OpenApiConfig.BEARER_AUTH)
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "401", description = "Niet ingelogd"), @ApiResponse(responseCode = "403", description = "Geen toegang")})
     @PutMapping("/edit/{id}")
     public ResponseEntity<?> updateMeetstation(@PathVariable long id, @RequestBody UpdateStationRequest updaterequest, @AuthenticationPrincipal User currentUser) throws Exception {
         Station station = stationService.GetStationById(id);
@@ -92,6 +109,9 @@ public class StationController {
         return ResponseEntity.status(HttpStatus.OK).body("OK");
     }
 
+    @Operation(summary = "Draag een station over aan een andere gebruiker")
+    @SecurityRequirement(name = OpenApiConfig.BEARER_AUTH)
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer"), @ApiResponse(responseCode = "401", description = "Niet ingelogd"), @ApiResponse(responseCode = "403", description = "Geen toegang")})
     @PutMapping("/transfer/{id}")
     public ResponseEntity<?> transferMeetstation(@PathVariable long id, @Valid @RequestBody TransferStationRequest request, @AuthenticationPrincipal User currentUser) {
         Station station = stationService.GetStationById(id);
@@ -110,6 +130,8 @@ public class StationController {
         return isAdmin || currentUser.getUserId().equals(ownerId);
     }
 
+    @Operation(summary = "Download de metingen van een station als PDF")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer")})
     @GetMapping("/measurements/{id}")
     public ResponseEntity<byte[]> getMeetstationMeasurements(@PathVariable int id, @RequestParam String startDate, @RequestParam String endDate) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
@@ -134,6 +156,8 @@ public class StationController {
         return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
     }
 
+    @Operation(summary = "Controleer of een station beschikbaar is en de workshopcode geldig is")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Statuscode in de body: 200 ok, 402 station bezet, 403 ongeldige workshopcode"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer")})
     @GetMapping("/Availibility/{stationId}/{workshopCode}")
     public ResponseEntity<Integer> IsAvailable(@PathVariable Long stationId, @PathVariable Long workshopCode) {
         if (!stationService.IsAvailable(stationId)) {
@@ -144,26 +168,34 @@ public class StationController {
         return ResponseEntity.status(HttpStatus.OK).body(200);
     }
 
+    @Operation(summary = "Claim een station voor de ingelogde gebruiker")
+    @SecurityRequirement(name = OpenApiConfig.BEARER_AUTH)
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer"), @ApiResponse(responseCode = "401", description = "Niet ingelogd")})
     @PutMapping("/Claim")
     public ResponseEntity<String> ClaimStation(@RequestBody StationDto stationDto, @AuthenticationPrincipal User currentUser) {
         // Bind the claim to the authenticated user, never to a client-supplied id.
+        // A station that already has an owner is rejected with 409 (see StationService).
         stationDto.userid = currentUser.getUserId();
         stationService.ClaimMeetstation(new Station(stationDto));
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
+    @Operation(summary = "Voeg een nieuw station toe")
+    @SecurityRequirement(name = OpenApiConfig.BEARER_AUTH)
+    @ApiResponses({@ApiResponse(responseCode = "201", description = "Station aangemaakt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer"), @ApiResponse(responseCode = "401", description = "Niet ingelogd"), @ApiResponse(responseCode = "500", description = "Onverwachte fout")})
     @PostMapping("/add")
-    public ResponseEntity<?> addStation(@RequestBody Station stationRequest) {
+    public ResponseEntity<?> addStation(@Valid @RequestBody AddStationRequest request) {
         Station station = new Station();
-        station.setName(stationRequest.getName());
+        station.setStationid(request.stationid() != null ? request.stationid() : request.registrationCode());
+        station.setName(request.name());
         station.setDatabase_tag("MJS");
         station.setIs_public(false);
         station.setIsActive(false);
-        station.setRegistrationCode(stationRequest.getRegistrationCode());
-        station.setLocation_locationid(stationRequest.getLocation_locationid());
+        station.setRegistrationCode(request.registrationCode());
+        station.setLocation_locationid(request.location_locationid());
 
         Station savedStation = stationService.addStation(station);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedStation);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedStation.toDto());
     }
 
     // Create station endpoint salvaged from removed DatabasePollingController

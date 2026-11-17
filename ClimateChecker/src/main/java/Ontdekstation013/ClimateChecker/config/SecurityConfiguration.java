@@ -2,6 +2,7 @@ package Ontdekstation013.ClimateChecker.config;
 
 import Ontdekstation013.ClimateChecker.features.user.UserRole;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -23,8 +24,16 @@ public class SecurityConfiguration {
     private final RestAuthenticationEntryPoint authenticationEntryPoint;
     private final RestAccessDeniedHandler accessDeniedHandler;
 
+    /** Alleen true in dev/test (zie application-dev.properties en application-test.properties). */
+    @Value("${springdoc.api-docs.enabled:false}")
+    private boolean apiDocsEnabled;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        if (apiDocsEnabled) {
+            http.authorizeHttpRequests(authorize -> authorize
+                    .requestMatchers("/v3/api-docs", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll());
+        }
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .csrf(AbstractHttpConfigurer::disable)
@@ -39,7 +48,8 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.PUT, "/api/Meetstation/edit/**").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/Meetstation/transfer/**").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/Meetstation/Claim").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/api/Meetstation/add").authenticated()
+                        // Adding a station by hand is an admin task, not something any logged-in user may do.
+                        .requestMatchers(HttpMethod.POST, "/api/Meetstation/add").hasAnyAuthority(UserRole.ADMIN.name(), UserRole.SUPER_ADMIN.name())
                         .requestMatchers("/api/Meetstation/**").permitAll()
                         // Coverage pulls weeks of raw data for every station; keep it to admins.
                         .requestMatchers("/api/measurement/coverage").hasAnyAuthority(UserRole.ADMIN.name(), UserRole.SUPER_ADMIN.name())
