@@ -32,6 +32,57 @@
         },
         "type" : "object"
       },
+      "Change" : {
+        "description" : "Verandering van de gemiddelde temperatuur in een wijk over de laatste 24 uur",
+        "properties" : {
+          "delta" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "from" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "id" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "to" : {
+            "format" : "float",
+            "type" : "number"
+          }
+        },
+        "type" : "object"
+      },
+      "City" : {
+        "properties" : {
+          "avgPm25" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "avgTemp" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "biggestChange" : {
+            "$ref" : "#/components/schemas/Change"
+          },
+          "coldest" : {
+            "$ref" : "#/components/schemas/WijkRef"
+          },
+          "warmest" : {
+            "$ref" : "#/components/schemas/WijkRef"
+          },
+          "wijkenWithData" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        },
+        "type" : "object"
+      },
       "DataCoverageResponse" : {
         "properties" : {
           "buckets" : {
@@ -127,6 +178,23 @@
         },
         "type" : "object"
       },
+      "Flags" : {
+        "properties" : {
+          "humError" : {
+            "type" : "boolean"
+          },
+          "locError" : {
+            "type" : "boolean"
+          },
+          "stofError" : {
+            "type" : "boolean"
+          },
+          "tempError" : {
+            "type" : "boolean"
+          }
+        },
+        "type" : "object"
+      },
       "ForgotPasswordRequest" : {
         "properties" : {
           "email" : {
@@ -216,6 +284,35 @@
         },
         "type" : "object"
       },
+      "HeatPoint" : {
+        "properties" : {
+          "ageMinutes" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "latitude" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "longitude" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "pm25" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "stationId" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "temperature" : {
+            "format" : "float",
+            "type" : "number"
+          }
+        },
+        "type" : "object"
+      },
       "HourMeasurementResponse" : {
         "properties" : {
           "avgPm25" : {
@@ -223,6 +320,51 @@
             "type" : "number"
           },
           "avgTemp" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "timestamp" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "Ingest" : {
+        "properties" : {
+          "consecutiveFailures" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "lastAttemptAt" : {
+            "type" : "string"
+          },
+          "lastError" : {
+            "type" : "string"
+          },
+          "lastSuccessAt" : {
+            "type" : "string"
+          },
+          "stale" : {
+            "type" : "boolean"
+          }
+        },
+        "type" : "object"
+      },
+      "Latest" : {
+        "properties" : {
+          "humidity" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "pm10" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "pm25" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "temperature" : {
             "format" : "float",
             "type" : "number"
           },
@@ -355,6 +497,31 @@
         },
         "type" : "object"
       },
+      "Network" : {
+        "properties" : {
+          "active" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "coveragePercent24h" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "offline" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "stationsTotal" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "withSensorErrors" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        },
+        "type" : "object"
+      },
       "NetworkGapResponse" : {
         "properties" : {
           "bucketCount" : {
@@ -402,6 +569,55 @@
           },
           "timestamp" : {
             "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "Overview" : {
+        "description" : "Vooraf berekende staat van het meetnetwerk",
+        "properties" : {
+          "city" : {
+            "$ref" : "#/components/schemas/City"
+          },
+          "dataAsOf" : {
+            "description" : "Tijdstip van de laatste geslaagde ingest (ISO-8601 UTC)",
+            "type" : "string"
+          },
+          "generatedAt" : {
+            "type" : "string"
+          },
+          "heatmapPoints" : {
+            "items" : {
+              "$ref" : "#/components/schemas/HeatPoint"
+            },
+            "type" : "array"
+          },
+          "ingest" : {
+            "$ref" : "#/components/schemas/Ingest"
+          },
+          "network" : {
+            "$ref" : "#/components/schemas/Network"
+          },
+          "recencyMinutes" : {
+            "description" : "Metingen ouder dan dit aantal minuten tellen niet als actueel",
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "schemaVersion" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "stations" : {
+            "items" : {
+              "$ref" : "#/components/schemas/Station"
+            },
+            "type" : "array"
+          },
+          "wijken" : {
+            "items" : {
+              "$ref" : "#/components/schemas/Wijk"
+            },
+            "type" : "array"
           }
         },
         "type" : "object"
@@ -557,6 +773,23 @@
         "required" : [ "email", "password", "token" ],
         "type" : "object"
       },
+      "SeriesPoint" : {
+        "description" : "Een uur uit de reeks van 24 uur; t is het einde van dat uur",
+        "properties" : {
+          "avgPm25" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "avgTemp" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "t" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
       "SortObject" : {
         "properties" : {
           "ascending" : {
@@ -572,6 +805,45 @@
             "type" : "string"
           },
           "property" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "Station" : {
+        "description" : "status is ok of no_current_value; reason is dan uitval, sensorfout of late_meting",
+        "properties" : {
+          "flags" : {
+            "$ref" : "#/components/schemas/Flags"
+          },
+          "id" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "isActive" : {
+            "type" : "boolean"
+          },
+          "lastMeasurementAt" : {
+            "type" : "string"
+          },
+          "latest" : {
+            "$ref" : "#/components/schemas/Latest"
+          },
+          "latitude" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "longitude" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "reason" : {
+            "type" : "string"
+          },
+          "status" : {
             "type" : "string"
           }
         },
@@ -837,6 +1109,55 @@
             "type" : "string"
           },
           "email" : {
+            "type" : "string"
+          }
+        },
+        "type" : "object"
+      },
+      "Wijk" : {
+        "properties" : {
+          "avgPm25" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "avgTemp" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "id" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "lastMeasurementAt" : {
+            "type" : "string"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "series" : {
+            "items" : {
+              "$ref" : "#/components/schemas/SeriesPoint"
+            },
+            "type" : "array"
+          },
+          "stationCount" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        },
+        "type" : "object"
+      },
+      "WijkRef" : {
+        "properties" : {
+          "avgTemp" : {
+            "format" : "float",
+            "type" : "number"
+          },
+          "id" : {
+            "format" : "int64",
+            "type" : "integer"
+          },
+          "name" : {
             "type" : "string"
           }
         },
@@ -2154,6 +2475,67 @@
         "tags" : [ "Wijken" ]
       }
     },
+    "/api/snapshot" : {
+      "get" : {
+        "description" : "Wijken (actuele gemiddelden en 24-uurs reeks), stad, stations met laatste meting en reden bij ontbrekende data, netwerkgezondheid en heatmap-punten. Alle tijden zijn ISO-8601 UTC. Ondersteunt ETag en If-None-Match (304).",
+        "operationId" : "getSnapshot",
+        "parameters" : [ {
+          "in" : "header",
+          "name" : "If-None-Match",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Overview"
+                }
+              }
+            },
+            "description" : "Gelukt"
+          },
+          "304" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "format" : "byte",
+                  "type" : "string"
+                }
+              }
+            },
+            "description" : "Ongewijzigd sinds de opgegeven ETag"
+          }
+        },
+        "summary" : "Geef de volledige actuele staat van het netwerk in een keer",
+        "tags" : [ "Snapshot" ]
+      }
+    },
+    "/api/status" : {
+      "get" : {
+        "operationId" : "getStatus",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "additionalProperties" : {
+                    "type" : "object"
+                  },
+                  "type" : "object"
+                }
+              }
+            },
+            "description" : "OK"
+          }
+        },
+        "summary" : "Status van de data-ingest en de snapshots",
+        "tags" : [ "Snapshot" ]
+      }
+    },
     "/api/users" : {
       "get" : {
         "operationId" : "getAllUsers",
@@ -2501,6 +2883,9 @@
   }, {
     "description" : "Registreren, inloggen en wachtwoord herstellen (publiek)",
     "name" : "Authenticatie"
+  }, {
+    "description" : "Vooraf berekende staat van het netwerk en de status van de data-ingest",
+    "name" : "Snapshot"
   }, {
     "description" : "Wijken met gemiddelde meetwaarden, onder andere voor de heatmap",
     "name" : "Wijken"
