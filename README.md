@@ -19,6 +19,26 @@ In de projectroot staat `setup_backend.bat`. Dit script helpt je om zonder Docke
 
 Alle runtime-instellingen (database, mail, root-gebruiker) worden uit `.env` gelezen. Pas `.env` aan voor je eigen omgeving.
 
+### JWT_SECRET per omgeving
+
+De backend tekent inlogtokens met `JWT_SECRET` (Base64, minimaal 256 bit). In `application.properties` staat een bekende standaard testsleutel als fallback voor je eigen laptop. De backend **start niet** als `JWT_SECRET` ontbreekt of die standaardsleutel is, tenzij het profiel `dev` of `test` actief is.
+
+| Situatie | Wat te doen |
+|----------|-------------|
+| Lokaal ontwikkelen | Start met `SPRING_PROFILES_ACTIVE=dev` (docker-compose.yml en docker-compose-dev.yml doen dit al), of zet zelf een `JWT_SECRET`. |
+| Unit-/integratietests | Het testprofiel staat aan in `src/test/resources/application.properties`. |
+| Test, acceptatie, productie | Zet per omgeving een eigen, unieke `JWT_SECRET` (zie hieronder). Gebruik nooit hetzelfde geheim in twee omgevingen. |
+
+Stappen per omgeving:
+
+1. Genereer een sleutel: `openssl rand -base64 48`.
+2. Zet hem als omgevingsvariabele `JWT_SECRET` in de omgeving zelf (bijv. Dokploy: Environment van de applicatie; docker-compose: `.env` naast het compose-bestand, niet in git).
+3. Voor GitHub Actions (bijv. e2e-workflows) zet je hem als repository-secret (Settings, Secrets and variables, Actions) en geef je hem door via `${{ secrets.JWT_SECRET }}`.
+4. Herstart de backend. Bestaande tokens worden daarmee ongeldig (gebruikers moeten opnieuw inloggen).
+5. Rouleren: herhaal stap 1 t/m 4 per omgeving. Een lek? Direct roteren.
+
+Gerelateerd (handmatig): de MailSlurp-key die ooit in de code stond moet in het MailSlurp-dashboard worden ingetrokken en vervangen, en de nieuwe key hoort alleen in GitHub-secrets en lokale `.env`-bestanden.
+
 ### Mailserver configuratie
 De backend kan e-mails versturen via een echte SMTP-server of de verzending onderdrukken (bijv. voor tests).
 
