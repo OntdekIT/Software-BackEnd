@@ -677,7 +677,7 @@
             "method": "POST",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"database_tag\": \"<string>\",\n  \"humError\": \"<boolean>\",\n  \"isActive\": \"<boolean>\",\n  \"is_public\": \"<boolean>\",\n  \"locError\": \"<boolean>\",\n  \"location_locationid\": \"<long>\",\n  \"measurementList\": [\n    {\n      \"humidity\": \"<float>\",\n      \"id\": \"<long>\",\n      \"is_public\": \"<boolean>\",\n      \"latitude\": \"<float>\",\n      \"longitude\": \"<float>\",\n      \"pm10\": \"<float>\",\n      \"pm25\": \"<float>\",\n      \"station\": {\n        \"value\": \"<Circular reference to #/components/schemas/Station detected>\"\n      },\n      \"temperature\": \"<float>\",\n      \"timestamp\": \"<dateTime>\"\n    }\n  ],\n  \"name\": \"<string>\",\n  \"registrationCode\": \"<long>\",\n  \"stationid\": \"<long>\",\n  \"stofError\": \"<boolean>\",\n  \"tempError\": \"<boolean>\",\n  \"user\": {\n    \"email\": \"<string>\",\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"accountNonExpired\": \"<boolean>\",\n    \"accountNonLocked\": \"<boolean>\",\n    \"authorities\": [\n      {\n        \"authority\": \"<string>\"\n      }\n    ],\n    \"credentialsNonExpired\": \"<boolean>\",\n    \"enabled\": \"<boolean>\",\n    \"password\": \"<string>\",\n    \"role\": \"USER\",\n    \"stations\": [\n      {\n        \"value\": \"<Circular reference to #/components/schemas/Station detected>\"\n      }\n    ],\n    \"userId\": \"<long>\",\n    \"username\": \"<string>\",\n    \"workshop\": {\n      \"creationTime\": \"<dateTime>\",\n      \"expirationDate\": \"<dateTime>\",\n      \"code\": \"<long>\",\n      \"users\": [\n        {\n          \"value\": \"<Circular reference to #/components/schemas/User detected>\"\n        }\n      ]\n    }\n  },\n  \"userid\": \"<long>\"\n}",
+              "raw": "{\n  \"registrationCode\": \"<long>\",\n  \"location_locationid\": \"<long>\",\n  \"name\": \"<string>\",\n  \"stationid\": \"<long>\"\n}",
               "options": {
                 "raw": {
                   "headerFamily": "json",
@@ -785,7 +785,7 @@
             "method": "PUT",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"database_tag\": \"<string>\",\n  \"humError\": \"<boolean>\",\n  \"isActive\": \"<boolean>\",\n  \"is_public\": \"<boolean>\",\n  \"latitude\": \"<float>\",\n  \"locError\": \"<boolean>\",\n  \"location_locationid\": \"<long>\",\n  \"longitude\": \"<float>\",\n  \"measurements\": [\n    {\n      \"humidity\": \"<float>\",\n      \"id\": \"<integer>\",\n      \"is_public\": \"<boolean>\",\n      \"latitude\": \"<float>\",\n      \"longitude\": \"<float>\",\n      \"measurementId\": \"<long>\",\n      \"particulate\": \"<float>\",\n      \"pm10\": \"<float>\",\n      \"pm2.5\": \"<float>\",\n      \"temperature\": \"<float>\",\n      \"timestamp\": \"<string>\",\n      \"userId\": \"<long>\"\n    }\n  ],\n  \"name\": \"<string>\",\n  \"registrationCode\": \"<long>\",\n  \"stationid\": \"<long>\",\n  \"stofError\": \"<boolean>\",\n  \"tempError\": \"<boolean>\",\n  \"userid\": \"<long>\"\n}",
+              "raw": "{\n  \"database_tag\": \"<string>\",\n  \"humError\": \"<boolean>\",\n  \"isActive\": \"<boolean>\",\n  \"is_public\": \"<boolean>\",\n  \"latitude\": \"<float>\",\n  \"locError\": \"<boolean>\",\n  \"location_locationid\": \"<long>\",\n  \"longitude\": \"<float>\",\n  \"measurements\": [\n    {\n      \"humidity\": \"<float>\",\n      \"id\": \"<integer>\",\n      \"is_public\": \"<boolean>\",\n      \"latitude\": \"<float>\",\n      \"locationInherited\": \"<boolean>\",\n      \"longitude\": \"<float>\",\n      \"measurementId\": \"<long>\",\n      \"particulate\": \"<float>\",\n      \"pm10\": \"<float>\",\n      \"pm2.5\": \"<float>\",\n      \"temperature\": \"<float>\",\n      \"timestamp\": \"<string>\",\n      \"userId\": \"<long>\"\n    }\n  ],\n  \"name\": \"<string>\",\n  \"registrationCode\": \"<long>\",\n  \"stationid\": \"<long>\",\n  \"stofError\": \"<boolean>\",\n  \"tempError\": \"<boolean>\",\n  \"userid\": \"<long>\"\n}",
               "options": {
                 "raw": {
                   "headerFamily": "json",
@@ -1004,6 +1004,15 @@
                   },
                   "key": "pageSize",
                   "value": "<integer>"
+                },
+                {
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  },
+                  "key": "paged",
+                  "value": "<boolean>"
                 },
                 {
                   "disabled": false,

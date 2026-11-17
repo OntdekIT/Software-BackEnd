@@ -84,7 +84,7 @@ class OpenApiSpecTest extends AbstractApiTest {
         assertThat(schemaRef(paths, "/api/authentication/login", "post", "200")).endsWith("/LoginResponse");
         assertThat(schemaRef(paths, "/api/authentication/verify", "post", "200")).endsWith("/AuthenticationResponse");
         assertThat(schemaRef(paths, "/api/authentication/register", "post", "201")).endsWith("/UserResponse");
-        assertThat(schemaRef(paths, "/api/meetstation/add", "post", "201")).endsWith("/Station");
+        assertThat(schemaRef(paths, "/api/meetstation/add", "post", "201")).endsWith("/StationDto");
         assertThat(paths.at("/~1api~1meetstation~1stations/get/responses/200/content/*~1*/schema/type").asText())
                 .isEqualTo("array");
     }
