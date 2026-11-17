@@ -39,12 +39,32 @@ public class MeetJeStadService {
     };
     private final StationRepository stationRepository;
     private final RestTemplate restTemplate;
+    // Plausibele grenzen voor meetwaarden, instelbaar via application.properties
+    // (met env-override). Waarden erbuiten worden op null gezet.
+    private final float humidityMin;
+    private final float humidityMax;
+    private final float pm25Min;
+    private final float pm25Max;
+    private final float pm10Min;
+    private final float pm10Max;
 
     public MeetJeStadService(
             StationRepository stationRepository,
-            @Value("${meetjestad.base-url:https://meetjestad.net/data/?type=sensors&format=json}") String baseUrl) {
+            @Value("${meetjestad.base-url:https://meetjestad.net/data/?type=sensors&format=json}") String baseUrl,
+            @Value("${measurement.limits.humidity-min:0}") float humidityMin,
+            @Value("${measurement.limits.humidity-max:100}") float humidityMax,
+            @Value("${measurement.limits.pm25-min:0}") float pm25Min,
+            @Value("${measurement.limits.pm25-max:1000}") float pm25Max,
+            @Value("${measurement.limits.pm10-min:0}") float pm10Min,
+            @Value("${measurement.limits.pm10-max:1000}") float pm10Max) {
         this.stationRepository = stationRepository;
         this.baseUrl = baseUrl;
+        this.humidityMin = humidityMin;
+        this.humidityMax = humidityMax;
+        this.pm25Min = pm25Min;
+        this.pm25Max = pm25Max;
+        this.pm10Min = pm10Min;
+        this.pm10Max = pm10Max;
 
         // Bounded timeouts so a slow or hanging meetjestad.net cannot tie up
         // request threads indefinitely.
@@ -162,8 +182,14 @@ public class MeetJeStadService {
         float average = total/measurements.size();
 
         for (Measurement measurement:measurements) {
-            if (measurement.getHumidity()!= null && (measurement.getHumidity()<0 || measurement.getHumidity()>100)){
+            if (isOutOfRange(measurement.getHumidity(), humidityMin, humidityMax)) {
                 measurement.setHumidity(null);
+            }
+            if (isOutOfRange(measurement.getPm25(), pm25Min, pm25Max)) {
+                measurement.setPm25(null);
+            }
+            if (isOutOfRange(measurement.getPm10(), pm10Min, pm10Max)) {
+                measurement.setPm10(null);
             }
             if (measurement.getTemperature() != null){
                 float absoluteDifferenceFromAverage = Math.abs(measurement.getTemperature()-average);
@@ -173,5 +199,9 @@ public class MeetJeStadService {
             }
         }
         return measurements;
+    }
+
+    private static boolean isOutOfRange(Float value, float min, float max) {
+        return value != null && (value.isNaN() || value < min || value > max);
     }
 }

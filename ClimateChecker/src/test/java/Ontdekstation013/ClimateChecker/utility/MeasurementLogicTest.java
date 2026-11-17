@@ -284,4 +284,44 @@ public class MeasurementLogicTest {
         assertEquals(11.0f, result.get(0).getMedian());
         assertEquals(27.0f, result.get(0).getAvg());
     }
+
+    // --- Filtered (null) particulate values ---------------------------------
+
+    @Test
+    public void regionBucketAverageSkipsFilteredParticulateValues() {
+        // Een gefilterde (null) pm-waarde mag het gemiddelde niet beinvloeden.
+        List<Measurement> measurements = new ArrayList<>();
+        measurements.add(measurement(Instant.parse("2026-01-01T12:00:00Z"), 10f, 50f, 10f, 20f));
+        measurements.add(measurement(Instant.parse("2026-01-01T12:10:00Z"), 11f, 50f, null, null));
+        measurements.add(measurement(Instant.parse("2026-01-01T12:20:00Z"), 12f, 50f, 30f, 40f));
+
+        List<RegionAverageBucketResponse> result = MeasurementLogic.splitIntoRegionBuckets(measurements, "hour");
+
+        assertEquals(1, result.size());
+        assertEquals(20f, result.get(0).getPm25());
+        assertEquals(30f, result.get(0).getPm10());
+    }
+
+    @Test
+    public void regionBucketParticulateIsNullWhenAllValuesFiltered() {
+        List<Measurement> measurements = new ArrayList<>();
+        measurements.add(measurement(Instant.parse("2026-01-01T12:00:00Z"), 10f, 50f, null, null));
+
+        List<RegionAverageBucketResponse> result = MeasurementLogic.splitIntoRegionBuckets(measurements, "hour");
+
+        assertNull(result.get(0).getPm25());
+        assertNull(result.get(0).getPm10());
+    }
+
+    @Test
+    public void dayAverageSkipsFilteredHumidityAndParticulate() {
+        List<Measurement> measurements = new ArrayList<>();
+        measurements.add(measurement(Instant.parse("2026-01-01T12:00:00Z"), 10f, 40f, 10f, null));
+        measurements.add(measurement(Instant.parse("2026-01-01T13:00:00Z"), 12f, null, null, null));
+
+        List<DayMeasurementResponse> result = MeasurementLogic.splitIntoDayMeasurements(measurements);
+
+        assertEquals(40f, result.get(0).getAvgHum());
+        assertEquals(10f, result.get(0).getAvgStof());
+    }
 }
