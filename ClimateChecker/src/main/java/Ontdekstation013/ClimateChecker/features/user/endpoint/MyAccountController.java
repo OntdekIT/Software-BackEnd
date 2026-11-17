@@ -12,6 +12,7 @@ import Ontdekstation013.ClimateChecker.features.user.PasswordEncodingService;
 import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.UserMapper;
 import Ontdekstation013.ClimateChecker.features.user.UserService;
+import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserResponse;
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UpdateMyAccountRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,37 +34,25 @@ public class MyAccountController {
     @Operation(summary = "Geef het account van de ingelogde gebruiker")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "401", description = "Niet ingelogd")})
     @GetMapping()
-    public ResponseEntity<?> getUser(@AuthenticationPrincipal UserDetails userDetails, @RequestParam(defaultValue = "false") boolean includeStations) {
-        try {
-            User user = userService.getUserById(Long.parseLong(userDetails.getUsername()));
-            return ResponseEntity.ok(UserMapper.toUserResponse(user, includeStations));
-        }  catch (InvalidArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Er is een onverwachte fout opgetreden.");
-        }
+    public ResponseEntity<UserResponse> getUser(@AuthenticationPrincipal UserDetails userDetails, @RequestParam(defaultValue = "false") boolean includeStations) {
+        User user = userService.getUserById(Long.parseLong(userDetails.getUsername()));
+        return ResponseEntity.ok(UserMapper.toUserResponse(user, includeStations));
     }
 
     @Operation(summary = "Wijzig naam, e-mail of wachtwoord van de ingelogde gebruiker")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer"), @ApiResponse(responseCode = "401", description = "Niet ingelogd")})
     @PutMapping()
-    public ResponseEntity<?> updateUser(@AuthenticationPrincipal UserDetails userDetails, @Valid @RequestBody UpdateMyAccountRequest updateRequest) {
-        try {
-            User user = userService.getUserById(Long.parseLong(userDetails.getUsername()));
-            user.setEmail(updateRequest.email());
-            user.setFirstName(updateRequest.firstName());
-            user.setLastName(updateRequest.lastName());
+    public ResponseEntity<Void> updateUser(@AuthenticationPrincipal UserDetails userDetails, @Valid @RequestBody UpdateMyAccountRequest updateRequest) {
+        User user = userService.getUserById(Long.parseLong(userDetails.getUsername()));
+        user.setEmail(updateRequest.email());
+        user.setFirstName(updateRequest.firstName());
+        user.setLastName(updateRequest.lastName());
 
-            if (updateRequest.password() != null && !updateRequest.password().isEmpty()) {
-                user.setPassword(passwordEncodingService.encodePassword(updateRequest.password()));
-            }
-
-            userService.updateUser(user.getUserId(), user);
-            return ResponseEntity.ok().build();
-        }  catch (InvalidArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Er is een onverwachte fout opgetreden.");
+        if (updateRequest.password() != null && !updateRequest.password().isEmpty()) {
+            user.setPassword(passwordEncodingService.encodePassword(updateRequest.password()));
         }
+
+        userService.updateUser(user.getUserId(), user);
+        return ResponseEntity.ok().build();
     }
 }

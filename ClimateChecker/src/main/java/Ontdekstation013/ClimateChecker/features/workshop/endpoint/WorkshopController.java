@@ -80,7 +80,7 @@ public class WorkshopController {
     @Operation(summary = "Verwijder een workshopcode")
     @ApiResponses({@ApiResponse(responseCode = "204", description = "Verwijderd"), @ApiResponse(responseCode = "403", description = "Geen toegang")})
     @DeleteMapping("/{code}")
-    public ResponseEntity<?> deleteWorkshopCode(@PathVariable long code) {
+    public ResponseEntity<Void> deleteWorkshopCode(@PathVariable long code) {
         workshopService.deleteWorkshopCode(code);
         return ResponseEntity.noContent().build();
     }

@@ -24,7 +24,6 @@ import Ontdekstation013.ClimateChecker.features.workshop.WorkshopService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -74,22 +73,15 @@ public class StationController {
     @Operation(summary = "Geef alle meetstations, optioneel gefilterd")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer")})
     @GetMapping("/stations")
-    public ResponseEntity<?> getAllMeetstations(GetAllStationsRequest request) {
-        try {
-            List<Station> stations = stationService.getAllStations(StationMapper.toStationFilter(request));
-            List<StationDto> responses = new ArrayList<>();
+    public ResponseEntity<List<StationDto>> getAllMeetstations(GetAllStationsRequest request) {
+        List<Station> stations = stationService.getAllStations(StationMapper.toStationFilter(request));
+        List<StationDto> responses = new ArrayList<>();
 
-
-            for (Station station : stations) {
-                responses.add(StationMapper.toStationDTO(station));
-            }
-
-            return ResponseEntity.ok(responses);
-        } catch (InvalidArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Er is een onverwachte fout opgetreden.");
+        for (Station station : stations) {
+            responses.add(StationMapper.toStationDTO(station));
         }
+
+        return ResponseEntity.ok(responses);
     }
 
 // Controller
@@ -114,7 +106,7 @@ public CompletableFuture<ResponseEntity<List<StationDto>>> getMeetstationWithMea
     @SecurityRequirement(name = OpenApiConfig.BEARER_AUTH)
     @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "401", description = "Niet ingelogd"), @ApiResponse(responseCode = "403", description = "Geen toegang")})
     @PutMapping("/edit/{id}")
-    public ResponseEntity<?> updateMeetstation(@PathVariable long id, @RequestBody UpdateStationRequest updaterequest, @AuthenticationPrincipal User currentUser) throws Exception {
+    public ResponseEntity<String> updateMeetstation(@PathVariable long id, @RequestBody UpdateStationRequest updaterequest, @AuthenticationPrincipal User currentUser) throws Exception {
         Station station = stationService.GetStationById(id);
         if (!isOwnerOrAdmin(currentUser, station.getUserid())) {
             throw new AccessDeniedException("You are not allowed to edit this station");
@@ -131,7 +123,7 @@ public CompletableFuture<ResponseEntity<List<StationDto>>> getMeetstationWithMea
     @SecurityRequirement(name = OpenApiConfig.BEARER_AUTH)
     @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer"), @ApiResponse(responseCode = "401", description = "Niet ingelogd"), @ApiResponse(responseCode = "403", description = "Geen toegang")})
     @PutMapping("/transfer/{id}")
-    public ResponseEntity<?> transferMeetstation(@PathVariable long id, @Valid @RequestBody TransferStationRequest request, @AuthenticationPrincipal User currentUser) {
+    public ResponseEntity<String> transferMeetstation(@PathVariable long id, @Valid @RequestBody TransferStationRequest request, @AuthenticationPrincipal User currentUser) {
         Station station = stationService.GetStationById(id);
         if (!isOwnerOrAdmin(currentUser, station.getUserid())) {
             throw new AccessDeniedException("You are not allowed to transfer this station");
@@ -210,23 +202,17 @@ public CompletableFuture<ResponseEntity<List<StationDto>>> getMeetstationWithMea
     @SecurityRequirement(name = OpenApiConfig.BEARER_AUTH)
     @ApiResponses({@ApiResponse(responseCode = "201", description = "Station aangemaakt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer"), @ApiResponse(responseCode = "401", description = "Niet ingelogd"), @ApiResponse(responseCode = "500", description = "Onverwachte fout")})
     @PostMapping("/add")
-    public ResponseEntity<?> addStation(@RequestBody Station stationRequest) {
-        try {
-            Station station = new Station();
-            station.setName(stationRequest.getName());
-            station.setDatabase_tag("MJS");
-            station.setIs_public(false);
-            station.setIsActive(false);
-            station.setRegistrationCode(stationRequest.getRegistrationCode());
-            station.setLocation_locationid(stationRequest.getLocation_locationid());
+    public ResponseEntity<Station> addStation(@RequestBody Station stationRequest) {
+        Station station = new Station();
+        station.setName(stationRequest.getName());
+        station.setDatabase_tag("MJS");
+        station.setIs_public(false);
+        station.setIsActive(false);
+        station.setRegistrationCode(stationRequest.getRegistrationCode());
+        station.setLocation_locationid(stationRequest.getLocation_locationid());
 
-            Station savedStation = stationService.addStation(station);
-            return ResponseEntity.status(HttpStatus.CREATED).body(savedStation);
-        }  catch (IncorrectResultSizeDataAccessException e) {  // Catch database constraint violation
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Registratiecode is al in gebruik!");
-        }   catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Er is een fout opgetreden bij het toevoegen van het meetstation.");
-        }
+        Station savedStation = stationService.addStation(station);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedStation);
     }
 
     // Create station endpoint salvaged from removed DatabasePollingController

@@ -29,7 +29,7 @@ public class E2ETestController {
      * @return ResponseEntity with status 200 OK
      */
     @PostMapping("/reset")
-    public ResponseEntity<?> resetData() {
+    public ResponseEntity<Void> resetData() {
         throw new UnsupportedOperationException("Not implemented yet");
 //        return ResponseEntity.ok().build();
     }
@@ -41,7 +41,7 @@ public class E2ETestController {
      * @return ResponseEntity with status 200 OK
      */
     @GetMapping("/users/{email}/auth-token")
-    public ResponseEntity<?> getAuthToken(@PathVariable String email) {
+    public ResponseEntity<Token> getAuthToken(@PathVariable String email) {
         User user = userService.getUserByEmail(email);
         Token token = tokenService.getTokenByUserIdAndTokenType(user.getUserId(), TokenType.VERIFY_AUTH);
 
