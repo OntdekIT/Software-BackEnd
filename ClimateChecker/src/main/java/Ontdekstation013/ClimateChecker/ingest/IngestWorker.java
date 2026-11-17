@@ -7,6 +7,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.Random;
 import java.util.random.RandomGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +49,7 @@ public class IngestWorker {
     public IngestWorker(IngestProperties properties, IngestState state, MeasurementSource source,
                         MeasurementIngestService ingestService, SnapshotService snapshotService,
                         Clock clock, DelayedRunner runner) {
-        this(properties, state, source, ingestService, snapshotService, clock, runner, RandomGenerator.getDefault());
+        this(properties, state, source, ingestService, snapshotService, clock, runner, new Random());
     }
 
     IngestWorker(IngestProperties properties, IngestState state, MeasurementSource source,
