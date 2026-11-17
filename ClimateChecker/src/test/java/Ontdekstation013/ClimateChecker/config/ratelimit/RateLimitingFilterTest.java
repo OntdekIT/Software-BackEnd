@@ -1,5 +1,6 @@
 package Ontdekstation013.ClimateChecker.config.ratelimit;
 
+import Ontdekstation013.ClimateChecker.utility.ClientIpResolver;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
@@ -15,7 +16,9 @@ class RateLimitingFilterTest {
 
     private static final int REQUESTS_PER_MINUTE = 20;
 
-    private final RateLimitingFilter filter = new RateLimitingFilter(true, REQUESTS_PER_MINUTE);
+    private static final ClientIpResolver RESOLVER = new ClientIpResolver("10.0.0.0/8");
+
+    private final RateLimitingFilter filter = new RateLimitingFilter(true, REQUESTS_PER_MINUTE, RESOLVER);
 
     @Test
     void shouldAllowRequestsWithinLimit() throws ServletException, IOException {
@@ -66,7 +69,7 @@ class RateLimitingFilterTest {
 
     @Test
     void shouldBypassFilterWhenDisabled() throws ServletException, IOException {
-        RateLimitingFilter disabledFilter = new RateLimitingFilter(false, REQUESTS_PER_MINUTE);
+        RateLimitingFilter disabledFilter = new RateLimitingFilter(false, REQUESTS_PER_MINUTE, RESOLVER);
         FilterChain filterChain = mock(FilterChain.class);
 
         for (int i = 0; i < REQUESTS_PER_MINUTE + 5; i++) {
@@ -87,6 +90,24 @@ class RateLimitingFilterTest {
         filter.doFilterInternal(request, response, filterChain);
 
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    @Test
+    void shouldNotLetAnUntrustedClientEvadeTheLimitWithAForgedForwardedForHeader() throws ServletException, IOException {
+        FilterChain filterChain = mock(FilterChain.class);
+
+        for (int i = 0; i < REQUESTS_PER_MINUTE; i++) {
+            MockHttpServletRequest request = createRequest("198.51.100.7");
+            request.addHeader("X-Forwarded-For", "203.0.113." + i);
+            filter.doFilterInternal(request, new MockHttpServletResponse(), filterChain);
+        }
+
+        MockHttpServletRequest forged = createRequest("198.51.100.7");
+        forged.addHeader("X-Forwarded-For", "203.0.113.200");
+        MockHttpServletResponse blocked = new MockHttpServletResponse();
+        filter.doFilterInternal(forged, blocked, filterChain);
+
+        assertThat(blocked.getStatus()).isEqualTo(HttpStatus.TOO_MANY_REQUESTS.value());
     }
 
     private MockHttpServletRequest createRequest(String remoteAddr) {

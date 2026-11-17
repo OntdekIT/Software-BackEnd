@@ -13,6 +13,7 @@ import Ontdekstation013.ClimateChecker.features.user.authentication.trustedip.Tr
 import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserResponse;
 import Ontdekstation013.ClimateChecker.features.workshop.Workshop;
 import Ontdekstation013.ClimateChecker.features.workshop.WorkshopService;
+import Ontdekstation013.ClimateChecker.utility.ClientIpResolver;
 import Ontdekstation013.ClimateChecker.utility.RateLimiter;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -46,6 +47,7 @@ public class UserAuthenticationController {
     private final PasswordEncodingService passwordEncodingService;
     private final RateLimiter rateLimiter;
     private final TrustedIpService trustedIpService;
+    private final ClientIpResolver clientIpResolver;
 
     private static final String RATE_LIMIT_MESSAGE = "Te veel pogingen. Probeer het over een minuut opnieuw.";
 
@@ -54,17 +56,8 @@ public class UserAuthenticationController {
         return !rateLimiter.isAllowed(key);
     }
 
-    /**
-     * Bepaalt het client-IP. Achter een reverse proxy/load balancer staat het
-     * echte adres in de eerste waarde van X-Forwarded-For; anders het
-     * directe remote address.
-     */
     private String clientIp(HttpServletRequest request) {
-        String forwarded = request.getHeader("X-Forwarded-For");
-        if (forwarded != null && !forwarded.isBlank()) {
-            return forwarded.split(",")[0].trim();
-        }
-        return request.getRemoteAddr();
+        return clientIpResolver.resolve(request);
     }
 
     @PostMapping("register")
