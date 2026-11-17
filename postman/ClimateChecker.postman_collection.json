@@ -1,0 +1,1992 @@
+{
+  "item": [
+    {
+      "name": "Workshops",
+      "description": "Workshopcodes beheren (alleen beheerders)",
+      "item": [
+        {
+          "name": "Geef actieve of verlopen workshops",
+          "request": {
+            "name": "Geef actieve of verlopen workshops",
+            "description": {},
+            "url": {
+              "path": [
+                "api",
+                "workshops"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "description": {
+                    "content": "",
+                    "type": "text/plain"
+                  },
+                  "key": "isExpired",
+                  "value": "false"
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "method": "GET",
+            "body": {},
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            }
+          },
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "name": "Maak een workshop met een vervaldatum",
+          "request": {
+            "name": "Maak een workshop met een vervaldatum",
+            "description": {},
+            "url": {
+              "path": [
+                "api",
+                "workshops"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"expirationDate\": \"<string>\"\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            }
+          },
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "name": "Verwijder een workshopcode",
+          "request": {
+            "name": "Verwijder een workshopcode",
+            "description": {},
+            "url": {
+              "path": [
+                "api",
+                "workshops",
+                ":code"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "type": "any",
+                  "value": "<long>",
+                  "key": "code",
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  }
+                }
+              ]
+            },
+            "method": "DELETE",
+            "body": {},
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            }
+          },
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "name": "Geef de gebruikers die via een workshopcode zijn geregistreerd",
+          "request": {
+            "name": "Geef de gebruikers die via een workshopcode zijn geregistreerd",
+            "description": {},
+            "url": {
+              "path": [
+                "api",
+                "workshops",
+                ":code",
+                "users"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "type": "any",
+                  "value": "<long>",
+                  "key": "code",
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  }
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "method": "GET",
+            "body": {},
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            }
+          },
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "Authenticatie",
+      "description": "Registreren, inloggen en wachtwoord herstellen (publiek)",
+      "item": [
+        {
+          "name": "Vraag een wachtwoordresetcode aan per e-mail",
+          "request": {
+            "name": "Vraag een wachtwoordresetcode aan per e-mail",
+            "description": {},
+            "url": {
+              "path": [
+                "api",
+                "authentication",
+                "forgot-password"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"<string>\"\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "auth": null
+          },
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "name": "Log in met e-mail en wachtwoord (geeft een token of vraagt om een e-mailcode)",
+          "request": {
+            "name": "Log in met e-mail en wachtwoord (geeft een token of vraagt om een e-mailcode)",
+            "description": {},
+            "url": {
+              "path": [
+                "api",
+                "authentication",
+                "login"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"<string>\",\n  \"password\": \"<string>\"\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "auth": null
+          },
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "name": "Registreer een gebruiker met workshop- en stationcode",
+          "request": {
+            "name": "Registreer een gebruiker met workshop- en stationcode",
+            "description": {},
+            "url": {
+              "path": [
+                "api",
+                "authentication",
+                "register"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"<string>\",\n  \"firstName\": \"<string>\",\n  \"lastName\": \"<string>\",\n  \"password\": \"<string>\",\n  \"stationCode\": \"<long>\",\n  \"workshopCode\": \"<long>\"\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "auth": null
+          },
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "name": "Stel een nieuw wachtwoord in met een resetcode",
+          "request": {
+            "name": "Stel een nieuw wachtwoord in met een resetcode",
+            "description": {},
+            "url": {
+              "path": [
+                "api",
+                "authentication",
+                "reset-password"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"<string>\",\n  \"password\": \"<string>\",\n  \"token\": \"<string>\"\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "auth": null
+          },
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "name": "Verifieer de e-mailcode en ontvang een JWT",
+          "request": {
+            "name": "Verifieer de e-mailcode en ontvang een JWT",
+            "description": {},
+            "url": {
+              "path": [
+                "api",
+                "authentication",
+                "verify"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"<string>\",\n  \"email\": \"<string>\"\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "auth": null
+          },
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "Wijken",
+      "description": "Wijken met gemiddelde meetwaarden, onder andere voor de heatmap",
+      "item": [
+        {
+          "name": "Geef alle wijken met hun metingen op een tijdstip",
+          "request": {
+            "name": "Geef alle wijken met hun metingen op een tijdstip",
+            "description": {},
+            "url": {
+              "path": [
+                "api",
+                "neighbourhood",
+                "history"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  },
+                  "key": "timestamp",
+                  "value": "<string>"
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "method": "GET",
+            "body": {},
+            "auth": null
+          },
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "name": "Geef dagelijkse temperatuurstatistiek van een wijk",
+          "request": {
+            "name": "Geef dagelijkse temperatuurstatistiek van een wijk",
+            "description": {},
+            "url": {
+              "path": [
+                "api",
+                "neighbourhood",
+                "history",
+                "average",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  },
+                  "key": "startDate",
+                  "value": "<string>"
+                },
+                {
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  },
+                  "key": "endDate",
+                  "value": "<string>"
+                }
+              ],
+              "variable": [
+                {
+                  "type": "any",
+                  "value": "<long>",
+                  "key": "id",
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  }
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "method": "GET",
+            "body": {},
+            "auth": null
+          },
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "name": "Geef een time-lapse van de heatmap per wijk",
+          "request": {
+            "name": "Geef een time-lapse van de heatmap per wijk",
+            "description": {},
+            "url": {
+              "path": [
+                "api",
+                "neighbourhood",
+                "history",
+                "timelapse"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "description": {
+                    "content": "",
+                    "type": "text/plain"
+                  },
+                  "key": "from",
+                  "value": "<string>"
+                },
+                {
+                  "disabled": false,
+                  "description": {
+                    "content": "",
+                    "type": "text/plain"
+                  },
+                  "key": "to",
+                  "value": "<string>"
+                },
+                {
+                  "disabled": false,
+                  "description": {
+                    "content": "",
+                    "type": "text/plain"
+                  },
+                  "key": "steps",
+                  "value": "24"
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "method": "GET",
+            "body": {},
+            "auth": null
+          },
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "name": "Geef een wijk op id",
+          "request": {
+            "name": "Geef een wijk op id",
+            "description": {},
+            "url": {
+              "path": [
+                "api",
+                "neighbourhood",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "type": "any",
+                  "value": "<long>",
+                  "key": "id",
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  }
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "method": "GET",
+            "body": {},
+            "auth": null
+          },
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "Meetstations",
+      "description": "Meetstations opvragen, claimen, bewerken en overdragen",
+      "item": [
+        {
+          "name": "Voeg een nieuw station toe",
+          "request": {
+            "name": "Voeg een nieuw station toe",
+            "description": {},
+            "url": {
+              "path": [
+                "api",
+                "meetstation",
+                "add"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"database_tag\": \"<string>\",\n  \"humError\": \"<boolean>\",\n  \"isActive\": \"<boolean>\",\n  \"is_public\": \"<boolean>\",\n  \"locError\": \"<boolean>\",\n  \"location_locationid\": \"<long>\",\n  \"measurementList\": [\n    {\n      \"humidity\": \"<float>\",\n      \"id\": \"<long>\",\n      \"is_public\": \"<boolean>\",\n      \"latitude\": \"<float>\",\n      \"longitude\": \"<float>\",\n      \"pm10\": \"<float>\",\n      \"pm25\": \"<float>\",\n      \"station\": {\n        \"value\": \"<Circular reference to #/components/schemas/Station detected>\"\n      },\n      \"temperature\": \"<float>\",\n      \"timestamp\": \"<dateTime>\"\n    }\n  ],\n  \"name\": \"<string>\",\n  \"registrationCode\": \"<long>\",\n  \"stationid\": \"<long>\",\n  \"stofError\": \"<boolean>\",\n  \"tempError\": \"<boolean>\",\n  \"user\": {\n    \"email\": \"<string>\",\n    \"firstName\": \"<string>\",\n    \"lastName\": \"<string>\",\n    \"accountNonExpired\": \"<boolean>\",\n    \"accountNonLocked\": \"<boolean>\",\n    \"authorities\": [\n      {\n        \"authority\": \"<string>\"\n      }\n    ],\n    \"credentialsNonExpired\": \"<boolean>\",\n    \"enabled\": \"<boolean>\",\n    \"password\": \"<string>\",\n    \"role\": \"USER\",\n    \"stations\": [\n      {\n        \"value\": \"<Circular reference to #/components/schemas/Station detected>\"\n      }\n    ],\n    \"userId\": \"<long>\",\n    \"username\": \"<string>\",\n    \"workshop\": {\n      \"creationTime\": \"<dateTime>\",\n      \"expirationDate\": \"<dateTime>\",\n      \"code\": \"<long>\",\n      \"users\": [\n        {\n          \"value\": \"<Circular reference to #/components/schemas/User detected>\"\n        }\n      ]\n    }\n  },\n  \"userid\": \"<long>\"\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            }
+          },
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "name": "Controleer of een station beschikbaar is en de workshopcode geldig is",
+          "request": {
+            "name": "Controleer of een station beschikbaar is en de workshopcode geldig is",
+            "description": {},
+            "url": {
+              "path": [
+                "api",
+                "meetstation",
+                "availability",
+                ":stationId",
+                ":workshopCode"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "type": "any",
+                  "value": "<long>",
+                  "key": "stationId",
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  }
+                },
+                {
+                  "type": "any",
+                  "value": "<long>",
+                  "key": "workshopCode",
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  }
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "method": "GET",
+            "body": {},
+            "auth": null
+          },
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "name": "Claim een station voor de ingelogde gebruiker",
+          "request": {
+            "name": "Claim een station voor de ingelogde gebruiker",
+            "description": {},
+            "url": {
+              "path": [
+                "api",
+                "meetstation",
+                "claim"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "method": "PUT",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"database_tag\": \"<string>\",\n  \"humError\": \"<boolean>\",\n  \"isActive\": \"<boolean>\",\n  \"is_public\": \"<boolean>\",\n  \"latitude\": \"<float>\",\n  \"locError\": \"<boolean>\",\n  \"location_locationid\": \"<long>\",\n  \"longitude\": \"<float>\",\n  \"measurements\": [\n    {\n      \"humidity\": \"<float>\",\n      \"id\": \"<integer>\",\n      \"is_public\": \"<boolean>\",\n      \"latitude\": \"<float>\",\n      \"longitude\": \"<float>\",\n      \"measurementId\": \"<long>\",\n      \"particulate\": \"<float>\",\n      \"pm10\": \"<float>\",\n      \"pm2.5\": \"<float>\",\n      \"temperature\": \"<float>\",\n      \"timestamp\": \"<string>\",\n      \"userId\": \"<long>\"\n    }\n  ],\n  \"name\": \"<string>\",\n  \"registrationCode\": \"<long>\",\n  \"stationid\": \"<long>\",\n  \"stofError\": \"<boolean>\",\n  \"tempError\": \"<boolean>\",\n  \"userid\": \"<long>\"\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            }
+          },
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "name": "Pas naam en zichtbaarheid van een station aan (eigenaar of beheerder)",
+          "request": {
+            "name": "Pas naam en zichtbaarheid van een station aan (eigenaar of beheerder)",
+            "description": {},
+            "url": {
+              "path": [
+                "api",
+                "meetstation",
+                "edit",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "type": "any",
+                  "value": "<long>",
+                  "key": "id",
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  }
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "method": "PUT",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"is_public\": \"<boolean>\",\n  \"name\": \"<string>\"\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            }
+          },
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "name": "Download de metingen van een station als PDF",
+          "request": {
+            "name": "Download de metingen van een station als PDF",
+            "description": {},
+            "url": {
+              "path": [
+                "api",
+                "meetstation",
+                "measurements",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  },
+                  "key": "startDate",
+                  "value": "<string>"
+                },
+                {
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  },
+                  "key": "endDate",
+                  "value": "<string>"
+                }
+              ],
+              "variable": [
+                {
+                  "type": "any",
+                  "value": "<integer>",
+                  "key": "id",
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  }
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "method": "GET",
+            "body": {},
+            "auth": null
+          },
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "name": "Geef alle meetstations, optioneel gefilterd",
+          "request": {
+            "name": "Geef alle meetstations, optioneel gefilterd",
+            "description": {},
+            "url": {
+              "path": [
+                "api",
+                "meetstation",
+                "stations"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  },
+                  "key": "database_tag",
+                  "value": "<string>"
+                },
+                {
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  },
+                  "key": "isActive",
+                  "value": "<boolean>"
+                },
+                {
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  },
+                  "key": "isPublic",
+                  "value": "<boolean>"
+                },
+                {
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  },
+                  "key": "name",
+                  "value": "<string>"
+                },
+                {
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  },
+                  "key": "page",
+                  "value": "<integer>"
+                },
+                {
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  },
+                  "key": "pageSize",
+                  "value": "<integer>"
+                },
+                {
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  },
+                  "key": "registrationCode",
+                  "value": "<long>"
+                },
+                {
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  },
+                  "key": "userid",
+                  "value": "<long>"
+                },
+                {
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  },
+                  "key": "username",
+                  "value": "<string>"
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "method": "GET",
+            "body": {},
+            "auth": null
+          },
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "name": "Geef meetstations met hun meting op een tijdstip",
+          "request": {
+            "name": "Geef meetstations met hun meting op een tijdstip",
+            "description": {},
+            "url": {
+              "path": [
+                "api",
+                "meetstation",
+                "stations-met-measurements"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  },
+                  "key": "timestamp",
+                  "value": "<string>"
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "method": "GET",
+            "body": {},
+            "auth": null
+          },
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "name": "Draag een station over aan een andere gebruiker",
+          "request": {
+            "name": "Draag een station over aan een andere gebruiker",
+            "description": {},
+            "url": {
+              "path": [
+                "api",
+                "meetstation",
+                "transfer",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "type": "any",
+                  "value": "<long>",
+                  "key": "id",
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  }
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "method": "PUT",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"newOwnerEmail\": \"<string>\"\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            }
+          },
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "name": "Geef een meetstation op id",
+          "request": {
+            "name": "Geef een meetstation op id",
+            "description": {},
+            "url": {
+              "path": [
+                "api",
+                "meetstation",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "type": "any",
+                  "value": "<long>",
+                  "key": "id",
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  }
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "method": "GET",
+            "body": {},
+            "auth": null
+          },
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "Gebruikers",
+      "description": "Gebruikersbeheer (alleen beheerders)",
+      "item": [
+        {
+          "name": "Geef een pagina met gebruikers, optioneel gefilterd",
+          "request": {
+            "name": "Geef een pagina met gebruikers, optioneel gefilterd",
+            "description": {},
+            "url": {
+              "path": [
+                "api",
+                "users"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  },
+                  "key": "email",
+                  "value": "<string>"
+                },
+                {
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  },
+                  "key": "firstName",
+                  "value": "<string>"
+                },
+                {
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  },
+                  "key": "lastName",
+                  "value": "<string>"
+                },
+                {
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  },
+                  "key": "page",
+                  "value": "<integer>"
+                },
+                {
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  },
+                  "key": "pageSize",
+                  "value": "<integer>"
+                },
+                {
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  },
+                  "key": "role",
+                  "value": "USER"
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "method": "GET",
+            "body": {},
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            }
+          },
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "name": "Verwijder een gebruiker",
+          "request": {
+            "name": "Verwijder een gebruiker",
+            "description": {},
+            "url": {
+              "path": [
+                "api",
+                "users",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "type": "any",
+                  "value": "<long>",
+                  "key": "id",
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  }
+                }
+              ]
+            },
+            "method": "DELETE",
+            "body": {},
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            }
+          },
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "name": "Geef een gebruiker op id",
+          "request": {
+            "name": "Geef een gebruiker op id",
+            "description": {},
+            "url": {
+              "path": [
+                "api",
+                "users",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "description": {
+                    "content": "",
+                    "type": "text/plain"
+                  },
+                  "key": "includeStations",
+                  "value": "false"
+                }
+              ],
+              "variable": [
+                {
+                  "type": "any",
+                  "value": "<long>",
+                  "key": "id",
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  }
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "method": "GET",
+            "body": {},
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            }
+          },
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "name": "Wijzig de rol van een gebruiker",
+          "request": {
+            "name": "Wijzig de rol van een gebruiker",
+            "description": {},
+            "url": {
+              "path": [
+                "api",
+                "users",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "type": "any",
+                  "value": "<long>",
+                  "key": "id",
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  }
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "PUT",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"USER\"\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            }
+          },
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "Metingen",
+      "description": "Metingen van meetstations in Tilburg, historisch en per wijk",
+      "item": [
+        {
+          "name": "Geef de volledigheid van fijnstofdata per station (alleen beheerders)",
+          "request": {
+            "name": "Geef de volledigheid van fijnstofdata per station (alleen beheerders)",
+            "description": {},
+            "url": {
+              "path": [
+                "api",
+                "measurement",
+                "coverage"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "description": {
+                    "content": "",
+                    "type": "text/plain"
+                  },
+                  "key": "from",
+                  "value": "<string>"
+                },
+                {
+                  "disabled": false,
+                  "description": {
+                    "content": "",
+                    "type": "text/plain"
+                  },
+                  "key": "to",
+                  "value": "<string>"
+                },
+                {
+                  "disabled": false,
+                  "description": {
+                    "content": "",
+                    "type": "text/plain"
+                  },
+                  "key": "granularity",
+                  "value": "hour"
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "method": "GET",
+            "body": {},
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            }
+          },
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "name": "Geef per meetstation de meting dichtst bij een tijdstip",
+          "request": {
+            "name": "Geef per meetstation de meting dichtst bij een tijdstip",
+            "description": {},
+            "url": {
+              "path": [
+                "api",
+                "measurement",
+                "history"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  },
+                  "key": "timestamp",
+                  "value": "<string>"
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "method": "GET",
+            "body": {},
+            "auth": null
+          },
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "name": "Geef gemiddelde temperatuur per tijdsblok voor een wijk",
+          "request": {
+            "name": "Geef gemiddelde temperatuur per tijdsblok voor een wijk",
+            "description": {},
+            "url": {
+              "path": [
+                "api",
+                "measurement",
+                "history",
+                "average",
+                "region",
+                ":regionId"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "description": {
+                    "content": "",
+                    "type": "text/plain"
+                  },
+                  "key": "from",
+                  "value": "<string>"
+                },
+                {
+                  "disabled": false,
+                  "description": {
+                    "content": "",
+                    "type": "text/plain"
+                  },
+                  "key": "to",
+                  "value": "<string>"
+                },
+                {
+                  "disabled": false,
+                  "description": {
+                    "content": "",
+                    "type": "text/plain"
+                  },
+                  "key": "granularity",
+                  "value": "hour"
+                }
+              ],
+              "variable": [
+                {
+                  "type": "any",
+                  "value": "<long>",
+                  "key": "regionId",
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  }
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "method": "GET",
+            "body": {},
+            "auth": null
+          },
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "name": "Geef dagelijkse gemiddelde, minimum en maximum temperatuur van een station",
+          "request": {
+            "name": "Geef dagelijkse gemiddelde, minimum en maximum temperatuur van een station",
+            "description": {},
+            "url": {
+              "path": [
+                "api",
+                "measurement",
+                "history",
+                "average",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  },
+                  "key": "startDate",
+                  "value": "<string>"
+                },
+                {
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  },
+                  "key": "endDate",
+                  "value": "<string>"
+                }
+              ],
+              "variable": [
+                {
+                  "type": "any",
+                  "value": "<integer>",
+                  "key": "id",
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  }
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "method": "GET",
+            "body": {},
+            "auth": null
+          },
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "name": "Geef halfuurgemiddelden van een station voor vandaag",
+          "request": {
+            "name": "Geef halfuurgemiddelden van een station voor vandaag",
+            "description": {},
+            "url": {
+              "path": [
+                "api",
+                "measurement",
+                "history",
+                "half-hourly",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "type": "any",
+                  "value": "<integer>",
+                  "key": "id",
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  }
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "method": "GET",
+            "body": {},
+            "auth": null
+          },
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "name": "Geef uurgemiddelden van een station voor vandaag",
+          "request": {
+            "name": "Geef uurgemiddelden van een station voor vandaag",
+            "description": {},
+            "url": {
+              "path": [
+                "api",
+                "measurement",
+                "history",
+                "hourly",
+                ":id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "type": "any",
+                  "value": "<integer>",
+                  "key": "id",
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  }
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "method": "GET",
+            "body": {},
+            "auth": null
+          },
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "name": "Geef dagelijkse netwerkbrede temperatuurstatistiek over alle stations",
+          "request": {
+            "name": "Geef dagelijkse netwerkbrede temperatuurstatistiek over alle stations",
+            "description": {},
+            "url": {
+              "path": [
+                "api",
+                "measurement",
+                "history",
+                "network"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  },
+                  "key": "startDate",
+                  "value": "<string>"
+                },
+                {
+                  "disabled": false,
+                  "description": {
+                    "content": "(Required) ",
+                    "type": "text/plain"
+                  },
+                  "key": "endDate",
+                  "value": "<string>"
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "method": "GET",
+            "body": {},
+            "auth": null
+          },
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "Mijn account",
+      "description": "Gegevens van de ingelogde gebruiker",
+      "item": [
+        {
+          "name": "Geef het account van de ingelogde gebruiker",
+          "request": {
+            "name": "Geef het account van de ingelogde gebruiker",
+            "description": {},
+            "url": {
+              "path": [
+                "api",
+                "my-account"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "description": {
+                    "content": "",
+                    "type": "text/plain"
+                  },
+                  "key": "includeStations",
+                  "value": "false"
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "method": "GET",
+            "body": {},
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            }
+          },
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "name": "Wijzig naam, e-mail of wachtwoord van de ingelogde gebruiker",
+          "request": {
+            "name": "Wijzig naam, e-mail of wachtwoord van de ingelogde gebruiker",
+            "description": {},
+            "url": {
+              "path": [
+                "api",
+                "my-account"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "PUT",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"<string>\",\n  \"firstName\": \"<string>\",\n  \"lastName\": \"<string>\",\n  \"password\": \"<string>\"\n}",
+              "options": {
+                "raw": {
+                  "headerFamily": "json",
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearerToken}}"
+                }
+              ]
+            }
+          },
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ]
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8082"
+    },
+    {
+      "key": "bearerToken",
+      "value": "",
+      "type": "string",
+      "description": "JWT uit POST /api/authentication/login of /verify"
+    }
+  ],
+  "info": {
+    "name": "ClimateChecker API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "REST API van ClimateChecker: meetstations, metingen en wijken van de klimaatkaart, plus accountbeheer en workshops.\n\nInloggen: roep `POST /api/authentication/login` aan (en daarna `POST /api/authentication/verify` met de code uit de e-mail). Plak het ontvangen token via de knop \"Authorize\" om beveiligde endpoints uit te proberen.",
+      "type": "text/plain"
+    }
+  }
+}

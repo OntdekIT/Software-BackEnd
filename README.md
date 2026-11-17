@@ -52,6 +52,13 @@ De backend genereert zijn eigen API-documentatie uit de code (springdoc-openapi)
 - Beveiligde endpoints proberen: log in via `POST /api/authentication/login` (en `verify`), klik in Swagger UI op "Authorize" en plak het JWT. Het token gaat mee als `Authorization: Bearer <token>`, cookies worden niet gebruikt.
 - Een test (`OpenApiDocsTest`) controleert dat de specificatie gegenereerd wordt.
 
+#### Padnamen, aliassen en Postman
+
+- Alle paden zijn kleine letters, bijvoorbeeld `/api/meetstation/...`, `/api/meetstation/claim`, `/api/meetstation/availability/{stationId}/{workshopCode}` en `/api/meetstation/stations-met-measurements`.
+- De oude spellingen (`/api/Meetstation/...`, `/Claim`, `/Availibility/...`, `/stationsMetMeasurements`) blijven werken als alias zodat de frontend niet breekt, maar staan niet in de specificatie. Een nieuw pad voor een station? Zet het in de beveiligingsregels van `SecurityConfiguration` voor beide spellingen: padmatching is hoofdlettergevoelig. `PathAliasApiTest` controleert dat elk muterend stationspad om een login vraagt.
+- De specificatie staat ingecheckt in `docs/api/openapi.json` en `OpenApiSpecTest` faalt als code en bestand uit elkaar lopen. Verversen na een wijziging in de controllers: `cd ClimateChecker && ./mvnw test -Dtest=OpenApiSpecTest -Dopenapi.update=true`.
+- De Postman-collectie `postman/ClimateChecker.postman_collection.json` wordt daaruit gegenereerd met `./scripts/generate-postman.sh` (vereist Node.js; importeer het bestand in Postman). Zet de collectievariabele `baseUrl` (standaard `http://localhost:8082`) en plak je JWT in `bearerToken`.
+
 ### Mailserver configuratie
 De backend kan e-mails versturen via een echte SMTP-server of de verzending onderdrukken (bijv. voor tests).
 
