@@ -11,6 +11,7 @@ import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.exception.NotFoundException;
 import Ontdekstation013.ClimateChecker.features.measurement.MeasurementService;
 import Ontdekstation013.ClimateChecker.features.station.Station;
+import Ontdekstation013.ClimateChecker.features.station.StationFilter;
 import Ontdekstation013.ClimateChecker.features.station.StationMapper;
 import Ontdekstation013.ClimateChecker.features.station.StationService;
 import Ontdekstation013.ClimateChecker.features.station.endpoint.dto.AddStationRequest;
@@ -21,6 +22,7 @@ import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.UserRole;
 import Ontdekstation013.ClimateChecker.features.workshop.WorkshopService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -45,8 +47,10 @@ public class StationController {
     private final StationService stationService;
     private final MeasurementService measurementService;
     private final WorkshopService adminService;
+    private final ZoneId applicationZone;
 
-    public StationController(StationService stationService, MeasurementService measurementService, WorkshopService workshopService) {
+    public StationController(StationService stationService, MeasurementService measurementService, WorkshopService workshopService, ZoneId applicationZone) {
+        this.applicationZone = applicationZone;
         this.stationService = stationService;
         this.measurementService = measurementService;
         this.adminService = workshopService;
@@ -66,14 +70,20 @@ public class StationController {
     @Operation(summary = "Geef alle meetstations, optioneel gefilterd")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer")})
     @GetMapping("/stations")
-    public ResponseEntity<?> getAllMeetstations(GetAllStationsRequest request) {
-        List<Station> stations = stationService.getAllStations(StationMapper.toStationFilter(request));
-        List<StationDto> responses = new ArrayList<>();
+    public ResponseEntity<List<StationDto>> getAllMeetstations(GetAllStationsRequest request) {
+        StationFilter filter = StationMapper.toStationFilter(request);
 
-        for (Station station : stations) {
-            responses.add(StationMapper.toStationDTO(station));
+        if (request.isPaged()) {
+            Page<Station> page = stationService.getStationsPage(filter);
+            return ResponseEntity.ok()
+                    .header("X-Total-Count", String.valueOf(page.getTotalElements()))
+                    .body(page.map(StationMapper::toStationDTO).getContent());
         }
 
+        List<StationDto> responses = new ArrayList<>();
+        for (Station station : stationService.getAllStations(filter)) {
+            responses.add(StationMapper.toStationDTO(station));
+        }
         return ResponseEntity.ok(responses);
     }
 
@@ -138,8 +148,8 @@ public class StationController {
         Instant startInstant;
         Instant endInstant;
         try {
-            startInstant = LocalDateTime.parse(startDate, formatter).atZone(ZoneId.systemDefault()).toInstant();
-            endInstant = LocalDateTime.parse(endDate, formatter).atZone(ZoneId.systemDefault()).toInstant();
+            startInstant = LocalDateTime.parse(startDate, formatter).atZone(applicationZone).toInstant();
+            endInstant = LocalDateTime.parse(endDate, formatter).atZone(applicationZone).toInstant();
         } catch (DateTimeParseException e) {
             throw new InvalidArgumentException("Dates must be in dd-MM-yyyy HH:mm format");
         }

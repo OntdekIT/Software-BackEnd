@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 public class NeighbourhoodController {
 
     private final NeighbourhoodService neighbourhoodService;
+    private final ZoneId applicationZone;
 
     /**
      * Gets all neighbourhoods at a given timestamp.
@@ -101,10 +102,10 @@ public class NeighbourhoodController {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
 
             LocalDateTime localDateTimeStart = LocalDateTime.parse(startDate, formatter);
-            Instant startInstant = localDateTimeStart.atZone(ZoneId.systemDefault()).toInstant();
+            Instant startInstant = localDateTimeStart.atZone(applicationZone).toInstant();
 
             LocalDateTime localDateTimeEnd = LocalDateTime.parse(endDate, formatter);
-            Instant endInstant = localDateTimeEnd.atZone(ZoneId.systemDefault()).toInstant();
+            Instant endInstant = localDateTimeEnd.atZone(applicationZone).toInstant();
 
             return neighbourhoodService.getHistoricalNeighbourhoodData(id, startInstant, endInstant);
         } catch (DateTimeParseException e) {

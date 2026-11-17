@@ -40,6 +40,7 @@ public class MeasurementController {
     private final StationService stationService;
     private final NeighbourhoodService neighbourhoodService;
     private final DataCoverageService dataCoverageService;
+    private final ZoneId applicationZone;
 
     /**
      * Gets the closest measurement to a given timestamp for each station.
@@ -83,8 +84,8 @@ public class MeasurementController {
         Instant startInstant;
         Instant endInstant;
         try {
-            startInstant = LocalDateTime.parse(startDate, formatter).atZone(ZoneId.systemDefault()).toInstant();
-            endInstant = LocalDateTime.parse(endDate, formatter).atZone(ZoneId.systemDefault()).toInstant();
+            startInstant = LocalDateTime.parse(startDate, formatter).atZone(applicationZone).toInstant();
+            endInstant = LocalDateTime.parse(endDate, formatter).atZone(applicationZone).toInstant();
         } catch (DateTimeParseException e) {
             throw new InvalidArgumentException("Dates must be in dd-MM-yyyy HH:mm format");
         }
@@ -116,8 +117,8 @@ public class MeasurementController {
         Instant startInstant;
         Instant endInstant;
         try {
-            startInstant = LocalDateTime.parse(startDate, formatter).atZone(ZoneId.systemDefault()).toInstant();
-            endInstant = LocalDateTime.parse(endDate, formatter).atZone(ZoneId.systemDefault()).toInstant();
+            startInstant = LocalDateTime.parse(startDate, formatter).atZone(applicationZone).toInstant();
+            endInstant = LocalDateTime.parse(endDate, formatter).atZone(applicationZone).toInstant();
         } catch (DateTimeParseException e) {
             throw new InvalidArgumentException("Dates must be in dd-MM-yyyy HH:mm format");
         }
@@ -197,8 +198,8 @@ public class MeasurementController {
     @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt")})
     @GetMapping("/history/hourly/{id}")
     public List<HourMeasurementResponse> getTodayHourlyMeasurements(@PathVariable int id) {
-        LocalDate today = LocalDate.now(ZoneId.systemDefault());
-        Instant startOfDay = today.atStartOfDay(ZoneId.systemDefault()).toInstant();
+        LocalDate today = LocalDate.now(applicationZone);
+        Instant startOfDay = today.atStartOfDay(applicationZone).toInstant();
         Instant endOfCurrentHour = Instant.now();
 
         return measurementService.getHourlyMeasurements(id, startOfDay, endOfCurrentHour);
@@ -212,8 +213,8 @@ public class MeasurementController {
     @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt")})
     @GetMapping("/history/half-hourly/{id}")
     public List<HalfHourMeasurementResponse> getTodayHalfHourlyMeasurements(@PathVariable int id) {
-        LocalDate today = LocalDate.now(ZoneId.systemDefault());
-        Instant startOfDay = today.atStartOfDay(ZoneId.systemDefault()).toInstant();
+        LocalDate today = LocalDate.now(applicationZone);
+        Instant startOfDay = today.atStartOfDay(applicationZone).toInstant();
         Instant endOfCurrentHour = Instant.now();
 
         return measurementService.getHalfHourlyMeasurements(id, startOfDay, endOfCurrentHour);

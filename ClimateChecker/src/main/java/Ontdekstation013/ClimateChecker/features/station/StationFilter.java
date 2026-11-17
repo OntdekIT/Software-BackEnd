@@ -16,4 +16,6 @@ public class StationFilter {
     private String username;
     private List<Long> userIds;
     private Boolean isActive;
+    private Integer page;
+    private Integer pageSize;
 }
