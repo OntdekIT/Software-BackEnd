@@ -179,7 +179,7 @@ public CompletableFuture<ResponseEntity<List<StationDto>>> getMeetstationWithMea
     public ResponseEntity<?> addStation(@Valid @RequestBody AddStationRequest request) {
         try {
             Station station = new Station();
-            station.setStationid(request.stationid());
+            station.setStationid(request.stationid() != null ? request.stationid() : request.registrationCode());
             station.setName(request.name());
             station.setDatabase_tag("MJS");
             station.setIs_public(false);

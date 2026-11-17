@@ -77,8 +77,7 @@ class AuthSecurityApiTest extends AbstractApiTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(registerBody(weak)))
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.statusCode").value(400))
-                    .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("password")));
+                    .andExpect(jsonPath("$").value(org.hamcrest.Matchers.startsWith("Wachtwoord moet")));
         }
     }
 

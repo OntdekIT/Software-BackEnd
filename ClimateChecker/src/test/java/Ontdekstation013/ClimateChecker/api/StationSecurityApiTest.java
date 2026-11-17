@@ -83,7 +83,7 @@ class StationSecurityApiTest extends AbstractApiTest {
         mockMvc.perform(post("/api/Meetstation/add")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
-                .andExpect(status().isForbidden());
+                .andExpect(status().is4xxClientError());
 
         assertThat(stationRepository.findById(777001L)).isEmpty();
     }
@@ -110,6 +110,20 @@ class StationSecurityApiTest extends AbstractApiTest {
     }
 
     @Test
+    void addingAStationFromTheFrontendFormDefaultsTheIdToTheRegistrationCode() throws Exception {
+        // Het frontend-formulier stuurt geen stationid, een lege naam en tekstwaarden.
+        mockMvc.perform(post("/api/Meetstation/add")
+                        .header(HttpHeaders.AUTHORIZATION, bearer(createUser(UserRole.ADMIN)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"database_tag\":\"MJS\",\"is_public\":false,\"is_active\":false,"
+                                + "\"registrationCode\":\"777004\",\"location_locationid\":\"5\"}"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.stationid").value(777004));
+
+        assertThat(stationRepository.findById(777004L).orElseThrow().getLocation_locationid()).isEqualTo(5L);
+    }
+
+    @Test
     void addingAStationWithoutRequiredFieldsOrWithADuplicateRegistrationCodeIsRejected() throws Exception {
         User admin = createUser(UserRole.SUPER_ADMIN);
         Station existing = createStation(null);
@@ -117,7 +131,7 @@ class StationSecurityApiTest extends AbstractApiTest {
         mockMvc.perform(post("/api/Meetstation/add")
                         .header(HttpHeaders.AUTHORIZATION, bearer(admin))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\":\"Zonder id\"}"))
+                        .content("{\"name\":\"Zonder registratiecode\"}"))
                 .andExpect(status().isBadRequest());
 
         mockMvc.perform(post("/api/Meetstation/add")

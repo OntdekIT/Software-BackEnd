@@ -4,6 +4,7 @@ import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.features.station.Station;
 import Ontdekstation013.ClimateChecker.features.station.StationService;
 import Ontdekstation013.ClimateChecker.features.user.PasswordEncodingService;
+import Ontdekstation013.ClimateChecker.features.user.PasswordRules;
 import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.UserMapper;
 import Ontdekstation013.ClimateChecker.features.user.UserService;
@@ -61,8 +62,12 @@ public class UserAuthenticationController {
     }
 
     @PostMapping("register")
-    public ResponseEntity<?> createNewUser(@Valid @RequestBody RegisterUserRequest registerRequest) throws MessagingException {
+    public ResponseEntity<?> createNewUser(@RequestBody RegisterUserRequest registerRequest) throws MessagingException {
         try {
+            // Plain-text 400 (like the other register errors), the frontend shows the body as-is.
+            if (registerRequest.password() == null || !registerRequest.password().matches(PasswordRules.PATTERN)) {
+                throw new InvalidArgumentException("Wachtwoord moet 8 tot 128 tekens lang zijn en minstens een hoofdletter en een cijfer bevatten");
+            }
             if (!workshopService.verifyWorkshopCode(registerRequest.workshopCode())) {
                 throw new InvalidArgumentException("Ongeldige workshopcode");
             }
