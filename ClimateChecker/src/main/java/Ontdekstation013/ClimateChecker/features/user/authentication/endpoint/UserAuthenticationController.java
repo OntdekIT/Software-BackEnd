@@ -61,7 +61,7 @@ public class UserAuthenticationController {
     }
 
     @PostMapping("register")
-    public ResponseEntity<?> createNewUser(@RequestBody RegisterUserRequest registerRequest) throws MessagingException {
+    public ResponseEntity<?> createNewUser(@Valid @RequestBody RegisterUserRequest registerRequest) throws MessagingException {
         try {
             if (!workshopService.verifyWorkshopCode(registerRequest.workshopCode())) {
                 throw new InvalidArgumentException("Ongeldige workshopcode");
@@ -184,23 +184,21 @@ public class UserAuthenticationController {
         if (isRateLimited("forgot-password", request, forgotPasswordRequest.email())) {
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(RATE_LIMIT_MESSAGE);
         }
+        // Altijd dezelfde reactie, ongeacht of het adres bekend is of de mail lukt:
+        // anders kunnen bestaande accounts worden achterhaald (account enumeration).
         try {
-            User user = userService.getUserByEmail(forgotPasswordRequest.email());
+            User user = forgotPasswordRequest.email() == null
+                    ? null
+                    : userService.getUserByEmail(forgotPasswordRequest.email());
 
             if (user != null) {
                 Token token = tokenService.createVerifyToken(user.getUserId(), TokenType.PASSWORD_RESET);
                 emailSenderService.sendForgotPasswordMail(user.getEmail(), user.getFirstName(), user.getLastName(), token.getNumericCode());
-            } else {
-                throw new InvalidArgumentException("Invalid email");
             }
-
-            return ResponseEntity.ok().build();
-        }  catch (InvalidArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
             log.error("Unexpected error during forgot-password request", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Er is een onverwachte fout opgetreden.");
         }
+        return ResponseEntity.ok().build();
     }
 
     // Not necessary when using JWTs
