@@ -65,6 +65,51 @@ De backend genereert zijn eigen API-documentatie uit de code (springdoc-openapi)
 - De specificatie staat ingecheckt in `docs/api/openapi.json` en `OpenApiSpecTest` faalt als code en bestand uit elkaar lopen. Verversen na een wijziging in de controllers: `cd ClimateChecker && ./mvnw test -Dtest=OpenApiSpecTest -Dopenapi.update=true`.
 - De Postman-collectie `postman/ClimateChecker.postman_collection.json` wordt daaruit gegenereerd met `./scripts/generate-postman.sh` (vereist Node.js; importeer het bestand in Postman). Zet de collectievariabele `baseUrl` (standaard `http://localhost:8082`) en plak je JWT in `bearerToken`.
 
+### Dataflow
+
+Een verzoek van de app roept meetjestad.net nooit aan. Alle werk gebeurt op de achtergrond, de app leest alleen voorberekende gegevens.
+
+```
+meetjestad.net --(IngestWorker, elke 5 min, incrementeel)--> database --(na elke run)--> snapshots (geheugen) --> endpoints
+```
+
+**Ingest-worker.** De `IngestWorker` is de enige aanroeper van meetjestad.net. Hij haalt periodiek alleen metingen op sinds de vorige geslaagde run (plus een overlap van 10 minuten), slaat ze idempotent op (sleutel: station + tijdstip, dus geen dubbelen bij overlap of herstart) en ververst daarna de snapshots. Runs overlappen nooit (single-flight). Hij houdt een minimale tussentijd en een maximum per uur aan, en wacht na een fout (429, 5xx, time-out) exponentieel langer met jitter; een `Retry-After` van de bron wint als die langer is. De bron publiceert geen vast limiet, daarom zijn de defaults voorzichtig. Na een herstart gaat hij verder vanaf de nieuwste meting in de database (maximaal 7 dagen terug).
+
+**Snapshots.** Na elke ingest-run (ook na een mislukte, zodat de status klopt) worden in een keer, atomair, opnieuw berekend: de stations met laatste meting (`/api/meetstation/stations-met-measurements`), de wijken voor "nu" (`/api/neighbourhood/history`), de time-lapse over 24 uur met 24 en 25 stappen (`/api/neighbourhood/history/timelapse`) en de geconsolideerde staat (`/api/snapshot`). Een verzoek voor "nu" (binnen `snapshot.now-tolerance-seconds`) of een standaard time-lapse wordt hieruit beantwoord. Een ander tijdstip wordt uit de lokale database berekend en per minuut 60 s gecachet (Caffeine). Is er bij het opstarten nog geen snapshot, dan wordt hij uit de database opgebouwd; een lege database geeft lege lijsten, geen live-aanroep. De legacy-endpoints houden hun vorm en tijdnotatie (`dd-MM-yyyy HH:mm:ss`).
+
+**Versheid.** Elk kaartantwoord heeft de header `X-Data-As-Of` (ISO-8601 UTC, tijdstip van de laatste geslaagde ingest), zichtbaar voor browsers via de CORS-exposed headers. `GET /api/status` toont de ingest-status (`lastSuccessAt`, `lastAttemptAt`, `lastError`, `consecutiveFailures`, `nextAttemptAt`, `stale`). De readiness-check (`/actuator/health/readiness`) geeft `DEGRADED` (HTTP 200, geen herstart) als de laatste geslaagde ingest ouder is dan `ingest.stale-after-minutes`.
+
+**`GET /api/snapshot`.** Een compacte JSON met alles wat Kaart, Heatmap, Wijken en Dashboard nodig hebben, zodat ze het per constructie eens zijn. Alle tijden zijn ISO-8601 UTC, gemiddelden zijn `null` als er geen actuele waarde is (nooit NaN, nooit een oude waarde). Het formaat is stabiel: velden worden alleen toegevoegd (zie `schemaVersion`).
+
+| Onderdeel | Inhoud |
+| --- | --- |
+| `dataAsOf`, `generatedAt`, `recencyMinutes`, `ingest` | versheid en status van de ingest |
+| `wijken[]` | `id`, `name`, `avgTemp`, `avgPm25`, `stationCount`, `lastMeasurementAt`, `series[24]` (uurwaarden, `t` is het einde van het uur) |
+| `city` | `avgTemp`, `avgPm25` (gemiddelde over wijken met actuele waarde), `warmest`, `coldest` (gelijk: op naam), `biggestChange` over 24 uur |
+| `stations[]` | `id`, `name`, `latitude`, `longitude`, `isActive`, `latest{timestamp,temperature,humidity,pm25,pm10}`, `flags`, `status` (`ok` of `no_current_value`), `reason` (`uitval`, `sensorfout`, `late_meting`), `lastMeasurementAt` (ook voor offline stations) |
+| `network` | `stationsTotal`, `active`, `offline`, `withSensorErrors`, `coveragePercent24h` (aandeel station-uren met data, over alle stations) |
+| `heatmapPoints[]` | stations met actuele temperatuur: `latitude`, `longitude`, `temperature`, `pm25`, `ageMinutes` |
+
+Recentieregel: een waarde is actueel als de meting hoogstens `snapshot.recency-minutes` (standaard 120) oud is. Per station en grootheid telt de nieuwste niet-lege waarde binnen die termijn. Een wijk met alleen een oudere waarde krijgt `null`. Het antwoord heeft een zwakke `ETag` (`If-None-Match` geeft 304) en `Cache-Control: public, max-age=30`, en wordt gzip-gecomprimeerd.
+
+**Configuratie** (property of env-var, alle met een default):
+
+| Property | Env-var | Default | Betekenis |
+| --- | --- | --- | --- |
+| `ingest.enabled` | `INGEST_ENABLED` | `true` | kill switch: uit betekent geen enkele externe aanroep |
+| `ingest.interval-seconds` | `INGEST_INTERVAL_SECONDS` | `300` | tijd tussen runs |
+| `ingest.overlap-minutes` | `INGEST_OVERLAP_MINUTES` | `10` | overlap met het vorige venster |
+| `ingest.initial-window-hours` | `INGEST_INITIAL_WINDOW_HOURS` | `24` | eerste venster bij een lege database |
+| `ingest.max-catch-up-hours` | `INGEST_MAX_CATCH_UP_HOURS` | `168` | maximale inhaalperiode na stilstand |
+| `ingest.min-request-interval-seconds` | `INGEST_MIN_REQUEST_INTERVAL_SECONDS` | `60` | minimale tijd tussen verzoeken |
+| `ingest.max-requests-per-hour` | `INGEST_MAX_REQUESTS_PER_HOUR` | `30` | maximum verzoeken per uur |
+| `ingest.backoff-initial-seconds` / `ingest.backoff-max-seconds` | `INGEST_BACKOFF_INITIAL_SECONDS` / `INGEST_BACKOFF_MAX_SECONDS` | `30` / `1800` | backoff na fouten |
+| `ingest.stale-after-minutes` | `INGEST_STALE_AFTER_MINUTES` | `30` | daarna is de readiness `DEGRADED` |
+| `snapshot.recency-minutes` | `SNAPSHOT_RECENCY_MINUTES` | `120` | recentieregel |
+| `snapshot.now-tolerance-seconds` | `SNAPSHOT_NOW_TOLERANCE_SECONDS` | `300` | marge voor "nu" |
+| `snapshot.cache-max-age-seconds` | `SNAPSHOT_CACHE_MAX_AGE_SECONDS` | `30` | `max-age` van `/api/snapshot` |
+| `map.cache.ttl-seconds` / `map.cache.max-entries` / `map.cache.timelapse-max-entries` | `MAP_CACHE_TTL_SECONDS` / `MAP_CACHE_MAX_ENTRIES` / `MAP_CACHE_TIMELAPSE_MAX_ENTRIES` | `60` / `120` / `20` | cache voor andere tijdstippen |
+
 ### Mailserver configuratie
 De backend kan e-mails versturen via een echte SMTP-server of de verzending onderdrukken (bijv. voor tests).
 

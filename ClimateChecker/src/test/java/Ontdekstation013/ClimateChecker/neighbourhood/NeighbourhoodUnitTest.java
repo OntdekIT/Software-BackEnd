@@ -2,6 +2,7 @@ package Ontdekstation013.ClimateChecker.neighbourhood;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import Ontdekstation013.ClimateChecker.features.measurement.LocalMeasurementReader;
 import Ontdekstation013.ClimateChecker.features.measurement.Measurement;
 import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadService;
 import Ontdekstation013.ClimateChecker.features.neighbourhood.Neighbourhood;
@@ -25,6 +26,9 @@ public class NeighbourhoodUnitTest {
 
     @Mock
     private MeetJeStadService meetJeStadService;
+
+    @Mock
+    private LocalMeasurementReader localMeasurementReader;
     private List<Measurement> measurementList;
 
     @Mock

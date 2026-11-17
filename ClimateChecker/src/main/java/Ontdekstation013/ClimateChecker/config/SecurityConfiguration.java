@@ -58,6 +58,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/measurement/coverage").hasAnyAuthority(UserRole.ADMIN.name(), UserRole.SUPER_ADMIN.name())
                         .requestMatchers("/api/measurement/**").permitAll()
                         .requestMatchers("/api/neighbourhood/**").permitAll()
+                        .requestMatchers("/api/snapshot", "/api/status").permitAll()
                         .requestMatchers("/api/e2e/**").permitAll()
                         .requestMatchers("/api/my-account/**").authenticated()
                         .anyRequest().authenticated()

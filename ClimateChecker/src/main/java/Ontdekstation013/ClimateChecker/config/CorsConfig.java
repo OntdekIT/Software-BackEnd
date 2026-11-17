@@ -31,6 +31,8 @@ public class CorsConfig {
                         .allowedOrigins(allowedOrigins)
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
                         .allowedHeaders("*")
+                        // Zodat de frontend de versheid (X-Data-As-Of) en ETag kan lezen.
+                        .exposedHeaders("X-Data-As-Of", "ETag")
                         .allowCredentials(true);
             }
         };

@@ -153,8 +153,16 @@ public class StationService {
 
     @Async
     public CompletableFuture<List<StationDto>> getStationsWithMeasurements(Instant timestamp) {
+        return CompletableFuture.completedFuture(assembleStations(measurementService.getMeasurementsAtTime(timestamp)));
+    }
+
+    /** Alle stations uit de database met de gegeven metingen eraan gekoppeld (zonder cache, voor snapshots). */
+    public List<StationDto> getStationsWithMeasurementsUncached(Instant timestamp) {
+        return assembleStations(measurementService.computeMeasurementsAtTime(timestamp));
+    }
+
+    private List<StationDto> assembleStations(List<MeasurementDto> measurements) {
         List<Station> stations = stationRepository.findAll();
-        List<MeasurementDto> measurements = measurementService.getMeasurementsAtTime(timestamp);
 
         Map<Long, StationDto> stationMap = new HashMap<>();
 
@@ -203,7 +211,7 @@ public class StationService {
             stationMap.get(stationId).measurementDtoList.add(measurement);
         }
 
-        return CompletableFuture.completedFuture(new ArrayList<>(stationMap.values()));
+        return new ArrayList<>(stationMap.values());
     }
 
     public void UpdateStationsInDatabase(Instant timestamp) {

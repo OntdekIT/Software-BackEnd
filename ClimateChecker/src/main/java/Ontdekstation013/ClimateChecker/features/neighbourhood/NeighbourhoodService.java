@@ -1,6 +1,9 @@
 package Ontdekstation013.ClimateChecker.features.neighbourhood;
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.exception.NotFoundException;
+import Ontdekstation013.ClimateChecker.cache.CacheNames;
+import Ontdekstation013.ClimateChecker.cache.TimeBuckets;
+import Ontdekstation013.ClimateChecker.features.measurement.LocalMeasurementReader;
 import Ontdekstation013.ClimateChecker.features.measurement.Measurement;
 import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadParameters;
 import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadService;
@@ -18,6 +21,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.client.RestClientException;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -25,6 +29,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class NeighbourhoodService {
     private final MeetJeStadService meetJeStadService;
+    private final LocalMeasurementReader localMeasurementReader;
     private final NeighbourhoodRepository neighbourhoodRepository;
     private final ZoneId applicationZone;
 
@@ -62,20 +67,28 @@ public class NeighbourhoodService {
         return neighbourhoodDtos;
     }
 
+    /**
+     * Alle wijken met gemiddelden op het tijdstip, uit de lokale database. Het tijdstip wordt op de
+     * minuut naar beneden afgerond; de uitkomst wordt per minuut 60 s gecachet (zie CacheConfig).
+     */
+    @Cacheable(cacheNames = CacheNames.NEIGHBOURHOODS_AT_TIME,
+            key = "T(Ontdekstation013.ClimateChecker.cache.TimeBuckets).floorToMinute(#dateTime)")
     public List<NeighbourhoodDto> getNeighbourhoodsAtTime(Instant dateTime) {
+        return computeNeighbourhoodsAtTime(dateTime);
+    }
+
+    /** Zoals {@link #getNeighbourhoodsAtTime}, maar zonder cache: voor het bouwen van snapshots. */
+    public List<NeighbourhoodDto> computeNeighbourhoodsAtTime(Instant dateTime) {
         List<Neighbourhood> neighbourhoods = neighbourhoodRepository.findAll();
 
-        return getNeighbourhoodsAverageTemp(neighbourhoods, getClosestMeasurementsAtTime(dateTime));
+        return getNeighbourhoodsAverageTemp(neighbourhoods, getClosestMeasurementsAtTime(TimeBuckets.floorToMinute(dateTime)));
     }
 
     /** The measurement per station that is closest to {@code dateTime}, within the usual margin before it. */
     private List<Measurement> getClosestMeasurementsAtTime(Instant dateTime) {
         int minuteMargin = meetJeStadService.getMinuteLimit();
-        MeetJeStadParameters params = new MeetJeStadParameters();
-        params.StartDate = dateTime.minus(Duration.ofMinutes(minuteMargin));
-        params.EndDate = dateTime;
-        params.includeFaultyMeasurements = false;
-        List<Measurement> allMeasurements = meetJeStadService.getMeasurements(params);
+        List<Measurement> allMeasurements = localMeasurementReader.getMeasurements(
+                dateTime.minus(Duration.ofMinutes(minuteMargin)), dateTime, false);
 
         return MeasurementLogic.filterClosestMeasurements(allMeasurements, dateTime);
     }
@@ -88,8 +101,8 @@ public class NeighbourhoodService {
      * Bouwt een time-lapse van de heatmap: per tijdstap de gemiddelde temperatuur
      * en PM2.5 per wijk.
      *
-     * <p>De winst zit in één enkele aanroep naar MeetJeStad. {@link #getNeighbourhoodsAtTime}
-     * haalt per tijdstip het hele meetvenster op (standaard 24 uur aan metingen van
+     * <p>De winst zit in één enkele query op de lokale database. {@link #getNeighbourhoodsAtTime}
+     * leest per tijdstip het hele meetvenster (standaard 24 uur aan metingen van
      * alle stations); dat 24 keer achter elkaar doen voor een time-lapse is zonde,
      * want die vensters overlappen bijna volledig. Hier wordt het bereik
      * {@code [from - venster, to]} één keer opgehaald en worden alle stappen uit
@@ -104,12 +117,22 @@ public class NeighbourhoodService {
      * @param to    tijdstip van de laatste stap
      * @param steps aantal stappen, inclusief begin en eind
      */
-    public NeighbourhoodTimelapseResponse getNeighbourhoodTimelapse(Instant from, Instant to, int steps) {
+    @Cacheable(cacheNames = CacheNames.NEIGHBOURHOOD_TIMELAPSE,
+            key = "T(Ontdekstation013.ClimateChecker.cache.TimeBuckets).timelapseKey(#rawFrom, #rawTo, #steps)")
+    public NeighbourhoodTimelapseResponse getNeighbourhoodTimelapse(Instant rawFrom, Instant rawTo, int steps) {
+        return computeNeighbourhoodTimelapse(rawFrom, rawTo, steps);
+    }
+
+    /** Zoals {@link #getNeighbourhoodTimelapse}, maar zonder cache: voor het bouwen van snapshots. */
+    public NeighbourhoodTimelapseResponse computeNeighbourhoodTimelapse(Instant rawFrom, Instant rawTo, int steps) {
+        // Begin en eind op de minuut, zodat de uitkomst bij de cachesleutel past.
+        Instant from = TimeBuckets.floorToMinute(rawFrom);
+        Instant to = TimeBuckets.floorToMinute(rawTo);
         if (steps < MIN_TIMELAPSE_STEPS || steps > MAX_TIMELAPSE_STEPS) {
             throw new InvalidArgumentException(
                     "steps must be between " + MIN_TIMELAPSE_STEPS + " and " + MAX_TIMELAPSE_STEPS);
         }
-        if (!from.isBefore(to)) {
+        if (!rawFrom.isBefore(rawTo)) {
             throw new InvalidArgumentException("'from' must be before 'to'");
         }
 
@@ -118,11 +141,8 @@ public class NeighbourhoodService {
 
         // Eén aanroep voor het hele bereik, inclusief het meetvenster vóór de
         // eerste stap zodat ook die stap metingen kan vinden.
-        MeetJeStadParameters params = new MeetJeStadParameters();
-        params.StartDate = from.minus(Duration.ofMinutes(minuteMargin));
-        params.EndDate = to;
-        params.includeFaultyMeasurements = false;
-        List<Measurement> allMeasurements = meetJeStadService.getMeasurements(params);
+        List<Measurement> allMeasurements = localMeasurementReader.getMeasurements(
+                from.minus(Duration.ofMinutes(minuteMargin)), to, false);
 
         // Wijkgrenzen en de wijk per meting eenmalig bepalen.
         List<NeighbourhoodTimelapseResponse.TimelapseNeighbourhood> neighbourhoodDtos = new ArrayList<>();
@@ -217,7 +237,7 @@ public class NeighbourhoodService {
         historicalParams.StartDate = startDate;
         historicalParams.EndDate = endDate;
         historicalParams.includeFaultyMeasurements = true;
-        List<Measurement> allMeasurements = meetJeStadService.getMeasurements(historicalParams);
+        List<Measurement> allMeasurements = localMeasurementReader.getMeasurements(historicalParams);
 
         Set<Integer> stationIds = allMeasurements.stream()
                 .filter(measurement -> {
@@ -252,7 +272,7 @@ public class NeighbourhoodService {
         params.StartDate = from;
         params.EndDate = to;
         params.includeFaultyMeasurements = true;
-        List<Measurement> allMeasurements = meetJeStadService.getMeasurements(params);
+        List<Measurement> allMeasurements = localMeasurementReader.getMeasurements(params);
 
         Set<Integer> stationIds = allMeasurements.stream()
                 .filter(m -> m.getStation() != null)

@@ -3,10 +3,12 @@ package Ontdekstation013.ClimateChecker.measurement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import Ontdekstation013.ClimateChecker.features.measurement.LocalMeasurementReader;
 import Ontdekstation013.ClimateChecker.features.measurement.Measurement;
 import Ontdekstation013.ClimateChecker.features.measurement.MeasurementService;
 import Ontdekstation013.ClimateChecker.features.measurement.endpoint.MeasurementDto;
@@ -19,16 +21,17 @@ import java.time.ZoneOffset;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 public class MeasurementServiceTest {
     private MeetJeStadService meetJeStadService;
+    private LocalMeasurementReader localMeasurementReader;
     private MeasurementService service;
 
     @BeforeEach
     public void setUp() {
         meetJeStadService = mock(MeetJeStadService.class);
-        service = new MeasurementService(meetJeStadService, ZoneOffset.UTC);
+        localMeasurementReader = mock(LocalMeasurementReader.class);
+        service = new MeasurementService(meetJeStadService, localMeasurementReader, ZoneOffset.UTC);
     }
 
     private static Measurement measurement(Instant timestamp, Float temperature) {
@@ -64,14 +67,12 @@ public class MeasurementServiceTest {
     public void getMeasurementsAtTime_asksForTheMinuteMarginBeforeTheGivenTime() {
         Instant now = Instant.parse("2026-01-01T12:00:00Z");
         when(meetJeStadService.getMinuteLimit()).thenReturn(1440);
-        when(meetJeStadService.getMeasurements(any())).thenReturn(List.of(measurement(now, 15f)));
+        when(localMeasurementReader.getMeasurements(any(), any(), anyBoolean()))
+                .thenReturn(List.of(measurement(now, 15f)));
 
         List<MeasurementDto> result = service.getMeasurementsAtTime(now);
 
-        ArgumentCaptor<MeetJeStadParameters> captor = ArgumentCaptor.forClass(MeetJeStadParameters.class);
-        verify(meetJeStadService).getMeasurements(captor.capture());
-        assertEquals(now, captor.getValue().EndDate);
-        assertEquals(now.minusSeconds(1440 * 60L), captor.getValue().StartDate);
+        verify(localMeasurementReader).getMeasurements(now.minusSeconds(1440 * 60L), now, false);
         assertEquals(1, result.size());
         assertEquals(5, result.get(0).getId());
     }
@@ -79,7 +80,7 @@ public class MeasurementServiceTest {
     @Test
     public void getDailyMeasurements_convertsEntitiesToDtosWithDutchTimestamp() {
         Instant time = Instant.parse("2026-01-01T12:00:00Z");
-        when(meetJeStadService.getMeasurements(any())).thenReturn(List.of(measurement(time, 15f)));
+        when(localMeasurementReader.getMeasurements(any(MeetJeStadParameters.class))).thenReturn(List.of(measurement(time, 15f)));
 
         List<MeasurementDto> result = service.GetDailyMeasurements(time);
 
@@ -90,7 +91,7 @@ public class MeasurementServiceTest {
 
     @Test
     public void getDailyMeasurements_returnsEmptyListWhenThereAreNoMeasurements() {
-        when(meetJeStadService.getMeasurements(any())).thenReturn(List.of());
+        when(localMeasurementReader.getMeasurements(any(MeetJeStadParameters.class))).thenReturn(List.of());
 
         assertTrue(service.GetDailyMeasurements(Instant.now()).isEmpty());
     }

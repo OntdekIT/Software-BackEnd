@@ -428,6 +428,86 @@
       ]
     },
     {
+      "name": "Snapshot",
+      "description": "Vooraf berekende staat van het netwerk en de status van de data-ingest",
+      "item": [
+        {
+          "name": "Geef de volledige actuele staat van het netwerk in een keer",
+          "request": {
+            "name": "Geef de volledige actuele staat van het netwerk in een keer",
+            "description": {
+              "content": "Wijken (actuele gemiddelden en 24-uurs reeks), stad, stations met laatste meting en reden bij ontbrekende data, netwerkgezondheid en heatmap-punten. Alle tijden zijn ISO-8601 UTC. Ondersteunt ETag en If-None-Match (304).",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "snapshot"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "disabled": false,
+                "description": {
+                  "content": "",
+                  "type": "text/plain"
+                },
+                "key": "If-None-Match",
+                "value": "<string>"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "body": {},
+            "auth": null
+          },
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "name": "Status van de data-ingest en de snapshots",
+          "request": {
+            "name": "Status van de data-ingest en de snapshots",
+            "description": {},
+            "url": {
+              "path": [
+                "api",
+                "status"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "method": "GET",
+            "body": {},
+            "auth": null
+          },
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ]
+    },
+    {
       "name": "Wijken",
       "description": "Wijken met gemiddelde meetwaarden, onder andere voor de heatmap",
       "item": [

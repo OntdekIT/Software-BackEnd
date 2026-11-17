@@ -7,7 +7,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import Ontdekstation013.ClimateChecker.features.measurement.Measurement;
-import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadService;
+import Ontdekstation013.ClimateChecker.features.measurement.LocalMeasurementReader;
 import Ontdekstation013.ClimateChecker.features.station.Station;
 import Ontdekstation013.ClimateChecker.features.station.StationMonitorService;
 import Ontdekstation013.ClimateChecker.features.station.StationService;
@@ -25,7 +25,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 public class StationMonitorServiceTest {
     @Mock
-    private MeetJeStadService meetJeStadService;
+    private LocalMeasurementReader localMeasurementReader;
 
     @Mock
     private StationService stationService;
@@ -42,7 +42,7 @@ public class StationMonitorServiceTest {
     public void setUp() {
         // Intervallen zijn nu configureerbaar; geef vaste testwaarden mee.
         stationMonitorService = new StationMonitorService(
-                stationService, measurementService, meetJeStadService, emailSenderService, 300L, 21600L);
+                stationService, measurementService, localMeasurementReader, emailSenderService, 300L, 21600L);
     }
 
     @Test
@@ -60,7 +60,7 @@ public class StationMonitorServiceTest {
         List<Measurement> emptyMeasurements = Collections.emptyList();
 
         when(stationService.findAll()).thenReturn(List.of(station));
-        when(meetJeStadService.getMeasurements(any())).thenReturn(emptyMeasurements);
+        when(localMeasurementReader.getMeasurements(any())).thenReturn(emptyMeasurements);
 
         // Act
         stationMonitorService.checkMeetstations();
@@ -92,7 +92,7 @@ public class StationMonitorServiceTest {
         m.setLongitude(5.0f);
 
         when(stationService.findAll()).thenReturn(List.of(station));
-        when(meetJeStadService.getMeasurements(any())).thenReturn(List.of(m));
+        when(localMeasurementReader.getMeasurements(any())).thenReturn(List.of(m));
 
         // Act
         stationMonitorService.checkMeetstations();
@@ -124,7 +124,7 @@ public class StationMonitorServiceTest {
         m.setLongitude(5.0f);
 
         when(stationService.findAll()).thenReturn(List.of(station));
-        when(meetJeStadService.getMeasurements(any())).thenReturn(List.of(m));
+        when(localMeasurementReader.getMeasurements(any())).thenReturn(List.of(m));
 
         // Act
         stationMonitorService.checkMeetstations();
@@ -160,7 +160,7 @@ public class StationMonitorServiceTest {
         m.setLongitude(5.0f);
 
         when(stationService.findAll()).thenReturn(List.of(station));
-        when(meetJeStadService.getMeasurements(any())).thenReturn(List.of(m));
+        when(localMeasurementReader.getMeasurements(any())).thenReturn(List.of(m));
 
         // Act
         stationMonitorService.checkMeetstations();
@@ -192,7 +192,7 @@ public class StationMonitorServiceTest {
         m.setLongitude(5.0f);
 
         when(stationService.findAll()).thenReturn(List.of(station));
-        when(meetJeStadService.getMeasurements(any())).thenReturn(List.of(m));
+        when(localMeasurementReader.getMeasurements(any())).thenReturn(List.of(m));
 
         // Act
         stationMonitorService.checkMeetstations();
@@ -224,7 +224,7 @@ public class StationMonitorServiceTest {
         m.setLongitude(5.0f);
 
         when(stationService.findAll()).thenReturn(List.of(station));
-        when(meetJeStadService.getMeasurements(any())).thenReturn(List.of(m));
+        when(localMeasurementReader.getMeasurements(any())).thenReturn(List.of(m));
 
         // Act
         stationMonitorService.checkMeetstations();
@@ -256,7 +256,7 @@ public class StationMonitorServiceTest {
         m.setLongitude(5.0f);
 
         when(stationService.findAll()).thenReturn(List.of(station));
-        when(meetJeStadService.getMeasurements(any())).thenReturn(List.of(m));
+        when(localMeasurementReader.getMeasurements(any())).thenReturn(List.of(m));
 
         // Act
         stationMonitorService.checkMeetstations();
@@ -287,7 +287,7 @@ public class StationMonitorServiceTest {
         m.setLocationInherited(true);
 
         when(stationService.findAll()).thenReturn(List.of(station));
-        when(meetJeStadService.getMeasurements(any())).thenReturn(List.of(m));
+        when(localMeasurementReader.getMeasurements(any())).thenReturn(List.of(m));
 
         stationMonitorService.checkMeetstations();
 
