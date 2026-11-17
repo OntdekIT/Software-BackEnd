@@ -3,12 +3,13 @@ package Ontdekstation013.ClimateChecker.neighbourhood;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 import Ontdekstation013.ClimateChecker.exception.NotFoundException;
+import Ontdekstation013.ClimateChecker.features.measurement.LocalMeasurementReader;
 import Ontdekstation013.ClimateChecker.features.measurement.Measurement;
-import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadParameters;
 import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadService;
 import Ontdekstation013.ClimateChecker.features.neighbourhood.Neighbourhood;
 import Ontdekstation013.ClimateChecker.features.neighbourhood.NeighbourhoodCoords;
@@ -34,6 +35,9 @@ class NeighbourhoodByIdTest {
     private MeetJeStadService meetJeStadService;
 
     @Mock
+    private LocalMeasurementReader localMeasurementReader;
+
+    @Mock
     private NeighbourhoodRepository neighbourhoodRepository;
 
     private NeighbourhoodService service;
@@ -41,7 +45,7 @@ class NeighbourhoodByIdTest {
 
     @BeforeEach
     void setUp() {
-        service = new NeighbourhoodService(meetJeStadService, neighbourhoodRepository, ZoneOffset.UTC);
+        service = new NeighbourhoodService(meetJeStadService, localMeasurementReader, neighbourhoodRepository, ZoneOffset.UTC);
 
         lars = new Neighbourhood(1, "Lars");
         lars.setCoordinates(List.of(
@@ -64,7 +68,7 @@ class NeighbourhoodByIdTest {
     @Test
     void averageTemperatureIsCalculatedFromTheMeasurementsInsideTheNeighbourhood() {
         when(meetJeStadService.getMinuteLimit()).thenReturn(1440);
-        when(meetJeStadService.getMeasurements(any(MeetJeStadParameters.class))).thenReturn(List.of(
+        when(localMeasurementReader.getMeasurements(any(), any(), anyBoolean())).thenReturn(List.of(
                 measurement(1, 51.578f, 4.99298f, 20.0f),
                 measurement(2, 51.578f, 4.99000f, 24.0f),
                 // Outside the neighbourhood: must not count.
@@ -82,7 +86,7 @@ class NeighbourhoodByIdTest {
     @Test
     void averageTemperatureIsNaNWhenThereAreNoMeasurementsInTheNeighbourhood() {
         when(meetJeStadService.getMinuteLimit()).thenReturn(1440);
-        when(meetJeStadService.getMeasurements(any(MeetJeStadParameters.class)))
+        when(localMeasurementReader.getMeasurements(any(), any(), anyBoolean()))
                 .thenReturn(List.of(measurement(3, 51.700f, 5.10000f, 40.0f)));
 
         NeighbourhoodDto dto = service.getNeighbourhoodById(1L);
@@ -94,7 +98,7 @@ class NeighbourhoodByIdTest {
     @Test
     void neighbourhoodIsStillReturnedWhenTheDataSourceIsUnreachable() {
         when(meetJeStadService.getMinuteLimit()).thenReturn(1440);
-        when(meetJeStadService.getMeasurements(any(MeetJeStadParameters.class)))
+        when(localMeasurementReader.getMeasurements(any(), any(), anyBoolean()))
                 .thenThrow(new ResourceAccessException("meetjestad.net onbereikbaar"));
 
         NeighbourhoodDto dto = service.getNeighbourhoodById(1L);

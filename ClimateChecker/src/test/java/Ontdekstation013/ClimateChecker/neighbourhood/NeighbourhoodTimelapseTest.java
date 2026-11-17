@@ -6,13 +6,14 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
+import Ontdekstation013.ClimateChecker.features.measurement.LocalMeasurementReader;
 import Ontdekstation013.ClimateChecker.features.measurement.Measurement;
-import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadParameters;
 import Ontdekstation013.ClimateChecker.features.meetjestad.MeetJeStadService;
 import Ontdekstation013.ClimateChecker.features.neighbourhood.Neighbourhood;
 import Ontdekstation013.ClimateChecker.features.neighbourhood.NeighbourhoodCoords;
@@ -46,6 +47,9 @@ public class NeighbourhoodTimelapseTest {
 
     @Mock
     private MeetJeStadService meetJeStadService;
+
+    @Mock
+    private LocalMeasurementReader localMeasurementReader;
 
     @Mock
     private NeighbourhoodRepository neighbourhoodRepository;
@@ -120,7 +124,7 @@ public class NeighbourhoodTimelapseTest {
 
         when(meetJeStadService.getMinuteLimit()).thenReturn(MINUTE_LIMIT);
         when(neighbourhoodRepository.findAll()).thenReturn(List.of(squareNeighbourhood(1L, "Centrum", 51.50f, 5.00f)));
-        when(meetJeStadService.getMeasurements(any())).thenReturn(new ArrayList<>());
+        when(localMeasurementReader.getMeasurements(any(), any(), anyBoolean())).thenReturn(new ArrayList<>());
 
         NeighbourhoodTimelapseResponse response = neighbourhoodService.getNeighbourhoodTimelapse(from, to, 5);
 
@@ -140,12 +144,12 @@ public class NeighbourhoodTimelapseTest {
 
         when(meetJeStadService.getMinuteLimit()).thenReturn(MINUTE_LIMIT);
         when(neighbourhoodRepository.findAll()).thenReturn(List.of(squareNeighbourhood(1L, "Centrum", 51.50f, 5.00f)));
-        when(meetJeStadService.getMeasurements(any())).thenReturn(new ArrayList<>());
+        when(localMeasurementReader.getMeasurements(any(), any(), anyBoolean())).thenReturn(new ArrayList<>());
 
         neighbourhoodService.getNeighbourhoodTimelapse(from, to, 48);
 
         // Dit is de hele reden dat dit endpoint bestaat: 48 stappen, één aanroep.
-        verify(meetJeStadService, times(1)).getMeasurements(any());
+        verify(localMeasurementReader, times(1)).getMeasurements(any(), any(), anyBoolean());
     }
 
     @Test
@@ -155,14 +159,16 @@ public class NeighbourhoodTimelapseTest {
 
         when(meetJeStadService.getMinuteLimit()).thenReturn(MINUTE_LIMIT);
         when(neighbourhoodRepository.findAll()).thenReturn(List.of(squareNeighbourhood(1L, "Centrum", 51.50f, 5.00f)));
-        ArgumentCaptor<MeetJeStadParameters> captor = ArgumentCaptor.forClass(MeetJeStadParameters.class);
-        when(meetJeStadService.getMeasurements(captor.capture())).thenReturn(new ArrayList<>());
+        ArgumentCaptor<Instant> startCaptor = ArgumentCaptor.forClass(Instant.class);
+        ArgumentCaptor<Instant> endCaptor = ArgumentCaptor.forClass(Instant.class);
+        when(localMeasurementReader.getMeasurements(startCaptor.capture(), endCaptor.capture(), anyBoolean()))
+                .thenReturn(new ArrayList<>());
 
         neighbourhoodService.getNeighbourhoodTimelapse(from, to, 4);
 
         // Zonder die marge zou de eerste stap nooit een meting kunnen vinden.
-        assertEquals(from.minus(Duration.ofMinutes(MINUTE_LIMIT)), captor.getValue().StartDate);
-        assertEquals(to, captor.getValue().EndDate);
+        assertEquals(from.minus(Duration.ofMinutes(MINUTE_LIMIT)), startCaptor.getValue());
+        assertEquals(to, endCaptor.getValue());
     }
 
     @Test
@@ -174,7 +180,7 @@ public class NeighbourhoodTimelapseTest {
         when(neighbourhoodRepository.findAll()).thenReturn(List.of(
                 squareNeighbourhood(1L, "Centrum", 51.50f, 5.00f),
                 squareNeighbourhood(2L, "Noord", 51.20f, 5.00f)));
-        when(meetJeStadService.getMeasurements(any())).thenReturn(new ArrayList<>());
+        when(localMeasurementReader.getMeasurements(any(), any(), anyBoolean())).thenReturn(new ArrayList<>());
 
         NeighbourhoodTimelapseResponse response = neighbourhoodService.getNeighbourhoodTimelapse(from, to, 6);
 
@@ -197,7 +203,7 @@ public class NeighbourhoodTimelapseTest {
                 squareNeighbourhood(1L, "Centrum", 51.50f, 5.00f),
                 squareNeighbourhood(2L, "Noord", 51.20f, 5.00f)));
         // Meting ligt in Centrum, niet in Noord.
-        when(meetJeStadService.getMeasurements(any())).thenReturn(List.of(
+        when(localMeasurementReader.getMeasurements(any(), any(), anyBoolean())).thenReturn(List.of(
                 measurement(1L, to.minus(Duration.ofHours(1)), 51.55f, 5.05f, 20.0f)));
 
         NeighbourhoodTimelapseResponse response = neighbourhoodService.getNeighbourhoodTimelapse(from, to, 2);
@@ -221,7 +227,7 @@ public class NeighbourhoodTimelapseTest {
         when(meetJeStadService.getMinuteLimit()).thenReturn(MINUTE_LIMIT);
         when(neighbourhoodRepository.findAll()).thenReturn(List.of(squareNeighbourhood(1L, "Centrum", 51.50f, 5.00f)));
         // Meting valt ná de eerste stap.
-        when(meetJeStadService.getMeasurements(any())).thenReturn(List.of(
+        when(localMeasurementReader.getMeasurements(any(), any(), anyBoolean())).thenReturn(List.of(
                 measurement(1L, to.minus(Duration.ofMinutes(30)), 51.55f, 5.05f, 25.0f)));
 
         NeighbourhoodTimelapseResponse response = neighbourhoodService.getNeighbourhoodTimelapse(from, to, 3);
@@ -237,7 +243,7 @@ public class NeighbourhoodTimelapseTest {
 
         when(meetJeStadService.getMinuteLimit()).thenReturn(MINUTE_LIMIT);
         when(neighbourhoodRepository.findAll()).thenReturn(List.of(squareNeighbourhood(1L, "Centrum", 51.50f, 5.00f)));
-        when(meetJeStadService.getMeasurements(any())).thenReturn(List.of(
+        when(localMeasurementReader.getMeasurements(any(), any(), anyBoolean())).thenReturn(List.of(
                 measurement(1L, to.minus(Duration.ofMinutes(10)), 51.55f, 5.05f, 20.0f),
                 measurement(2L, to.minus(Duration.ofMinutes(20)), 51.56f, 5.06f, 22.0f),
                 // Tweede meting van station 1: telt niet dubbel, alleen de dichtstbijzijnde.
@@ -257,7 +263,7 @@ public class NeighbourhoodTimelapseTest {
 
         when(meetJeStadService.getMinuteLimit()).thenReturn(MINUTE_LIMIT);
         when(neighbourhoodRepository.findAll()).thenReturn(List.of(squareNeighbourhood(1L, "Centrum", 51.50f, 5.00f)));
-        when(meetJeStadService.getMeasurements(any())).thenReturn(List.of(
+        when(localMeasurementReader.getMeasurements(any(), any(), anyBoolean())).thenReturn(List.of(
                 measurement(1L, to.minus(Duration.ofMinutes(10)), 52.90f, 6.90f, 30.0f)));
 
         NeighbourhoodTimelapseResponse response = neighbourhoodService.getNeighbourhoodTimelapse(from, to, 2);
