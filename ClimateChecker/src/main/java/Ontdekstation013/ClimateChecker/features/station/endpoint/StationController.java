@@ -42,9 +42,14 @@ import java.util.concurrent.CompletableFuture;
 
 @Tag(name = "Meetstations", description = "Meetstations opvragen, claimen, bewerken en overdragen")
 @RestController
-@RequestMapping("/api/Meetstation")
+@RequestMapping({StationController.BASE_PATH, StationController.LEGACY_BASE_PATH})
 @CrossOrigin(origins = {"http://localhost:5173"}, allowCredentials = "true")
 public class StationController {
+    /** Canonical (lowercase) base path. */
+    public static final String BASE_PATH = "/api/meetstation";
+    /** Old spelling, kept as an alias so existing clients keep working. Hidden from the OpenAPI spec. */
+    public static final String LEGACY_BASE_PATH = "/api/Meetstation";
+
     private final StationService stationService;
     private final MeasurementService measurementService;
     private final WorkshopService adminService;
@@ -87,7 +92,7 @@ public class StationController {
 // Controller
     @Operation(summary = "Geef meetstations met hun meting op een tijdstip")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer")})
-@GetMapping("/stationsMetMeasurements")
+@GetMapping({"/stations-met-measurements", "/stationsMetMeasurements"})
 public CompletableFuture<ResponseEntity<List<StationDto>>> getMeetstationWithMeasurement(
         @RequestParam(value = "timestamp") String timestamp) {
     try {
@@ -169,7 +174,7 @@ public CompletableFuture<ResponseEntity<List<StationDto>>> getMeetstationWithMea
 
     @Operation(summary = "Controleer of een station beschikbaar is en de workshopcode geldig is")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "Statuscode in de body: 200 ok, 402 station bezet, 403 ongeldige workshopcode"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer")})
-    @GetMapping("/Availibility/{stationId}/{workshopCode}")
+    @GetMapping({"/availability/{stationId}/{workshopCode}", "/Availibility/{stationId}/{workshopCode}"})
     public ResponseEntity<Integer> IsAvailable(@PathVariable Long stationId, @PathVariable Long workshopCode) {
         try {
             if (!stationService.IsAvailable(stationId)) {
@@ -186,7 +191,7 @@ public CompletableFuture<ResponseEntity<List<StationDto>>> getMeetstationWithMea
     @Operation(summary = "Claim een station voor de ingelogde gebruiker")
     @SecurityRequirement(name = OpenApiConfig.BEARER_AUTH)
     @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer"), @ApiResponse(responseCode = "401", description = "Niet ingelogd")})
-    @PutMapping("/Claim")
+    @PutMapping({"/claim", "/Claim"})
     public ResponseEntity<String> ClaimStation(@RequestBody StationDto stationDto, @AuthenticationPrincipal User currentUser) {
         try {
             // Bind the claim to the authenticated user, never to a client-supplied id.

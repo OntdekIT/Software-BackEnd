@@ -41,7 +41,7 @@ class OpenApiDocsTest {
                 .andExpect(jsonPath("$.openapi").value(org.hamcrest.Matchers.startsWith("3.")))
                 .andExpect(jsonPath("$.info.title").value("ClimateChecker API"))
                 .andExpect(jsonPath("$.paths['/api/authentication/login']").exists())
-                .andExpect(jsonPath("$.paths['/api/Meetstation/stations']").exists())
+                .andExpect(jsonPath("$.paths['/api/meetstation/stations']").exists())
                 .andExpect(jsonPath("$.paths['/api/measurement/history']").exists())
                 .andExpect(jsonPath("$.paths['/api/neighbourhood/{id}']").exists())
                 .andExpect(jsonPath("$.paths['/api/users']").exists())
