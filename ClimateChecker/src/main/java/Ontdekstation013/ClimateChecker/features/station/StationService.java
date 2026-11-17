@@ -54,6 +54,9 @@ public class StationService {
 
     public void ClaimMeetstation(Station station) {
         Station existingStation = stationRepository.getMeetstationByStationid(station.getStationid());
+        if (existingStation == null) {
+            throw new NotFoundException("Station not found");
+        }
         existingStation.setUserid(station.getUserid());
         existingStation.setName(station.getName());
         existingStation.setDatabase_tag(station.getDatabase_tag());

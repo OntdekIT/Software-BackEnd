@@ -67,23 +67,20 @@ public class MeasurementController {
      */
     @GetMapping("/history/average/{id}")
     public List<DayMeasurementResponse> getMeasurementsAverage(@PathVariable int id, @RequestParam String startDate, @RequestParam String endDate) {
-
-    try{
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
-        LocalDateTime localDateTimeStart = LocalDateTime.parse(startDate, formatter);
-        Instant startInstant = localDateTimeStart.atZone(ZoneId.systemDefault()).toInstant();
+        Instant startInstant;
+        Instant endInstant;
+        try {
+            startInstant = LocalDateTime.parse(startDate, formatter).atZone(ZoneId.systemDefault()).toInstant();
+            endInstant = LocalDateTime.parse(endDate, formatter).atZone(ZoneId.systemDefault()).toInstant();
+        } catch (DateTimeParseException e) {
+            throw new InvalidArgumentException("Dates must be in dd-MM-yyyy HH:mm format");
+        }
 
-        LocalDateTime localDateTimeEnd = LocalDateTime.parse(endDate, formatter);
-        Instant endInstant = localDateTimeEnd.atZone(ZoneId.systemDefault()).toInstant();
-
-        if (startInstant.isAfter(endInstant)){
+        if (startInstant.isAfter(endInstant)) {
             throw new InvalidArgumentException("Start date is after end date");
         }
         return measurementService.getHistoricalMeasurements(id, startInstant, endInstant);
-        }
-        catch (Exception ex){
-            throw ex;
-        }
     }
 
     /**
@@ -179,15 +176,11 @@ public class MeasurementController {
      */
     @GetMapping("/history/hourly/{id}")
     public List<HourMeasurementResponse> getTodayHourlyMeasurements(@PathVariable int id) {
-        try {
-            LocalDate today = LocalDate.now(ZoneId.systemDefault());
-            Instant startOfDay = today.atStartOfDay(ZoneId.systemDefault()).toInstant();
-            Instant endOfCurrentHour = Instant.now();
+        LocalDate today = LocalDate.now(ZoneId.systemDefault());
+        Instant startOfDay = today.atStartOfDay(ZoneId.systemDefault()).toInstant();
+        Instant endOfCurrentHour = Instant.now();
 
-            return measurementService.getHourlyMeasurements(id, startOfDay, endOfCurrentHour);
-        } catch (Exception ex) {
-            throw ex;
-        }
+        return measurementService.getHourlyMeasurements(id, startOfDay, endOfCurrentHour);
     }
 
     /**
@@ -196,14 +189,10 @@ public class MeasurementController {
      */
     @GetMapping("/history/half-hourly/{id}")
     public List<HalfHourMeasurementResponse> getTodayHalfHourlyMeasurements(@PathVariable int id) {
-        try {
-            LocalDate today = LocalDate.now(ZoneId.systemDefault());
-            Instant startOfDay = today.atStartOfDay(ZoneId.systemDefault()).toInstant();
-            Instant endOfCurrentHour = Instant.now();
+        LocalDate today = LocalDate.now(ZoneId.systemDefault());
+        Instant startOfDay = today.atStartOfDay(ZoneId.systemDefault()).toInstant();
+        Instant endOfCurrentHour = Instant.now();
 
-            return measurementService.getHalfHourlyMeasurements(id, startOfDay, endOfCurrentHour);
-        } catch (Exception ex) {
-            throw ex;
-        }
+        return measurementService.getHalfHourlyMeasurements(id, startOfDay, endOfCurrentHour);
     }
 }
