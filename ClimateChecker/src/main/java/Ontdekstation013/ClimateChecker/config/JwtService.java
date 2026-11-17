@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
@@ -20,7 +21,8 @@ public class JwtService {
 
     private final String secretKey;
 
-    public JwtService(@Value("${application.jwt.secret}") String secretKey) {
+    public JwtService(@Value("${application.jwt.secret}") String secretKey, Environment environment) {
+        JwtSecretGuard.verify(secretKey, environment);
         if (secretKey == null || secretKey.isBlank()) {
             throw new IllegalStateException(
                     "application.jwt.secret (env JWT_SECRET) is not set. Provide a Base64-encoded key of at least "
