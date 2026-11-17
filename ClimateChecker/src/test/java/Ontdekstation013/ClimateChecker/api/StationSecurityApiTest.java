@@ -140,6 +140,6 @@ class StationSecurityApiTest extends AbstractApiTest {
                         .content("{\"stationid\":777003,\"name\":\"Dubbel\",\"registrationCode\":"
                                 + existing.getRegistrationCode() + "}"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$").value("Registratiecode is al in gebruik!"));
+                .andExpect(jsonPath("$.message").value("Registratiecode is al in gebruik!"));
     }
 }

@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
+import Ontdekstation013.ClimateChecker.exception.NotFoundException;
 import Ontdekstation013.ClimateChecker.features.measurement.MeasurementService;
 import Ontdekstation013.ClimateChecker.features.station.Station;
 import Ontdekstation013.ClimateChecker.features.station.StationMapper;
@@ -18,12 +19,7 @@ import Ontdekstation013.ClimateChecker.features.station.endpoint.dto.UpdateStati
 import Ontdekstation013.ClimateChecker.features.station.endpoint.dto.TransferStationRequest;
 import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.UserRole;
-import Ontdekstation013.ClimateChecker.features.user.UserMapper;
-import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.GetAllUsersRequest;
-import Ontdekstation013.ClimateChecker.features.user.endpoint.dto.UserResponse;
 import Ontdekstation013.ClimateChecker.features.workshop.WorkshopService;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -37,6 +33,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -58,56 +55,42 @@ public class StationController {
     @Operation(summary = "Geef een meetstation op id")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "404", description = "Niet gevonden")})
     @GetMapping("{id}")
-    public ResponseEntity<StationDto> getMeetstation(@PathVariable Long id) throws Exception {
-        try {
-            if (id != 0) {
-                StationDto stationDto = stationService.ReadById(id);
-                return ResponseEntity.status(HttpStatus.OK).body(stationDto);
-            }
-        } catch (Exception error) {
-
+    public ResponseEntity<StationDto> getMeetstation(@PathVariable Long id) {
+        StationDto stationDto = id != 0 ? stationService.ReadById(id) : null;
+        if (stationDto == null) {
+            throw new NotFoundException("Station not found");
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        return ResponseEntity.status(HttpStatus.OK).body(stationDto);
     }
 
     @Operation(summary = "Geef alle meetstations, optioneel gefilterd")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer")})
     @GetMapping("/stations")
     public ResponseEntity<?> getAllMeetstations(GetAllStationsRequest request) {
-        try {
-            List<Station> stations = stationService.getAllStations(StationMapper.toStationFilter(request));
-            List<StationDto> responses = new ArrayList<>();
+        List<Station> stations = stationService.getAllStations(StationMapper.toStationFilter(request));
+        List<StationDto> responses = new ArrayList<>();
 
-
-            for (Station station : stations) {
-                responses.add(StationMapper.toStationDTO(station));
-            }
-
-            return ResponseEntity.ok(responses);
-        } catch (InvalidArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Er is een onverwachte fout opgetreden.");
+        for (Station station : stations) {
+            responses.add(StationMapper.toStationDTO(station));
         }
+
+        return ResponseEntity.ok(responses);
     }
 
-// Controller
     @Operation(summary = "Geef meetstations met hun meting op een tijdstip")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer")})
-@GetMapping("/stationsMetMeasurements")
-public CompletableFuture<ResponseEntity<List<StationDto>>> getMeetstationWithMeasurement(
-        @RequestParam(value = "timestamp") String timestamp) {
-    try {
-        Instant utcDateTime = Instant.parse(timestamp);
-        return stationService.getStationsWithMeasurements(utcDateTime)
-            .thenApply(ResponseEntity::ok)
-            .exceptionally(ex -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(null));
-    } catch (Exception e) {
-        return CompletableFuture.completedFuture(
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null));
+    @GetMapping("/stationsMetMeasurements")
+    public CompletableFuture<ResponseEntity<List<StationDto>>> getMeetstationWithMeasurement(
+            @RequestParam(value = "timestamp") String timestamp) {
+        Instant utcDateTime;
+        try {
+            utcDateTime = Instant.parse(timestamp);
+        } catch (DateTimeParseException e) {
+            throw new InvalidArgumentException("Timestamp must be in ISO 8601 format");
+        }
+        // A failing future is turned into a 500 by the central exception handler.
+        return stationService.getStationsWithMeasurements(utcDateTime).thenApply(ResponseEntity::ok);
     }
-}
 
     @Operation(summary = "Pas naam en zichtbaarheid van een station aan (eigenaar of beheerder)")
     @SecurityRequirement(name = OpenApiConfig.BEARER_AUTH)
@@ -151,43 +134,38 @@ public CompletableFuture<ResponseEntity<List<StationDto>>> getMeetstationWithMea
     @ApiResponses({@ApiResponse(responseCode = "200", description = "Gelukt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer")})
     @GetMapping("/measurements/{id}")
     public ResponseEntity<byte[]> getMeetstationMeasurements(@PathVariable int id, @RequestParam String startDate, @RequestParam String endDate) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+        Instant startInstant;
+        Instant endInstant;
         try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
-            LocalDateTime localDateTimeStart = LocalDateTime.parse(startDate, formatter);
-            Instant startInstant = localDateTimeStart.atZone(ZoneId.systemDefault()).toInstant();
-
-            LocalDateTime localDateTimeEnd = LocalDateTime.parse(endDate, formatter);
-            Instant endInstant = localDateTimeEnd.atZone(ZoneId.systemDefault()).toInstant();
-
-            if (startInstant.isAfter(endInstant)) {
-                throw new InvalidArgumentException("Start date is after end date");
-            }
-            byte[] pdfBytes = measurementService.getMeasurementsAsPDF(id, startInstant, endInstant);
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_PDF);
-            headers.setContentDispositionFormData("attachment", "measurements.pdf");
-            headers.setContentLength(pdfBytes.length);
-
-            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
-        } catch (Exception ex) {
-            throw ex;
+            startInstant = LocalDateTime.parse(startDate, formatter).atZone(ZoneId.systemDefault()).toInstant();
+            endInstant = LocalDateTime.parse(endDate, formatter).atZone(ZoneId.systemDefault()).toInstant();
+        } catch (DateTimeParseException e) {
+            throw new InvalidArgumentException("Dates must be in dd-MM-yyyy HH:mm format");
         }
+
+        if (startInstant.isAfter(endInstant)) {
+            throw new InvalidArgumentException("Start date is after end date");
+        }
+        byte[] pdfBytes = measurementService.getMeasurementsAsPDF(id, startInstant, endInstant);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("attachment", "measurements.pdf");
+        headers.setContentLength(pdfBytes.length);
+
+        return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
     }
 
     @Operation(summary = "Controleer of een station beschikbaar is en de workshopcode geldig is")
     @ApiResponses({@ApiResponse(responseCode = "200", description = "Statuscode in de body: 200 ok, 402 station bezet, 403 ongeldige workshopcode"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer")})
     @GetMapping("/Availibility/{stationId}/{workshopCode}")
     public ResponseEntity<Integer> IsAvailable(@PathVariable Long stationId, @PathVariable Long workshopCode) {
-        try {
-            if (!stationService.IsAvailable(stationId)) {
-                return ResponseEntity.status(HttpStatus.OK).body(402);
-            } else if (!adminService.verifyWorkshopCode(workshopCode)) {
-                return ResponseEntity.status(HttpStatus.OK).body(403);
-            }
-            return ResponseEntity.status(HttpStatus.OK).body(200);
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        if (!stationService.IsAvailable(stationId)) {
+            return ResponseEntity.status(HttpStatus.OK).body(402);
+        } else if (!adminService.verifyWorkshopCode(workshopCode)) {
+            return ResponseEntity.status(HttpStatus.OK).body(403);
         }
+        return ResponseEntity.status(HttpStatus.OK).body(200);
     }
 
     @Operation(summary = "Claim een station voor de ingelogde gebruiker")
@@ -207,23 +185,17 @@ public CompletableFuture<ResponseEntity<List<StationDto>>> getMeetstationWithMea
     @ApiResponses({@ApiResponse(responseCode = "201", description = "Station aangemaakt"), @ApiResponse(responseCode = "400", description = "Ongeldige invoer"), @ApiResponse(responseCode = "401", description = "Niet ingelogd"), @ApiResponse(responseCode = "500", description = "Onverwachte fout")})
     @PostMapping("/add")
     public ResponseEntity<?> addStation(@Valid @RequestBody AddStationRequest request) {
-        try {
-            Station station = new Station();
-            station.setStationid(request.stationid() != null ? request.stationid() : request.registrationCode());
-            station.setName(request.name());
-            station.setDatabase_tag("MJS");
-            station.setIs_public(false);
-            station.setIsActive(false);
-            station.setRegistrationCode(request.registrationCode());
-            station.setLocation_locationid(request.location_locationid());
+        Station station = new Station();
+        station.setStationid(request.stationid() != null ? request.stationid() : request.registrationCode());
+        station.setName(request.name());
+        station.setDatabase_tag("MJS");
+        station.setIs_public(false);
+        station.setIsActive(false);
+        station.setRegistrationCode(request.registrationCode());
+        station.setLocation_locationid(request.location_locationid());
 
-            Station savedStation = stationService.addStation(station);
-            return ResponseEntity.status(HttpStatus.CREATED).body(savedStation.toDto());
-        } catch (InvalidArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Er is een fout opgetreden bij het toevoegen van het meetstation.");
-        }
+        Station savedStation = stationService.addStation(station);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedStation.toDto());
     }
 
     // Create station endpoint salvaged from removed DatabasePollingController

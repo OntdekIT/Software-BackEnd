@@ -16,6 +16,7 @@ import Ontdekstation013.ClimateChecker.features.workshop.WorkshopMapper;
 import Ontdekstation013.ClimateChecker.features.workshop.WorkshopService;
 import Ontdekstation013.ClimateChecker.features.workshop.endpoint.dto.WorkshopRequest;
 import Ontdekstation013.ClimateChecker.features.workshop.endpoint.dto.WorkshopResponse;
+import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -41,7 +42,7 @@ public class WorkshopController {
     @Operation(summary = "Maak een workshop met een vervaldatum")
     @ApiResponses({@ApiResponse(responseCode = "201", description = "Workshop aangemaakt"), @ApiResponse(responseCode = "403", description = "Geen toegang")})
     @PostMapping()
-    public ResponseEntity<WorkshopResponse> createNewWorkshop(@RequestBody WorkshopRequest request) {
+    public ResponseEntity<WorkshopResponse> createNewWorkshop(@Valid @RequestBody WorkshopRequest request) {
         Workshop workshop = workshopService.createWorkshop(LocalDateTime.parse(request.expirationDate(), DateTimeFormatter.ISO_DATE_TIME));
         WorkshopResponse response = WorkshopMapper.toResponse(workshop);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
