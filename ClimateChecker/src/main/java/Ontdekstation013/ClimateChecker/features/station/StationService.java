@@ -1,5 +1,6 @@
 package Ontdekstation013.ClimateChecker.features.station;
 
+import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.exception.NotFoundException;
 import Ontdekstation013.ClimateChecker.features.measurement.Measurement;
 import Ontdekstation013.ClimateChecker.features.measurement.MeasurementService;
@@ -7,6 +8,10 @@ import Ontdekstation013.ClimateChecker.features.measurement.endpoint.Measurement
 import Ontdekstation013.ClimateChecker.features.station.endpoint.StationDto;
 import Ontdekstation013.ClimateChecker.features.user.User;
 import Ontdekstation013.ClimateChecker.features.user.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
@@ -77,21 +82,53 @@ public class StationService {
 
     }
 
+    public static final int MAX_PAGE_SIZE = 100;
+    public static final int DEFAULT_PAGE_SIZE = 20;
+
     public List<Station> getAllStations(StationFilter filter) {
-        if (filter.getUsername() != null && !filter.getUsername().isEmpty()) {
-            List<User> users = userRepository.findByFullName(filter.getUsername());
-            if (users.isEmpty()) {
-                return Collections.emptyList();
-            }
-            List<Long> userIds = users.stream().map(User::getUserId).collect(Collectors.toList());
-            filter.setUserIds(userIds);
-        }
-        // Avoid passing an empty list to the IN clause, which is invalid in some databases (e.g. H2)
-        List<Long> userIds = filter.getUserIds();
+        List<Long> userIds = resolveUserIds(filter);
         if (userIds != null && userIds.isEmpty()) {
-            userIds = null;
+            return Collections.emptyList();
         }
         return stationRepository.findStationsByOptionalFilters(filter.getName(), filter.getDatabaseTag(), filter.getIsPublic(), filter.getRegistrationCode(), userIds, filter.getIsActive());
+    }
+
+    /** Paged variant of {@link #getAllStations}, ordered by station id. Uses {@code filter.getPage()} and {@code filter.getPageSize()}. */
+    public Page<Station> getStationsPage(StationFilter filter) {
+        int page = filter.getPage() != null ? filter.getPage() : 0;
+        int pageSize = filter.getPageSize() != null ? filter.getPageSize() : DEFAULT_PAGE_SIZE;
+        if (page < 0) {
+            throw new InvalidArgumentException("page must be 0 or greater");
+        }
+        if (pageSize < 1 || pageSize > MAX_PAGE_SIZE) {
+            throw new InvalidArgumentException("pageSize must be between 1 and " + MAX_PAGE_SIZE);
+        }
+
+        Pageable pageable = PageRequest.of(page, pageSize, Sort.by("stationid"));
+        List<Long> userIds = resolveUserIds(filter);
+        if (userIds != null && userIds.isEmpty()) {
+            return Page.empty(pageable);
+        }
+        return stationRepository.findStationsByOptionalFilters(filter.getName(), filter.getDatabaseTag(), filter.getIsPublic(), filter.getRegistrationCode(), userIds, filter.getIsActive(), pageable);
+    }
+
+    /**
+     * Combines the {@code userid} filter and the {@code username} filter. Returns null when neither
+     * is set (no user restriction) and an empty list when they match no user (no stations).
+     */
+    private List<Long> resolveUserIds(StationFilter filter) {
+        List<Long> userIds = filter.getUserIds();
+        if (filter.getUsername() != null && !filter.getUsername().isEmpty()) {
+            List<Long> usernameIds = userRepository.findByFullName(filter.getUsername()).stream()
+                    .map(User::getUserId)
+                    .collect(Collectors.toList());
+            if (userIds == null) {
+                userIds = usernameIds;
+            } else {
+                userIds = userIds.stream().filter(usernameIds::contains).collect(Collectors.toList());
+            }
+        }
+        return userIds;
     }
 
     @Async

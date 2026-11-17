@@ -3,6 +3,7 @@ package Ontdekstation013.ClimateChecker.features.station.endpoint;
 import Ontdekstation013.ClimateChecker.exception.InvalidArgumentException;
 import Ontdekstation013.ClimateChecker.features.measurement.MeasurementService;
 import Ontdekstation013.ClimateChecker.features.station.Station;
+import Ontdekstation013.ClimateChecker.features.station.StationFilter;
 import Ontdekstation013.ClimateChecker.features.station.StationMapper;
 import Ontdekstation013.ClimateChecker.features.station.StationService;
 import Ontdekstation013.ClimateChecker.features.station.endpoint.dto.GetAllStationsRequest;
@@ -18,6 +19,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -64,22 +66,21 @@ public class StationController {
     }
 
     @GetMapping("/stations")
-    public ResponseEntity<?> getAllMeetstations(GetAllStationsRequest request) {
-        try {
-            List<Station> stations = stationService.getAllStations(StationMapper.toStationFilter(request));
-            List<StationDto> responses = new ArrayList<>();
+    public ResponseEntity<List<StationDto>> getAllMeetstations(GetAllStationsRequest request) {
+        StationFilter filter = StationMapper.toStationFilter(request);
 
-
-            for (Station station : stations) {
-                responses.add(StationMapper.toStationDTO(station));
-            }
-
-            return ResponseEntity.ok(responses);
-        } catch (InvalidArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Er is een onverwachte fout opgetreden.");
+        if (request.isPaged()) {
+            Page<Station> page = stationService.getStationsPage(filter);
+            return ResponseEntity.ok()
+                    .header("X-Total-Count", String.valueOf(page.getTotalElements()))
+                    .body(page.map(StationMapper::toStationDTO).getContent());
         }
+
+        List<StationDto> responses = new ArrayList<>();
+        for (Station station : stationService.getAllStations(filter)) {
+            responses.add(StationMapper.toStationDTO(station));
+        }
+        return ResponseEntity.ok(responses);
     }
 
 // Controller
