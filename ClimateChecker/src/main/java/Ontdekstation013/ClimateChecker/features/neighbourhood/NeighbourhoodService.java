@@ -12,6 +12,7 @@ import Ontdekstation013.ClimateChecker.utility.MeasurementLogic;
 import Ontdekstation013.ClimateChecker.utility.RegionAverageBucketResponse;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 public class NeighbourhoodService {
     private final MeetJeStadService meetJeStadService;
     private final NeighbourhoodRepository neighbourhoodRepository;
+    private final ZoneId applicationZone;
 
     private List<NeighbourhoodDto> getNeighbourhoodsAverageTemp(List<Neighbourhood> neighbourhoods, List<Measurement> measurements) {
         List<NeighbourhoodDto> neighbourhoodDtos = new ArrayList<>();
@@ -231,7 +233,7 @@ public class NeighbourhoodService {
                         stationIds.contains(Math.toIntExact(measurement.getStation().getStationid())))
                 .collect(Collectors.toList());
 
-        return MeasurementLogic.splitIntoDayMeasurements(neighbourhoodMeasurements);
+        return MeasurementLogic.splitIntoDayMeasurements(neighbourhoodMeasurements, applicationZone);
     }
 
     public List<RegionAverageBucketResponse> getRegionAverageHistory(Long regionId, Instant from, Instant to, String granularity) {
@@ -264,7 +266,7 @@ public class NeighbourhoodService {
                         stationIds.contains(Math.toIntExact(m.getStation().getStationid())))
                 .collect(Collectors.toList());
 
-        return MeasurementLogic.splitIntoRegionBuckets(regionMeasurements, granularity);
+        return MeasurementLogic.splitIntoRegionBuckets(regionMeasurements, granularity, applicationZone);
     }
 
     private List<Measurement> filterMeasurementsInPolygon(List<Measurement> measurements, float[][] polygon) {

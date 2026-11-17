@@ -41,8 +41,10 @@ public class StationController {
     private final StationService stationService;
     private final MeasurementService measurementService;
     private final WorkshopService adminService;
+    private final ZoneId applicationZone;
 
-    public StationController(StationService stationService, MeasurementService measurementService, WorkshopService workshopService) {
+    public StationController(StationService stationService, MeasurementService measurementService, WorkshopService workshopService, ZoneId applicationZone) {
+        this.applicationZone = applicationZone;
         this.stationService = stationService;
         this.measurementService = measurementService;
         this.adminService = workshopService;
@@ -133,10 +135,10 @@ public CompletableFuture<ResponseEntity<List<StationDto>>> getMeetstationWithMea
         try {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
             LocalDateTime localDateTimeStart = LocalDateTime.parse(startDate, formatter);
-            Instant startInstant = localDateTimeStart.atZone(ZoneId.systemDefault()).toInstant();
+            Instant startInstant = localDateTimeStart.atZone(applicationZone).toInstant();
 
             LocalDateTime localDateTimeEnd = LocalDateTime.parse(endDate, formatter);
-            Instant endInstant = localDateTimeEnd.atZone(ZoneId.systemDefault()).toInstant();
+            Instant endInstant = localDateTimeEnd.atZone(applicationZone).toInstant();
 
             if (startInstant.isAfter(endInstant)) {
                 throw new InvalidArgumentException("Start date is after end date");

@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class  MeasurementService {
     private final MeetJeStadService meetJeStadService;
+    private final ZoneId applicationZone;
 
     public List<MeasurementDto> getMeasurementsAtTime(Instant dateTime) {
         int minuteMargin = meetJeStadService.getMinuteLimit();
@@ -64,7 +65,7 @@ public class  MeasurementService {
         params.includeFaultyMeasurements = true;
         List<Measurement> measurements = meetJeStadService.getMeasurements(params);
 
-        return MeasurementLogic.splitIntoDayMeasurements(measurements);
+        return MeasurementLogic.splitIntoDayMeasurements(measurements, applicationZone);
     }
 
     /**
@@ -86,7 +87,7 @@ public class  MeasurementService {
         params.includeFaultyMeasurements = false; // netwerkstatistiek zonder uitschieters van defecte sensoren
 
         List<Measurement> measurements = meetJeStadService.getMeasurements(params);
-        return MeasurementLogic.splitIntoNetworkDayMeasurements(measurements);
+        return MeasurementLogic.splitIntoNetworkDayMeasurements(measurements, applicationZone);
     }
 
     public List<HourMeasurementResponse> getHourlyMeasurements(int id, Instant startDate, Instant endDate) {
@@ -97,7 +98,7 @@ public class  MeasurementService {
         params.includeFaultyMeasurements = true;
 
         List<Measurement> measurements = meetJeStadService.getMeasurements(params);
-        return MeasurementLogic.splitIntoHourMeasurements(measurements);
+        return MeasurementLogic.splitIntoHourMeasurements(measurements, applicationZone);
     }
 
     public List<HalfHourMeasurementResponse> getHalfHourlyMeasurements(int id, Instant startDate, Instant endDate) {
@@ -108,7 +109,7 @@ public class  MeasurementService {
         params.includeFaultyMeasurements = true;
 
         List<Measurement> measurements = meetJeStadService.getMeasurements(params);
-        return MeasurementLogic.splitIntoHalfHourMeasurements(measurements);
+        return MeasurementLogic.splitIntoHalfHourMeasurements(measurements, applicationZone);
     }
 
     public byte[] getMeasurementsAsPDF(int id, Instant startDate, Instant endDate){
@@ -130,6 +131,12 @@ public class  MeasurementService {
             PdfWriter.getInstance(document, baos);
             document.open();
 
+            // A PDF without content fails on close ("The document has no pages"), which used to
+            // turn a period without measurements into a 500.
+            if (measurements.isEmpty()) {
+                document.add(new Paragraph("Geen metingen in de gekozen periode."));
+            }
+
             for (Measurement measurement : measurements) {
                 String formattedMeasurement = formatMeasurement(measurement);
                 Paragraph paragraph = new Paragraph(formattedMeasurement);
@@ -146,7 +153,7 @@ public class  MeasurementService {
 
     private String formatMeasurement(Measurement measurement) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String timestampStr = measurement.getTimestamp().atZone(ZoneId.systemDefault()).format(formatter);
+        String timestampStr = measurement.getTimestamp().atZone(applicationZone).format(formatter);
         return String.format("%d: %s - Temp: %.2f - Hum: %.2f - Lat/Long: %.6f / %.6f",
                 measurement.getId(), timestampStr, measurement.getTemperature() != null ? measurement.getTemperature() : 0,
                 measurement.getHumidity() != null ? measurement.getHumidity() : 0, measurement.getLatitude(), measurement.getLongitude());
