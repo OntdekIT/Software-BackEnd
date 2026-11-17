@@ -25,11 +25,11 @@ public class MeasurementDto {
 
     @JsonProperty("latitude")
     @SerializedName("latitude")
-    private float latitude;
+    private Float latitude;
 
     @JsonProperty("longitude")
     @SerializedName("longitude")
-    private float longitude;
+    private Float longitude;
 
     @JsonProperty("temperature")
     @SerializedName("temperature")
@@ -50,6 +50,10 @@ public class MeasurementDto {
     @JsonProperty("is_public")
     @SerializedName("is_public")
     private Boolean is_public;
+
+    @JsonProperty("locationInherited")
+    @SerializedName("locationInherited")
+    private boolean locationInherited;
 
     @JsonProperty("userId")
     private Long userId;

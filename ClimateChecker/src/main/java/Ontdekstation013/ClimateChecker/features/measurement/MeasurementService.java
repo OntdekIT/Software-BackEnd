@@ -164,6 +164,7 @@ public class  MeasurementService {
         dto.setId(Math.toIntExact(entity.getStation().getStationid()));
         dto.setLongitude(entity.getLongitude());
         dto.setLatitude(entity.getLatitude());
+        dto.setLocationInherited(entity.isLocationInherited());
         dto.setTemperature(entity.getTemperature());
         dto.setHumidity(entity.getHumidity());
         dto.setPm10(entity.getPm10());

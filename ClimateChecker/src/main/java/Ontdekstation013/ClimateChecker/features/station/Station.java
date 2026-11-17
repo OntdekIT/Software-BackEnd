@@ -52,6 +52,14 @@ public class Station {
     @Column(name = "loc_error")
     private Boolean locError;
 
+    // Laatst bekende geldige GPS-positie. Metingen zonder geldige positie
+    // krijgen deze positie (zie MeetJeStadService).
+    @Column(name = "last_known_latitude")
+    private Float lastKnownLatitude;
+
+    @Column(name = "last_known_longitude")
+    private Float lastKnownLongitude;
+
     @ManyToOne(optional = true)
     @JoinColumn(name = "user_id", nullable = true, insertable = false, updatable = false)
     private User user;
